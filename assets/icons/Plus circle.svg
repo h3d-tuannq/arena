@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <style type="text/css">
+        .st0{fill:#808080;}
+    </style>
+    <defs><style>.a{opacity:0.3;}.b{fill:#AD2428;}</style></defs>
+    <circle class="a" cx="12" cy="12" r="12"/>
+    <path class="b" d="M12-17.25a.75.75,0,0,1,.743.648l.007.1v9a.75.75,0,0,1-.75.75.75.75,0,0,1-.743-.648l-.007-.1v-9A.75.75,0,0,1,12-17.25Z" transform="translate(0 24)"/>
+    <path class="b" d="M16.5-12.75a.75.75,0,0,1,.75.75.75.75,0,0,1-.648.743l-.1.007h-9A.75.75,0,0,1,6.75-12a.75.75,0,0,1,.648-.743l.1-.007Z" transform="translate(0 24)"/>
+</svg>
