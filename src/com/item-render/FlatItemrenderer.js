@@ -73,23 +73,53 @@ class FlatItemrenderer extends PureComponent{
                 </View>
 
                 <View style={styles.info}>
-                        <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
-                            {model.code+""}
-                        </Text>
 
-                        <Text style={{fontSize:Style.MIDLE_SIZE , paddingTop:5, paddingRight:5}}>
-                            {model.status+""}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE , paddingTop:5, paddingRight:5}}>
-                            {model.building ? model.building.name+"" : ""}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE,  paddingTop:5, paddingRight:5}}>
-                            { model.customer? model.customer.name+"" : ""}
-                        </Text>
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Mã:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
+                                {model.code+""}
+                            </Text>
+                        </View>
 
-                        <Text style={{fontSize:Style.MIDLE_SIZE,  paddingTop:5, paddingRight:5}}>
-                            { model.deliver_date+""}
-                        </Text>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Trạng thái:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingTop:5, paddingRight:5}}>
+                                {model.status+""}
+                            </Text>
+                        </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Dự án:" + ' '}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingTop:5, paddingRight:5}}>
+                                {model.building ? model.building.name+"" : ""}
+                            </Text>
+                        </View>
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Khách hàng:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE,  paddingTop:5, paddingRight:5}}>
+                                { model.customer? model.customer.name+"" : ""}
+                            </Text>
+                        </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Ngày bàn giao:" + ''}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE,  paddingTop:5, paddingRight:5}}>
+                                { model.deliver_date ? Def.getDateString(new Date(model.deliver_date *1000), "dd-MM-yyyy") : ""}
+                            </Text>
+                        </View>
                 </View>
 
 

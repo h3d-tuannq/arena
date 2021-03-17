@@ -12,7 +12,7 @@ export default class Style{
     static BOTTOM_HEIGHT = PixelRatio.get() < 2? 70:80;
 
     static DEFAUT_RED_COLOR = '#AD2428';
-    static DEFAUT_BLUE_COLOR = '#e51c8b';// '#305E74';
+    static DEFAUT_BLUE_COLOR = '#783148';// '#305E74';
 
     static GREY_TEXT_COLOR = '#b3b3b3';
     static GREY_BACKGROUND_COLOR = "#e6e6e6";
