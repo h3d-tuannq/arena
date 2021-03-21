@@ -5,6 +5,7 @@ import Style from "../../../src/def/Style";
 import Def from "../../../src/def/Def";
 import FlatItemrenderer from "../item-render/FlatItemrenderer";
 import ProductItemrenderer from "../item-render/ProductItemrenderer";
+import RequestRepairRenderer from "../item-render/RequestRepairRenderer";
 
 const {width, height} = Dimensions.get('window');
 
@@ -47,6 +48,12 @@ class ProgramVerList extends React.Component{
             return (
                 <View style={{paddingLeft : 10}}>
                     {
+                        this.props.type == 'request-repair'?
+                            <RequestRepairRenderer
+                                item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
+                                styleImage={{width: PROGRAM_IMAGE_WIDTH / 3, height: PROGRAM_IMAGE_WIDTH / 3}}
+                                type={this.props.type}
+                            /> :
                         this.props.type == 'flat'?
                         <FlatItemrenderer
                         item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
@@ -72,7 +79,7 @@ class ProgramVerList extends React.Component{
         return (
             <View style={styles.container}>
                 <FlatList
-                    style={[{},{ marginBottom :  0, backgroundColor:'#fff'}]}
+                    style={[this.props.styleList,{ marginBottom :  0 , backgroundColor:'#fff'}]}
                     data={this.props.data ? this.props.data : [] }
                     renderItem={this.props.renderFunction ? this.props.renderFunction :renderItem}
                     keyExtractor={(item,index) => item.id + "" + index.toString()}

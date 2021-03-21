@@ -148,7 +148,7 @@ class ProductDetailScreen extends React.Component {
 
     getRequestRepairSuccess(data){
 
-        console.log('get Data Success : ' + JSON.stringify(data));
+        // console.log('get Data Success : ' + JSON.stringify(data));
         if( data['result']  && data['request_repairs']){
             Def.requestRepairsTree[this.state.item.id] = data['request_repairs'];
             this.setState({requestRepairs:Def.requestRepairsTree[this.state.item.id]});
@@ -172,13 +172,13 @@ class ProductDetailScreen extends React.Component {
 
         const renderItem = ({item}) => {
             return (
-                <View style={{paddingLeft : 10}}>
+                <View style={{}}>
                             <RequestRepairRenderer
                                 item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
                                 styleImage={{width: PROGRAM_IMAGE_WIDTH / 3, height: PROGRAM_IMAGE_WIDTH / 3}}
                                 type={this.props.type}
                             />
-                    }
+
                 </View>
             )
         }
@@ -240,23 +240,28 @@ class ProductDetailScreen extends React.Component {
                     </ScrollView>
                 </View>
 
-                <View style={{marginTop:10}}>
+                <View style={{marginTop:10, flex:1}}>
                     <Text style={{paddingHorizontal : 10}}>
                         {"Lịch sử chỉnh sửa:" + ' '}
                     </Text>
                     <ProgramVerList
+                        // styleList={{maxHeight : height /2 - 100}}
                         data={this.state.requestRepairs}
                         navigation={this.props.navigation}
                         type={'request-repair'}
                         numColumns={1}
-                        itemRenderer={RequestRepairRenderer}
                         renderFunction={renderItem}
                         stack={'Flat'}
                         screen={'request-repair-detail'}
                         addToCart={this.addToCart}
                     />
-
-
+                </View>
+                <View >
+                    <TouchableOpacity style={styles.bookingBtn}>
+                        <Text style={Style.text_styles.whiteTitleText}>
+                            Thêm giỏ hàng
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         )
@@ -335,7 +340,8 @@ const styles = StyleSheet.create({
         // justifyContent: 'space-around',
         // paddingVertical: 5,
         // backgroundColor : 'red'
-    }
+    },
+
 
 });
 

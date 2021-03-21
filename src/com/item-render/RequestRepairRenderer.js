@@ -52,9 +52,18 @@ const styles = StyleSheet.create({
         // paddingHorizontal : 10
     },
     content: {
+        width : width - 20,
         paddingLeft : 10,
+        flexDirection: 'row'
 
     },
+
+    itemImage: {
+        width : width / 5,
+        height : width / 7,
+        borderRadius : 5,
+    },
+
     author : {
         fontSize : Style.MIDLE_SIZE,
         fontWeight: 'bold',
