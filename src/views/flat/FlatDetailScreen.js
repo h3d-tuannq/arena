@@ -3,10 +3,12 @@ import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Style from '../../def/Style';
+import FlatHelper from  '../../def/FlatHelper'
+
 import ProgramVerList from '../../com/common/ProgramVerList';
 
-const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
-const PROGRAM_IMAGE_HEIGHT = (width - 30-8) /2;
+const PROGRAM_IMAGE_WIDTH = (width - 38) /2;
+const PROGRAM_IMAGE_HEIGHT = (width) /3;
 const carouselItems = [
     {
         id:1,
@@ -18,13 +20,10 @@ const carouselItems = [
     }
 ];
 
-class FlatDetailList extends React.Component {
+class FlatDetailScreen extends React.Component {
 
     constructor(props){
         super(props);
-        this.onGetDesignSuccess     = this.onGetDesignSuccess.bind(this);
-        this.onGetDesignFalse     = this.onGetDesignFalse.bind(this);
-
         this.formatText    = this.formatText.bind(this);
         this.refresh     = this.refresh.bind(this);
         this.addToCart = this.addToCart.bind(this);
@@ -96,75 +95,119 @@ class FlatDetailList extends React.Component {
 
 
     addToCart = (item) => {
-        this.setState({choseProduct:false});
-        let store = this.state.item;
-        let store_cart = [];
-
-        if(Def.cart_data[store.organ.id]) {
-            store_cart = Def.cart_data[store.organ.id];
-        } else {
-            store_cart['store'] = store;
-            store_cart['data'] = [];
-        }
-        const found = store_cart['data'].findIndex(element => element.product.id == item.id);
-        if(found !== -1){
-            store_cart['data'][found].amount++;
-            store_cart['data'][found].selectValue = true;
-        } else {
-            let orderItem = {
-                product:item,
-                selectValue: true,
-                amount:1,
-            }
-
-            store_cart['data'].push(orderItem);
-        }
-        Def.cart_data[store.id] = store_cart;
-        AsyncStorage.setItem('cart_data', JSON.stringify(Def.cart_data));
+        // this.setState({choseProduct:false});
+        // let store = this.state.item;
+        // let store_cart = [];
+        //
+        // if(Def.cart_data[store.organ.id]) {
+        //     store_cart = Def.cart_data[store.organ.id];
+        // } else {
+        //     store_cart['store'] = store;
+        //     store_cart['data'] = [];
+        // }
+        // const found = store_cart['data'].findIndex(element => element.product.id == item.id);
+        // if(found !== -1){
+        //     store_cart['data'][found].amount++;
+        //     store_cart['data'][found].selectValue = true;
+        // } else {
+        //     let orderItem = {
+        //         product:item,
+        //         selectValue: true,
+        //         amount:1,
+        //     }
+        //
+        //     store_cart['data'].push(orderItem);
+        // }
+        // Def.cart_data[store.id] = store_cart;
     }
 
     render() {
         const {navigation} = this.props;
+        const {item} = this.state;
         const configMenu = Def.config_design_menu;
         Def.order_number = 20;
-        // const ListHeader = () => (
-        //     <View>
-        //         <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
-        //             <View style={{marginLeft:15, paddingBottom:8}}>
-        //                 <Text style={styles.titleStyle}>{this.state.item.material_relation.length + " Sản phẩm"}</Text>
-        //             </View>
-        //         </View>
-        //     </View>
-        // );
+        const ListHeader = () => (
+            <View>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
+                    <View style={{marginLeft:15, paddingBottom:8}}>
+                        <Text style={styles.titleStyle}>{(this.state.item.productInstanceFlat ? this.state.item.productInstanceFlat.length : 0) + " Sản phẩm"}</Text>
+                    </View>
+                </View>
+            </View>
+        );
 
 
         return (
             <View style={{flex:1}}>
-                {/*<View style={{height:height /3}}>*/}
-                    {/*<WebView*/}
-                        {/*ref={(ref) => (this.webview = ref)}*/}
-                        {/*originWhitelist={['intent://*', 'https://vr.house3d.com']}*/}
-                        {/*onShouldStartLoadWithRequest={this.handleWebViewNavigationStateChange}*/}
-                        {/*source={{ uri: this.state.item.panorama_url }}*/}
-                    {/*/>*/}
-                {/*</View>*/}
-                {/*<View style={{flex:1, paddingTop:5}}>*/}
-                    {/*<ProgramVerList*/}
-                        {/*data={this.state.item.material_relation}*/}
-                        {/*navigation={this.props.navigation}*/}
-                        {/*header={ListHeader}*/}
-                        {/*type={'product'}*/}
-                        {/*numColumns={2}*/}
-                        {/*stack={'Product'}*/}
-                        {/*screen={'product-detail'}*/}
-                        {/*addToCart={this.addToCart}*/}
-                    {/*/>*/}
-                {/*</View>*/}
+                <View style={{width : width,height:PROGRAM_IMAGE_HEIGHT + 10 , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
+                    <View style={styles.imageContainer}>
+                        {item.design && item.design.image_path ?
+                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.design.image_path)}}  />
+                            :
+                            <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
+                        }
+                    </View>
+                    <View style={styles.info}>
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Mã:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
+                                {item.code+""}
+                            </Text>
+                        </View>
 
-                <Text>
-                    Detail Scheme
-                </Text>
 
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Trạng thái:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {Def.getFlatStatusName(item.status)+""}
+                            </Text>
+                        </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Dự án:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {item.building ? item.building.name+"" : ""}
+                            </Text>
+                        </View>
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Khách hàng:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                { item.customer? item.customer.name+"" : ""}
+                            </Text>
+                        </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Ngày bàn giao:" + ''}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : ""}
+                            </Text>
+                        </View>
+                    </View>
+
+                </View>
+                <View style={{flex:1, paddingTop:5 }}>
+                    <ProgramVerList
+                        data={this.state.item.productInstanceFlat}
+                        navigation={this.props.navigation}
+                        header={ListHeader}
+                        type={'product'}
+                        numColumns={2}
+                        stack={'Flat'}
+                        screen={'product-detail'}
+                        addToCart={this.addToCart}
+                    />
+                </View>
             </View>
         )
     }
@@ -195,18 +238,35 @@ const styles = StyleSheet.create({
         height: width/2,
 
     },
+    imageContainer:{
+        flex: 2,
+        borderRadius :5,
+        justifyContent:'center',
+        padding: 10,
+        marginTop:5,
+    },
+
     programListStyle : {
 
     },
     itemImage: {
-        width: PROGRAM_IMAGE_WIDTH -5,
+        width: PROGRAM_IMAGE_WIDTH,
         height : PROGRAM_IMAGE_HEIGHT -5,
         borderRadius: 5,
     },
     titleStyle : {
         fontSize : Style.BIG_SIZE,
         color: Style.GREY_TEXT_COLOR,
+    },
+    info: {
+        marginLeft:5,
+        flex: 2.2,
+        // backgroundColor : 'red',
+        marginTop : 5,
+        // justifyContent: 'space-around',
+        // paddingVertical: 5,
+        // backgroundColor : 'red'
     }
 });
 
-export default FlatDetailList;
+export default FlatDetailScreen;

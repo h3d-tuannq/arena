@@ -22,6 +22,7 @@ import PolicyIcon from './assets/icon/icon-policy.svg';
 import GuideIcon from './assets/icon/icon-how-to-use.svg'
 import RuleIcon from './assets/icon/icon-rule.svg';
 
+import {createStackNavigator} from '@react-navigation/stack';
 
 import BackIcon from './assets/icon/icon-back.svg';
 
@@ -52,7 +53,7 @@ function CustomDrawerContent(props) {
                     }}>
                     <BackIcon width={25} height={25} />
                 </TouchableOpacity>
-                <Text style={{marginLeft: 30, fontSize:(Def.email == null || Def.email == '') ? Style.TITLE_SIZE : Style.NORMAL_SIZE, color: '#fff'}}>
+                <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
                     {Def.email == null || Def.email == '' ? 'Cài đặt' : 'Cài đặt'}
                 </Text>
                 <View />
@@ -161,6 +162,18 @@ function HomeScreen({ navigation }) {
     );
 }
 
+const RootStack = createStackNavigator();
+
+function AppStack() {
+    return (
+        <RootStack.Navigator headerMode="none">
+            <RootStack.Screen name="Flat" component={FlatStack} />
+            <RootStack.Screen name="Login" component={LoginStack} />
+        </RootStack.Navigator>
+        );
+
+}
+
 
 function AppDrawer() {
     const iconSize = true <2 ? 18 : 20;
@@ -178,7 +191,7 @@ function AppDrawer() {
         >
             <Drawer.Screen
                 name="Flat"
-                component={FlatStack}
+                component={AppStack}
                 options={{
                     drawerIcon: ({focused: boolean, color: string, size: number}) => {
                         return <GuideIcon width={iconSize} height={iconSize} />;

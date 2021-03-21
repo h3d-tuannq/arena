@@ -1,5 +1,5 @@
 import {PureComponent} from "react";
-import {Image, StyleSheet, TouchableOpacity, Text, View,Alert} from "react-native";
+import {Image, StyleSheet, TouchableOpacity, Text, View,Alert, Dimensions} from "react-native";
 
 import DefaultProgramImage from "../../../assets/icon/logo-vov.svg";
 import React from "react";
@@ -8,6 +8,11 @@ import PlusCircleIcon from "../../../assets/icons/Plus circle.svg";
 
 import Def from '../../def/Def'
 import Style from "../../def/Style";
+
+const {width,height} = Dimensions.get('window');
+
+const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
+const PROGRAM_IMAGE_HEIGHT = (width - 30-8) /2;
 
 class ProductItemrenderer extends PureComponent{
     state = {
@@ -20,28 +25,13 @@ class ProductItemrenderer extends PureComponent{
     constructor(props) {
         super(props);
     }
-
-
-    formatText(text, maxCharacter = 20){
-        let rs = text;
-        // if(this.props.type == "product"){
-        //     rs = text.replace("Sản phẩm ", '');
-        // }
-
-        if(text.length > maxCharacter -2){
-            rs = text.substring(0, maxCharacter -2) + " ...";
-        }
-        return rs;
-    }
-
-
     render(){
         const model = this.props.item;
         const click = this.props.click;
         return (
-            <View>
+            <View style={{justifyContent : 'center', alignItems:'center' , marginVertical : 3 , marginLeft:1}}>
 
-            <TouchableOpacity style={[styles.itemStyle, this.props.styleImage]} onPress={
+            <TouchableOpacity style={[styles.itemStyle]} onPress={
                 () => {
                     click(model);
                 }
@@ -61,18 +51,21 @@ class ProductItemrenderer extends PureComponent{
                 }
 
 
-                {model.image_path ?
-                    <Image  style={[this.props.styleImage, styles.imageStyle ]}  source={{uri: Def.getThumnailImg(model.image_path)}}  />
-                    :
-                    <DefaultProgramImage style={styles.imageStyle} width={this.props.styleImage.width} height={this.props.styleImage.height}/>
+                {
+                    model.productInstance && model.productInstance && model.productInstance.product.image_path ?
+
+                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(model.productInstance.product.image_path)}}  />
+                        :
+                        <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
+
                 }
 
                 </TouchableOpacity>
 
                 <View style = {{width:this.props.styleImage.width, justifyContent:'center', alignItems: (this.props.type == 'product' ? 'flex-start' :'center')}}>
 
-                    <Text style={[{position: 'absolute',zIndex:3 , paddingHorizontal : 4 , paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor: this.props.type == 'product' ? Style.DEFAUT_BLUE_COLOR :Style.DEFAUT_RED_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                          {this.formatText(this.props.type == 'product' ? model.model :model.name, 15)}
+                    <Text style={[{position: 'absolute',zIndex:3 , paddingHorizontal : 5 , left : 5 , paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor: this.props.type == 'product' ? Style.DEFAUT_BLUE_COLOR :Style.DEFAUT_RED_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
+                          {Def.formatText(this.props.type == 'product' ? model.productInstance.code :model.productInstance.code, 15)}
                     </Text>
                 </View>
             </View>
@@ -80,19 +73,18 @@ class ProductItemrenderer extends PureComponent{
         )
     }
 }
-
 const  styles = StyleSheet.create({
     itemStyle : {
             borderRadius: 5,
             marginRight: 5,
             alignItems : 'flex-start',
             marginTop: 5,
+            justifyContent : 'center',
+            borderWidth : 2,
+            borderColor : Style.DEFAUT_BLUE_COLOR
 
     },
-    imageStyle : {
 
-        borderRadius: 5,
-    },
 
     favoriteIcon : {
         width:20,
@@ -102,7 +94,12 @@ const  styles = StyleSheet.create({
         right: 3,
         zIndex : 10,
         padding : 5,
-    }
+    } ,
+    itemImage: {
+        width: PROGRAM_IMAGE_HEIGHT -5,
+        height : PROGRAM_IMAGE_HEIGHT -5,
+        borderRadius: 5,
+    },
 });
 
 export default ProductItemrenderer;

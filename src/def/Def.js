@@ -66,6 +66,9 @@ export default class Def {
 
     static OrderStatus = {0: "Chưa tiếp nhận", 1: "Xác nhận", 2: "Thanh toán", 3: "Giao hàng", 4: "Hoàn thành"}; // DRAFT, CONFIRM, PAID, DELIVERING, ACCOMPLISHED
 
+    static FlatSTatusList = {0: "Chưa kích hoạt", 1: "Hoạt động", 2: "Hoàn thành nghĩa vụ tài chính", 3: "Đủ điều kiện bàn giao", 4: "Đang bàn giao", 5:"Đã ký nhận bàn giao" , 6:"Sữa chữa sau bàn giao", 8:"Đã hoàn thiện hồ sơ", 7:"Đã hoàn thành"};
+    static FlatSTatusColorList = {0: '#D33724', 1: '#008D4C', 2: '#337AB7', 3: '#605CA8', 4: '#F39C12', 5:'#FF851B' , 6:' #000', 8:'#ccc', 7:'#000'};
+
     static news_data = null;
     static collection_data = null;
     static design_data = null;
@@ -308,6 +311,18 @@ export default class Def {
 
     }
 
+    static formatText(text, maxCharacter = 20){
+        let rs = text;
+        // if(this.props.type == "product"){
+        //     rs = text.replace("Sản phẩm ", '');
+        // }
+
+        if(text.length > maxCharacter -2){
+            rs = text.substring(0, maxCharacter -2) + " ...";
+        }
+        return rs;
+    }
+
     static createPaymentUrl(orderId){
         console.log('UserInfo: ' + JSON.stringify(Def.user_info));
         $rsUrl = Def.URL_BASE + '/user/sign-in/login-by-access-token?token=' + Def.user_info['access_token']+'&redirectUrl=' + Def.URL_BASE + '/payment?id=' + orderId;
@@ -322,5 +337,31 @@ export default class Def {
     static checkInCart($product){
 
     }
+
+    static getFlatStatusName( statusFilter = 0 ){
+        return Def.FlatSTatusList[statusFilter];
+    }
+
+    static getFlatStatusColor( statusFilter = 0 ){
+        return Def.FlatSTatusColorList[statusFilter];
+    }
+
+    static PRODUCT_ACTIVE_STATUS = 1; // Đạt
+    static PRODUCT_REPAIRED_STATUS = 2 ; // Đã chỉnh sửa
+    static PRODUCT_UNACTIVE_STATUS = 0; // Không đạt
+
+    static ProductStatusName = {0:"Không đạt", 1:"Đạt", 2:'Đã chỉnh sửa'};
+    static ProductStatusColor = {0:"#FF0000", 1:"'#00FF04'", 2: '#FFAE00'};
+
+    static getProductStatusName(status){
+        return  Def.ProductStatusName[status];
+    }
+
+    static getProductStatusColor(status){
+        return  Def.ProductStatusColor[status];
+    }
+
+    static requestRepairsTree = [];
+
 
 }

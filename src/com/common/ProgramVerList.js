@@ -4,6 +4,7 @@ import {View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions} from 're
 import Style from "../../../src/def/Style";
 import Def from "../../../src/def/Def";
 import FlatItemrenderer from "../item-render/FlatItemrenderer";
+import ProductItemrenderer from "../item-render/ProductItemrenderer";
 
 const {width, height} = Dimensions.get('window');
 
@@ -44,24 +45,36 @@ class ProgramVerList extends React.Component{
         const {iconStyleHome, titleStyle,titleView, } = styles;
         const renderItem = ({item}) => {
             return (
-
                 <View style={{paddingLeft : 10}}>
                     {
-                            <FlatItemrenderer
-                                item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
-                                styleImage={{width: PROGRAM_IMAGE_WIDTH , height: PROGRAM_IMAGE_HEIGHT}}
-                                type={this.props.type}
-                            />
+                        this.props.type == 'flat'?
+                        <FlatItemrenderer
+                        item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
+                        styleImage={{width: PROGRAM_IMAGE_WIDTH, height: PROGRAM_IMAGE_HEIGHT}}
+                        type={this.props.type}
+                        />
+                        :
+                        <ProductItemrenderer
+                            item ={item} click={this.itemClick}
+                            styleImage={{width: PROGRAM_IMAGE_WIDTH /2, height: PROGRAM_IMAGE_HEIGHT}}
+                            type={this.props.type}
+                        />
                     }
+
                 </View>
             )
-        }
+        };
+
+
+
+
+
         return (
             <View style={styles.container}>
                 <FlatList
                     style={[{},{ marginBottom :  0, backgroundColor:'#fff'}]}
                     data={this.props.data ? this.props.data : [] }
-                    renderItem={renderItem}
+                    renderItem={this.props.renderFunction ? this.props.renderFunction :renderItem}
                     keyExtractor={(item,index) => item.id + "" + index.toString()}
                     showsHorizontalScrollIndicator={false}
                     numColumns={this.props.numColumns ?  this.props.numColumns : 1}

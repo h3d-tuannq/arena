@@ -4,6 +4,9 @@ import {Image, StyleSheet, TouchableOpacity, Text, View, Alert, Dimensions} from
 const {width, height} = Dimensions.get('window');
 
 import DefaultProgramImage from "../../../assets/icon/logo-vov.svg";
+
+import DefaultProgram from "../../../assets/icon/default_arena.jpg"
+
 import React from "react";
 import FavoriteIcon from "../../../assets/icon/icon-unlike.svg";
 import FavoriteIconSelect from "../../../assets/icon/icon-like.svg";
@@ -67,7 +70,7 @@ class FlatItemrenderer extends PureComponent{
                     {model.design && model.design.image_path ?
                         <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(model.design.image_path)}}  />
                         :
-                        <DefaultProgramImage  width={styles.itemImage.width} height={styles.itemImage.height}/>
+                        <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }
 
                 </View>
@@ -88,8 +91,8 @@ class FlatItemrenderer extends PureComponent{
                             <Text>
                                 {"Trạng thái:" + ' '}
                             </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingTop:5, paddingRight:5}}>
-                                {model.status+""}
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {Def.getFlatStatusName(model.status)+""}
                             </Text>
                         </View>
 
@@ -98,7 +101,7 @@ class FlatItemrenderer extends PureComponent{
                                 {"Dự án:" + ' '}
                             </Text>
 
-                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingTop:5, paddingRight:5}}>
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
                                 {model.building ? model.building.name+"" : ""}
                             </Text>
                         </View>
@@ -106,7 +109,7 @@ class FlatItemrenderer extends PureComponent{
                             <Text>
                                 {"Khách hàng:" + ' '}
                             </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE,  paddingTop:5, paddingRight:5}}>
+                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
                                 { model.customer? model.customer.name+"" : ""}
                             </Text>
                         </View>
@@ -116,7 +119,7 @@ class FlatItemrenderer extends PureComponent{
                                 {"Ngày bàn giao:" + ''}
                             </Text>
 
-                            <Text style={{fontSize:Style.MIDLE_SIZE,  paddingTop:5, paddingRight:5}}>
+                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
                                 { model.deliver_date ? Def.getDateString(new Date(model.deliver_date *1000), "dd-MM-yyyy") : ""}
                             </Text>
                         </View>

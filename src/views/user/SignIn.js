@@ -11,10 +11,9 @@ import {
     Modal,PixelRatio, Keyboard
 } from 'react-native'
 import Style from "../../../src/def/Style";
-import FacebookIcon from '../../../assets/icon/icon-facebook.svg'
-import GoogleIcon from '../../../assets/icon/icon-google.svg'
-import ZaloIcon from '../../../assets/icon/icon-zalo.svg'
 import Def from "../../../src/def/Def";
+
+import UserController from '../../../src/controller/UserController'
 
 const {width,height} = Dimensions.get('window');
 
@@ -31,8 +30,8 @@ export default class SignIn extends Component {
         super(props);
         this.state = {
             focus : 0,
-            email:"",
-            password:"",
+            email:"admin",
+            password:"123123",
             isLoging : false,
         }
         this.signIn = this.signIn.bind(this);
@@ -48,13 +47,15 @@ export default class SignIn extends Component {
     }
 
     signIn(){
-        if(!this.state.email.includes("@", 0) && !this.state.email.includes(".", 0)){
+        console.log('Email : ' + this.state.email);
+        if(!this.state.email){
             alert("Email không đúng định dạng");
         } else if(this.state.password.length < 6){
             alert("Mật khẩu phải dài hơn 8 ký tự");
         }else{
             const {navigation} = this.props;
             this.setState({isLoging:true});
+            UserController.login(this.state.email,this.state.password,navigation, this.loginSuccessCallback, this.loginFalseCallback);
         }
     }
 
@@ -95,7 +96,6 @@ export default class SignIn extends Component {
 
         return (
             <View style={wraper}>
-
                 <View style={[loginform, {marginTop:-10}]}>
                     <TextInput
                         onFocus={() => this.setState({focus:1})}
@@ -123,33 +123,13 @@ export default class SignIn extends Component {
                     />
 
                     <View style={{flexDirection: 'row', justifyContent : 'flex-end', alignItems : 'center' , marginTop:10 }}>
-                        <TouchableOpacity style={{alignItems: 'center', marginRight : 20}} onPress={()=> {
-                            navigation.navigate('forgetPass');
-                        }}>
-                            <Text style={{fontSize:Style.MIDLE_SIZE, color:'#b3b3b3'}}>
-                                Quên mật khẩu?
-                            </Text>
-                        </TouchableOpacity>
-
                         <TouchableOpacity style={loginButton} onPress={()=>this.signIn()}>
                             <Text style={loginText}>
                                 Đăng nhập
                             </Text>
                         </TouchableOpacity>
-
                     </View>
                     <LoadingModal visible={this.state.isLoging}/>
-
-                    <TouchableOpacity style={{alignItems: 'center', marginTop : 20, paddingVertical: 5,marginRight : 20, flexDirection : 'row', maxWidth: width -20}} onPress={()=> {
-                        navigation.navigate('signUp');
-                    }}>
-                        <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
-                            Bạn chưa có tài khoản?
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE, marginLeft:5 , color:Style.DEFAUT_RED_COLOR}}>
-                            Đăng ký ngay
-                        </Text>
-                    </TouchableOpacity>
                 </View>
             </View>
         )

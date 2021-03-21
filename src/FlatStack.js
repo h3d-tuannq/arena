@@ -5,6 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import FlatListScreen from './views/flat/FlatListScreen';
 import FlatDetailScreen from './views/flat/FlatDetailScreen';
+import ProductDetailScreen from './views/flat/ProductDetailScreen'
 import MenuIcon from '../assets/icon/menu.svg';
 
 import BackIconSvg from '../assets/icon/icon-back.svg'
@@ -22,7 +23,7 @@ class FlatStack extends React.Component {
         return (
             <RootStack.Navigator>
                 <RootStack.Screen name="flat-screen" component={FlatListScreen} options={{
-                    title: "Căn hộ",
+                    title: "Danh sách căn hộ",
                     headerLeft: () => (
                         <TouchableOpacity
                             style={
@@ -68,6 +69,23 @@ class FlatStack extends React.Component {
                         return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
                     }
                 }} />
+
+                <RootStack.Screen name="product-detail" component={ProductDetailScreen} options={{
+                    title: 'Chi tiết sản phẩm',
+                    headerStyle: {
+                        backgroundColor: Style.DEFAUT_BLUE_COLOR,
+                        height: Style.HEADER_HEIGHT,
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+
+                    },
+                    headerBackImage: ()=> {
+                        return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
+                    }
+                }} />
+
+
             </RootStack.Navigator>
         )
     }
