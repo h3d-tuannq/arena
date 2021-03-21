@@ -46,14 +46,14 @@ const styles = StyleSheet.create({
        flexDirection : 'row',
        justifyContent : 'space-between',
        marginVertical :5,
-       marginHorizontal:10,
+       // marginHorizontal:10,
         borderRadius : 5,
         paddingVertical:5,
         // paddingHorizontal : 10
     },
     content: {
         width : width - 20,
-        paddingLeft : 10,
+        // paddingLeft : 10,
         flexDirection: 'row'
 
     },

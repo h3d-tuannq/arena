@@ -240,7 +240,7 @@ class ProductDetailScreen extends React.Component {
                     </ScrollView>
                 </View>
 
-                <View style={{marginTop:10, flex:1}}>
+                <View style={{marginTop:10, flex:1, marginBottom:25}}>
                     <Text style={{paddingHorizontal : 10}}>
                         {"Lịch sử chỉnh sửa:" + ' '}
                     </Text>
@@ -255,14 +255,24 @@ class ProductDetailScreen extends React.Component {
                         screen={'request-repair-detail'}
                         addToCart={this.addToCart}
                     />
-                </View>
-                <View >
+                </View >
+
+                <View style={{flexDirection:'row', paddingBottom : 5}}>
                     <TouchableOpacity style={styles.bookingBtn}>
                         <Text style={Style.text_styles.whiteTitleText}>
-                            Thêm giỏ hàng
+                            Yêu cầu sữa chữa
                         </Text>
                     </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.bookingBtn}>
+                        <Text style={Style.text_styles.whiteTitleText}>
+                            Hoàn thành
+                        </Text>
+                    </TouchableOpacity>
+
                 </View>
+
+
             </View>
         )
     }
@@ -328,9 +338,12 @@ const styles = StyleSheet.create({
     },
     bookingBtn : {
         backgroundColor: Style.DEFAUT_RED_COLOR,
-        height: 60,
+        height: 45,
         justifyContent : 'center',
         alignItems: 'center',
+        flex:1, paddingHorizontal : 10,
+        marginHorizontal : 10,
+        borderRadius:10
     },
     info: {
         marginLeft:5,
