@@ -15,24 +15,32 @@ class RequestRepairRenderer extends React.PureComponent{
         return (
             <View style={styles.comment}>
                 <View style={styles.content}>
+                    <View style={styles.imageContainer}>
                     {
                         item.image_path ?
                         <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
                         :
                         <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }
-                    <Text style={styles.author}>
-                        {item.reporter_id}
-                    </Text>
-                    <Text style={styles.commentContent}>
-                        {item.note ? item.note : "" }
-                    </Text>
+                    </View>
+                    <View style={styles.infoContainer}>
+                        <View style={{flexDirection:'row', justifyContent: 'space-between', paddingRight:5}}>
+                            <Text style={styles.author}>
+                                {item.reporter_id}
+                            </Text>
+                            <View style={styles.date}>
+                            <Text style={{fontSize: Style.SMALL_SIZE, color: Style.GREY_TEXT_COLOR}}>{Def.getDateString(new Date(item.date * 1000), "dd-MM-yyyy")}
+                            </Text>
+                            </View>
+                        </View>
+                        <Text style={styles.commentContent}>
+                            {item.note ? Def.formatText(item.note , 100) : "" }
+                        </Text>
+                    </View>
+
 
                 </View>
-                {/*<View style={styles.date}>*/}
-                    {/*<Text style={{fontSize: Style.SMALL_SIZE, color: Style.GREY_TEXT_COLOR}}>{item.create_datetime.split(" ")[1] + " " + (item.create_datetime.split(" ")[0]).split("-")[2] + "/"+ (item.create_datetime.split(" ")[0]).split("-")[1] + "/"+ (item.create_datetime.split(" ")[0]).split("-")[0] }*/}
-                    {/*</Text>*/}
-                {/*</View>*/}
+
 
             </View>
         )
@@ -63,7 +71,13 @@ const styles = StyleSheet.create({
         height : width / 7,
         borderRadius : 5,
     },
+    imageContainer: {
+       flex:2,
+    },
 
+    infoContainer:{
+       flex:6,
+    },
     author : {
         fontSize : Style.MIDLE_SIZE,
         fontWeight: 'bold',
