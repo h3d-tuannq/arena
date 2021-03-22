@@ -1,71 +1,29 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList} from 'react-native'
+import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList , Modal, TouchableWithoutFeedback} from 'react-native'
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import RequestRepairRenderer from '../../../src/com/item-render/RequestRepairRenderer';
 import ProgramVerList from  '../../../src/com/common/ProgramVerList'
-
-
+import RequestRepairDetailModal from  '../../../src/com/modal/RequestRepairDetailModal'
 
 import Style from '../../def/Style';
 import FlatController from "../../controller/FlatController";
+import RequestRepairModalForm from "../../com/modal/RequestRepairModalForm";
+
 
 const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
 const PROGRAM_IMAGE_HEIGHT = (width - 30-8) /2;
 
 class ProductDetailScreen extends React.Component {
 
-
-    state = {
-        stateCount: 0.0,
-        configMenu: Def.config_collection_menu,
-        item:this.props.route.params.item,
-        requestRepairs:[]
-    };
-
-
-    addToCart(item){
-        this.setState({choseProduct:false});
-
-        let store = this.state.item;
-
-        let store_cart = [];
-
-        if(Def.cart_data[store.id]) {
-            store_cart = Def.cart_data[store.id];
-        } else {
-            store_cart['store'] = store;
-            store_cart['data'] = [];
-        }
-
-        const found = store_cart['data'].findIndex(element => element.product.id == item.id);
-
-        if(found !== -1){
-            store_cart['data'][found].amount++;
-            store_cart['data'][found].selectValue = true;
-        } else {
-            let orderItem = {
-                product:item,
-                selectValue: true,
-                amount:1,
-            }
-
-            store_cart['data'].push(orderItem);
-        }
-        Def.cart_data[store.id] = store_cart;
-    }
-
-
     constructor(props){
         super(props);
-        this.onGetCollectionSuccess     = this.onGetCollectionSuccess.bind(this);
-        this.onGetCollectionFalse     = this.onGetCollectionFalse.bind(this);
-        this.formatText    = this.formatText.bind(this);
         this.refresh     = this.refresh.bind(this);
-
         this.getRequestRepairSuccess = this.getRequestRepairSuccess.bind(this);
         this.getRequestRepairFalse = this.getRequestRepairFalse.bind(this);
-
+        this.itemClick = this.itemClick.bind(this);
+        this.openRequestForm = this.openRequestForm.bind(this);
+        this.closeFunction = this.closeFunction.bind(this);
 
         Def.product_detail_data = this.props.route.params.item;
         let item = this.props.route.params.item;
@@ -74,11 +32,32 @@ class ProductDetailScreen extends React.Component {
             stateCount: 0.0,
             item:this.props.route.params.item,
             activeSlide:0,
-            requestRepairs: Def.requestRepairsTree[item.id] ? Def.requestRepairsTree[item.id] : []
+            requestRepairs: Def.requestRepairsTree[item.id] ? Def.requestRepairsTree[item.id] : [],
+            displayRequestModal:false,
+            requestDetail:null,
+            displayRequestForm: false,
+
         };
         Def.mainNavigate = this.props.navigation;
-
     }
+
+    itemClick = (item) => {
+        console.log('item click');
+        this.setState({requestDetail:item, displayRequestModal : true});
+    };
+
+    openRequestForm = () => {
+        console.log("Open Form");
+        this.setState({displayRequestForm:true});
+    }
+
+    closeFunction = () => {
+        this.setState({requestDetail:null, displayRequestModal : false , displayRequestForm : false});
+    }
+
+
+
+
     getImageForCollection(item){
         let collectionImages;
         if(item.faces){
@@ -95,44 +74,9 @@ class ProductDetailScreen extends React.Component {
     {
         this.setState({ stateCount: Math.random() });
     }
-
-    onGetCollectionSuccess(data){
-        this.setState({ collection_data: data["data"] });
-        Def.collection_data = data["data"];
-        Def.config_collection_menu = this.createConfigData(data["data"]) ;
-        this.setState({ configMenu: Def.config_collection_menu});
-    }
-
-    createConfigData(data){
-        console.log("Data : " + JSON.stringify(data));
-        var configData = [];
-        if(data){
-            if(data.viewer_url){
-                let viewerUrl =  Def.LIFE_STYLE_BASE + '/viewer-3d/view?id=' + data.id;
-                configData.push({key: '3D', type:'3D' ,name_vi:"3D", hidden:0, data:{url_3d:viewerUrl  , url_ar:data["viewer_url"]}});
-            }
-            configData.push({key: '2D', type:'2D' ,name_vi:"2D", hidden:0, data:this.getImageForCollection(data)});
-        }
-        return configData;
-
-    }
-
-    onGetCollectionFalse(data){
-        console.log("false data : " + data);
-    }
-
-    formatText(text){
-        let rs = text;
-        if(text && text.length > 10){
-            rs = text.substring(0, 20) ;
-        }
-        return rs;
-    }
-
     shouldComponentUpdate(){
         return true;
     }
-
     componentDidMount(){
         if(this.state.requestRepairs.length == 0) {
            if(Def.requestRepairsTree && Def.requestRepairsTree[this.state.item.id]) {
@@ -230,7 +174,7 @@ class ProductDetailScreen extends React.Component {
                     <Text style={{paddingHorizontal : 10}}>
                         {"Mô tả:" + ' '}
                     </Text>
-                    <ScrollView style={{maxHeight:120, width:width, paddingHorizontal:10}}>
+                    <ScrollView style={{maxHeight:120, width:width, paddingHorizontal:10, minHeight:60}}>
                         <Text>
                             {product ? product.description : "sdfsdfsdfsdfsdfsdfsdfsdfsdfgfhdfasdfgfgasgfgjđjdjdjdjdjdjjjjjjddsdfsdfsdfsdf" + '\n' +
                                 "sdfsdfsdfgfhfjghjhjghjghjghjghjgjghjgjhddddsdfsdfdddddddddddddddddddddddddddddddddddddddđffffffffffffffffffffff" +
@@ -258,7 +202,7 @@ class ProductDetailScreen extends React.Component {
                 </View >
 
                 <View style={{flexDirection:'row', paddingBottom : 5}}>
-                    <TouchableOpacity style={styles.bookingBtn}>
+                    <TouchableOpacity style={styles.bookingBtn} onPress={this.openRequestForm}>
                         <Text style={Style.text_styles.whiteTitleText}>
                             Yêu cầu sữa chữa
                         </Text>
@@ -269,8 +213,41 @@ class ProductDetailScreen extends React.Component {
                             Hoàn thành
                         </Text>
                     </TouchableOpacity>
-
                 </View>
+                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestModal} >
+                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.6*height,  alignItems: "center",
+                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
+                            // props.closeFun(props.selectedDate)
+                            console.log('prevent click');
+                            e.preventDefault()
+                        }}>
+                            <View>
+                                <RequestRepairDetailModal item={this.state.requestDetail} />
+                            </View>
+
+                        </TouchableWithoutFeedback>
+
+                    </TouchableOpacity>
+                </Modal>
+
+                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestForm} >
+                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.6*height,  alignItems: "center",
+                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
+                            // props.closeFun(props.selectedDate)
+                            console.log('prevent click');
+                            e.preventDefault()
+                        }}>
+                            <View style={{zIndex : 5 , height :0.5*height}}>
+                                <RequestRepairModalForm product={this.state.item} />
+                            </View>
+
+                        </TouchableWithoutFeedback>
+
+                    </TouchableOpacity>
+                </Modal>
+
 
 
             </View>
@@ -279,6 +256,13 @@ class ProductDetailScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+    modalStyle: {
+        width : width,
+        height: 300,
+        marginTop : 20,
+        backgroundColor:'green'
+    },
+
     container: {
         flex : 1,
         paddingLeft: 15,
@@ -354,6 +338,18 @@ const styles = StyleSheet.create({
         // paddingVertical: 5,
         // backgroundColor : 'red'
     },
+    requestDetailModalView : {
+        padding: 5,
+        paddingVertical : 0,
+        height :height,
+        width : width,
+        shadowOpacity:1,
+        shadowRadius: 3.84,
+        justifyContent : 'center',
+        alignItems : 'center',
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    }
 
 
 });

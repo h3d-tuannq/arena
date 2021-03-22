@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, StyleSheet, Dimensions, Image} from  'react-native'
+import {View, Text, StyleSheet, Dimensions, Image, TouchableOpacity} from  'react-native'
 import Def from "../../def/Def";
 import Style from  "../../def/Style"
 
@@ -13,7 +13,7 @@ class RequestRepairRenderer extends React.PureComponent{
     render(){
         const {item} =  this.props;
         return (
-            <View style={styles.comment}>
+            <TouchableOpacity style={styles.comment} onPress={() => this.props.click(item)}>
                 <View style={styles.content}>
                     <View style={styles.imageContainer}>
                     {
@@ -42,7 +42,7 @@ class RequestRepairRenderer extends React.PureComponent{
                 </View>
 
 
-            </View>
+            </TouchableOpacity>
         )
     }
 }
