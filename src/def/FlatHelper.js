@@ -1,3 +1,4 @@
+import Def from './Def'
 export default class FlatHelper {
 
     static INACTIVE_STATUS = 0; // Trạng thái mặc định khi đưa lên hệ thống
@@ -85,8 +86,16 @@ export default class FlatHelper {
     }
 
     static checkCanPermission(user, permission){
-        let userPermission = user.listRoleName.split();
+        let userPermission = user ? user.listRoleName.split() : [];
         return userPermission.indexOf(permission) != -1;
+    }
+
+    static canRequestRepair(product, user){
+        return FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) || FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+    }
+
+    static canFixRepair(product, user){
+        return (product.status == Def.PRODUCT_UNACTIVE_STATUS || product.status == Def.PRODUCT_REPAIRED_STATUS)  && FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
     }
 
     

@@ -59,6 +59,8 @@ export default class UserController{
                 Def.username = data['username'];
                 Def.user_info = data;
 
+
+
                 // let token = await messaging().getToken();
                 //
                 //

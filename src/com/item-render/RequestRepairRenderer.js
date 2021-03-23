@@ -26,7 +26,7 @@ class RequestRepairRenderer extends React.PureComponent{
                     <View style={styles.infoContainer}>
                         <View style={{flexDirection:'row', justifyContent: 'space-between', paddingRight:5}}>
                             <Text style={styles.author}>
-                                {item.reporter_id}
+                                {item.reporter ? item.reporter.username :  item.reporter_id}
                             </Text>
                             <View style={styles.date}>
                             <Text style={{fontSize: Style.SMALL_SIZE, color: Style.GREY_TEXT_COLOR}}>{Def.getDateString(new Date(item.date * 1000), "dd-MM-yyyy")}

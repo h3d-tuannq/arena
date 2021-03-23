@@ -1,5 +1,8 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList} from 'react-native'
+import {
+    Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList,
+    Alert, Platform
+} from 'react-native'
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -23,11 +26,55 @@ class RequestRepairModalForm extends React.Component {
             product: props.product ,
             note:'',
             image: '',
+            type: 0
         };
-
         this.handleChoosePhoto = this.handleChoosePhoto.bind(this);
-
+        this.requestBtnClick = this.requestBtnClick.bind(this);
     }
+
+    requestBtnClick = () => {
+        if(Def.user_info) {
+            let img ;
+            if(this.state.image){
+                img = {
+                    name: this.state.image.fileName ? this.state.image.fileName : this.state.image.name,
+                    type: this.state.image.type,
+                    uri: Platform.OS === "android" ? this.state.image.uri : this.state.image.uri.replace("file://", "")
+                };
+            }
+            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product.id, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.state.type, this.state.note, img, 0);
+        } else  {
+            console.log('User info not exits');
+        }
+    };
+
+    changeStatusSuccess = (data) => {
+        console.log('Change Status Sucsess ' + JSON.stringify(data));
+        if(data['msg'] == "Ok"){
+            console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
+            this.props.appendRepairItem(data['requestRepair']);
+        } else {
+            Alert.alert(
+                "Thông báo",
+                data['msg'],
+                [
+                    {
+                        text: "Ok",
+                        onPress: () => {Def.setIsLogin(false)},
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+    };
+
+    changeStatusFalse = (data) => {
+        console.log('Change Status False ' + JSON.stringify(data));
+    };
+
+
+
 
     handleChoosePhoto = (attr = null) => {
         const options = {
@@ -112,7 +159,10 @@ class RequestRepairModalForm extends React.Component {
                                 </View>
                             }
                         </TouchableOpacity>
-                        <TouchableOpacity  style={styles.requestBtn} >
+                        <TouchableOpacity
+                            style={styles.requestBtn}
+                            onPress={this.requestBtnClick}
+                        >
                             <Text style={{color:'#fff'}}>
                                 Gửi yêu cầu
                             </Text>

@@ -1,6 +1,5 @@
 import React from 'react'
 import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList , Modal, TouchableWithoutFeedback} from 'react-native'
-import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import RequestRepairRenderer from '../../../src/com/item-render/RequestRepairRenderer';
 import ProgramVerList from  '../../../src/com/common/ProgramVerList'
@@ -9,6 +8,8 @@ import RequestRepairDetailModal from  '../../../src/com/modal/RequestRepairDetai
 import Style from '../../def/Style';
 import FlatController from "../../controller/FlatController";
 import RequestRepairModalForm from "../../com/modal/RequestRepairModalForm";
+import FlatHelper from "../../def/FlatHelper";
+import Def from "../../def/Def";
 
 
 const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
@@ -23,6 +24,7 @@ class ProductDetailScreen extends React.Component {
         this.getRequestRepairFalse = this.getRequestRepairFalse.bind(this);
         this.itemClick = this.itemClick.bind(this);
         this.openRequestForm = this.openRequestForm.bind(this);
+        this.appendRepairItem = this.appendRepairItem.bind(this);
         this.closeFunction = this.closeFunction.bind(this);
 
         Def.product_detail_data = this.props.route.params.item;
@@ -36,6 +38,7 @@ class ProductDetailScreen extends React.Component {
             displayRequestModal:false,
             requestDetail:null,
             displayRequestForm: false,
+            requestType:0,
 
         };
         Def.mainNavigate = this.props.navigation;
@@ -46,18 +49,21 @@ class ProductDetailScreen extends React.Component {
         this.setState({requestDetail:item, displayRequestModal : true});
     };
 
-    openRequestForm = () => {
+    appendRepairItem = (item) => {
+        let currentList = this.state.requestRepairs;
+        currentList.push(item);
+        this.setState({requestRepairs : currentList, displayRequestForm : false});
+    };
+
+    openRequestForm = (type = 0) => {
         console.log("Open Form");
-        this.setState({displayRequestForm:true});
-    }
+        this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
+    };
+
 
     closeFunction = () => {
         this.setState({requestDetail:null, displayRequestModal : false , displayRequestForm : false});
-    }
-
-
-
-
+    };
     getImageForCollection(item){
         let collectionImages;
         if(item.faces){
@@ -202,17 +208,22 @@ class ProductDetailScreen extends React.Component {
                 </View >
 
                 <View style={{flexDirection:'row', paddingBottom : 5}}>
-                    <TouchableOpacity style={styles.bookingBtn} onPress={this.openRequestForm}>
-                        <Text style={Style.text_styles.whiteTitleText}>
-                            Yêu cầu sữa chữa
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.bookingBtn}>
+                    {FlatHelper.canRequestRepair(this.state.item, Def.user_info) ?
+                        <TouchableOpacity style={styles.bookingBtn} onPress={this.openRequestForm}>
+                            <Text style={Style.text_styles.whiteTitleText}>
+                                Yêu cầu sữa chữa
+                            </Text>
+                        </TouchableOpacity> : null
+                    }
+                    {
+                    FlatHelper.canFixRepair(this.state.item, Def.user_info) ?
+                    <TouchableOpacity style={styles.bookingBtn} onPress={() => this.openFixedForm(1)}>
                         <Text style={Style.text_styles.whiteTitleText}>
                             Hoàn thành
                         </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> : null
+                    }
+
                 </View>
                 <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestModal} >
                     <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
@@ -240,7 +251,7 @@ class ProductDetailScreen extends React.Component {
                             e.preventDefault()
                         }}>
                             <View style={{zIndex : 5 , height :0.5*height}}>
-                                <RequestRepairModalForm product={this.state.item} />
+                                <RequestRepairModalForm appendRepairItem={this.appendRepairItem} product={this.state.item} type={this.state.requestType} />
                             </View>
 
                         </TouchableWithoutFeedback>
