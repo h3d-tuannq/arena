@@ -14,6 +14,8 @@ export default class Style{
     static DEFAUT_RED_COLOR = '#AD2428';
     static DEFAUT_BLUE_COLOR = '#783148';// '#305E74';
 
+    static BLUE_COLOR = '#15335e';
+
     static GREY_TEXT_COLOR = '#b3b3b3';
     static GREY_BACKGROUND_COLOR = "#e6e6e6";
 
@@ -86,8 +88,34 @@ export default class Style{
             width: width,
             height: width,
         },
+    });
 
+    static button_styles = StyleSheet.create({
+        buttonStyle : {
+            backgroundColor: Style.BLUE_COLOR,
+            height: 35,
+            // maxWidth:height/2,
+            // minWidth: height /3 -20,
+            justifyContent : 'center',
+            alignItems: 'center',
+            flex:1,
+            paddingHorizontal : 5,
+            marginHorizontal : 5,
+            borderRadius:10
+        },
 
+        buttonFlatStyle : {
+            backgroundColor: Style.BLUE_COLOR,
+            height: 38,
+            // maxWidth:height/2,
+            // minWidth: width /4 -5,
+            justifyContent : 'center',
+            alignItems: 'center',
+            flex:1,
+            paddingHorizontal : 3,
+            marginHorizontal : 1,
+            borderRadius:1
+        },
 
     });
 

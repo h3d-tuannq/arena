@@ -211,7 +211,7 @@ class ProductDetailScreen extends React.Component {
                     {FlatHelper.canRequestRepair(this.state.item, Def.user_info) ?
                         <TouchableOpacity style={styles.bookingBtn} onPress={this.openRequestForm}>
                             <Text style={Style.text_styles.whiteTitleText}>
-                                Yêu cầu sữa chữa
+                                Yêu cầu sửa chữa
                             </Text>
                         </TouchableOpacity> : null
                     }

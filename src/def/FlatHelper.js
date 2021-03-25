@@ -1,6 +1,11 @@
 import Def from './Def'
 export default class FlatHelper {
 
+    static DECLINE_DELIVER_TYPE = 0;
+    static UPDATE_STATUS_TYPE = 1;
+    static SIGNATURE_PAD_TYPE = 2;
+
+
     static INACTIVE_STATUS = 0; // Trạng thái mặc định khi đưa lên hệ thống
     static ACTIVE_STATUS = 1; // Trạng thái đang active
     static FINANCE_DONE_STATUS = 2; // Hoàn thành nghĩa vụ tài chính
@@ -98,6 +103,73 @@ export default class FlatHelper {
         return (product.status == Def.PRODUCT_UNACTIVE_STATUS || product.status == Def.PRODUCT_REPAIRED_STATUS)  && FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
     }
 
-    
+    static canChangeDeliverStatus(flat, user){
+        let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        let status = flat.status == FlatHelper.FINANCE_DONE_STATUSS;
+        return isQa && status;
+    }
+
+    static canRollbackFinalDone(flat, user){
+        let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        let status = flat.status == FlatHelper.CAN_DELIVER_STATUS;
+        return isQa && status;
+    }
+
+
+    static canPerformDelivering(flat, user){
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER);
+        let status = flat.status == FlatHelper.CAN_DELIVER_STATUS;
+        return isHandover && status;
+    }
+
+    static canSigning(flat, user){
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
+        let status = flat.status == FlatHelper.DELIVERING_STATUS;
+        return isHandover && status;
+    }
+
+    static canReSigning(flat, user){
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
+        let status = flat.status == FlatHelper.SIGNED_STATUS;
+        return isHandover && status;
+    }
+
+    static canCompleteProfile(flat, user){
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
+        let isRepairAfterSign = flat.status == FlatHelper.REPAIR_AFTER_SIGN_STATUS;
+        let isSigned = flat.status == FlatHelper.SIGNED_STATUS;
+        return isHandover && (isSigned || isRepairAfterSign);
+    }
+
+    static canDecline(flat, user){
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) &&  (flat.handover_id = user.id);
+        let status = flat.status == FlatHelper.DELIVERING_STATUS;
+        let isDecline = flat.is_decline;
+        return !isDecline && isHandover && status;
+    }
+
+    static canSendRequestRepair(flat, user){
+        let statusFinalDone = flat.status == FlatHelper.FINANCE_DONE_STATUS;
+        let canDeliver = flat.status >= FlatHelper.DELIVERING_STATUS && flat.status != FlatHelper.DONE_STATUS;
+        let isSignedStatus = flat.status >= FlatHelper.SIGNED_STATUS && flat.status != FlatHelper.DONE_STATUS;
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
+        let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        return (isQa && statusFinalDone) || (isHandover && (canDeliver || isSignedStatus));
+
+    }
+
+    static canDone(flat, user){
+        let isProfileCompleted = flat.status == FlatHelper.PROFILE_COMPLETED_STATUS;
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
+        return (isHandover && isProfileCompleted) ;
+    }
+
+    static canRepairAfterSigned(flat, user){
+        let isSignedStatus = flat.status == FlatHelper.SIGNED_STATUS;
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
+        return isSignedStatus && isHandover;
+    }
+
+
     
 }

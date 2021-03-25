@@ -1,9 +1,12 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, FlatList} from 'react-native'
+import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, FlatList, TouchableWithoutFeedback, Modal} from 'react-native'
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Style from '../../def/Style';
 import FlatHelper from  '../../def/FlatHelper'
+
+import DeclineDeliverModalForm from  '../../../src/com/modal/DeclineDeliverModalForm'
+import SignatureModalForm from  '../../../src/com/modal/SignatureModalForm'
 
 import ProgramVerList from '../../com/common/ProgramVerList';
 
@@ -20,17 +23,20 @@ const carouselItems = [
     }
 ];
 
+const decline_deliver_form = 0;
+
 class FlatDetailScreen extends React.Component {
 
     constructor(props){
         super(props);
         this.formatText    = this.formatText.bind(this);
         this.refresh     = this.refresh.bind(this);
-        this.addToCart = this.addToCart.bind(this);
         Def.mainNavigate = this.props.navigation;
 
         let design_list = [];
         let title = "Gian hàng";
+
+        this.closeFunction = this.closeFunction.bind(this);
 
 
         this.state = {
@@ -38,15 +44,37 @@ class FlatDetailScreen extends React.Component {
             title: title,
             stateCount: 0.0,
             slide_data : carouselItems,
-            activeSlide : 0
+            activeSlide : 0,
+            displayDeclineForm : false,
+            displaySignatureForm : false,
+            type : -1
         };
+        this.updateFlatStatus = this.updateFlatStatus.bind(this);
 
+    }
+
+    changeFlatStatus = (type) => {
+        if(type == decline_deliver_form) {
+            this.setState({displayDeclineForm : true, type:type});
+        }
     }
 
     refresh()
     {
         this.setState({ stateCount: Math.random() });
     }
+
+    updateFlatStatus =(flat) => {
+        this.setState({item:flat});
+        this.closeFunction();
+    };
+
+    closeFunction = () => {
+        if(this.state.type == decline_deliver_form) {
+            this.setState({displayDeclineForm : false});
+        }
+
+    };
 
     onGetDesignSuccess(data){
         Object.entries(data["data"]).map((prop, key) => {
@@ -94,32 +122,6 @@ class FlatDetailScreen extends React.Component {
     }
 
 
-    addToCart = (item) => {
-        // this.setState({choseProduct:false});
-        // let store = this.state.item;
-        // let store_cart = [];
-        //
-        // if(Def.cart_data[store.organ.id]) {
-        //     store_cart = Def.cart_data[store.organ.id];
-        // } else {
-        //     store_cart['store'] = store;
-        //     store_cart['data'] = [];
-        // }
-        // const found = store_cart['data'].findIndex(element => element.product.id == item.id);
-        // if(found !== -1){
-        //     store_cart['data'][found].amount++;
-        //     store_cart['data'][found].selectValue = true;
-        // } else {
-        //     let orderItem = {
-        //         product:item,
-        //         selectValue: true,
-        //         amount:1,
-        //     }
-        //
-        //     store_cart['data'].push(orderItem);
-        // }
-        // Def.cart_data[store.id] = store_cart;
-    }
 
     render() {
         const {navigation} = this.props;
@@ -135,35 +137,61 @@ class FlatDetailScreen extends React.Component {
                 </View>
             </View>
         );
-
-
         return (
             <View style={{flex:1}}>
-                <View style={{width : width,height:PROGRAM_IMAGE_HEIGHT + 10 , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
+                <View style={{width : width,height:PROGRAM_IMAGE_HEIGHT + 80 , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <View style={styles.imageContainer}>
                         {item.design && item.design.image_path ?
                             <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.design.image_path)}}  />
                             :
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                         }
+
+                        <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
+
+                            <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
+                                {Def.formatText(item.code, 15)}
+                            </Text>
+                        </View>
+
                     </View>
                     <View style={styles.info}>
                         <View style={{flexDirection:'row'}}>
                             <Text>
-                                {"Mã:" + ' '}
+                                {"Tình trạng:" + ' '}
                             </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
-                                {item.code+""}
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5 , width: width /2 - 60}}>
+                                {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
                             </Text>
                         </View>
 
+                        {
+                            item.is_decline ?
+                            <View style={{flexDirection:'row'}}>
+                                <Text>
+                                    {"Lý do từ chối bàn giao:" + ' '}
+                                </Text>
+                                <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                    {item.decline_note}
+                                </Text>
+                            </View> : null
+                        }
 
                         <View style={{flexDirection:'row'}}>
                             <Text>
-                                {"Trạng thái:" + ' '}
+                                {"Cán bộ bàn giao:" + ' '}
                             </Text>
                             <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {Def.getFlatStatusName(item.status)+""}
+                                {item.handover ? item.handover.username+"" : ""}
+                            </Text>
+                        </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"CSKH:" + ' '}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {item.handover ? item.handover.username+"" : ""}
                             </Text>
                         </View>
 
@@ -175,6 +203,9 @@ class FlatDetailScreen extends React.Component {
                                 {item.building ? item.building.name+"" : ""}
                             </Text>
                         </View>
+
+
+
                         <View style={{flexDirection:'row'}}>
                             <Text>
                                 {"Khách hàng:" + ' '}
@@ -193,10 +224,23 @@ class FlatDetailScreen extends React.Component {
                                 { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : ""}
                             </Text>
                         </View>
+
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Deadline hoàn thiện:" + ''}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : "Không có"}
+                            </Text>
+                        </View>
+
+
                     </View>
 
                 </View>
-                <View style={{flex:1, paddingTop:5 }}>
+                <View style={{flex:1, paddingTop:5 , paddingBottom : 5 }}>
                     <ProgramVerList
                         data={this.state.item.productInstanceFlat}
                         navigation={this.props.navigation}
@@ -208,6 +252,142 @@ class FlatDetailScreen extends React.Component {
                         addToCart={this.addToCart}
                     />
                 </View>
+
+                <View style={styles.controlBtn}>
+                    {
+                        Def.user_info ?
+
+                            <View style={{flexDirection: 'row', paddingBottom: 2}}>
+                                {FlatHelper.canDecline(this.state.item, Def.user_info) ?
+                                    <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                      onPress={() => this.changeFlatStatus(decline_deliver_form)}>
+                                        <Text style={Style.text_styles.whiteTitleText}>
+                                            Từ chối
+                                        </Text>
+                                    </TouchableOpacity> : null
+                                }
+                                {
+                                    FlatHelper.canSigning(this.state.item, Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Ký nhận
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {FlatHelper.canSendRequestRepair(this.state.item, Def.user_info) ?
+                                    <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                      onPress={this.openRequestForm}>
+                                        <Text style={Style.text_styles.whiteTitleText}>
+                                            Gửi biên bản
+                                        </Text>
+                                    </TouchableOpacity> : null
+                                }
+                                {
+                                    FlatHelper.canDone(this.state.item,Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Hoàn thành
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+
+
+                                {
+                                    FlatHelper.canChangeDeliverStatus(this.state.item,Def.user_info)  ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Đủ điều kiện
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {
+                                    FlatHelper.canPerformDelivering(this.state.item,Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Thực hiện bàn giao
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {
+                                    FlatHelper.canCompleteProfile(this.state.item,Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Hoàn thiện hồ sơ
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {
+                                    FlatHelper.canRepairAfterSigned(this.state.item,Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Sửa chữa sau bàn giao
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {
+                                    FlatHelper.canRollbackFinalDone(this.state.item,Def.user_info)  ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.openFixedForm(1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Chưa đủ điều kiện
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+
+                            </View> :  null
+                    }
+                </View>
+
+                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayDeclineForm} >
+                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.5*height,  alignItems: "center",
+                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
+                            // props.closeFun(props.selectedDate)
+                            console.log('prevent click');
+                            e.preventDefault()
+                        }}>
+                            <View style={{zIndex : 5 }}>
+                                <DeclineDeliverModalForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item}  />
+                            </View>
+
+                        </TouchableWithoutFeedback>
+
+                    </TouchableOpacity>
+                </Modal>
+
+                <Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displaySignatureForm} >
+                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestSignatureModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                        {/*<TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.5*height,  alignItems: "center",*/}
+                            {/*justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {*/}
+                            {/*// props.closeFun(props.selectedDate)*/}
+                            {/*console.log('prevent click');*/}
+                            {/*e.preventDefault()*/}
+                        {/*}}>*/}
+                            <View style={{zIndex : 5 }}>
+                                <SignatureModalForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item}  />
+                            </View>
+
+                        {/*</TouchableWithoutFeedback>*/}
+
+                    </TouchableOpacity>
+                </Modal>
+
+
+
+
             </View>
         )
     }
@@ -241,9 +421,10 @@ const styles = StyleSheet.create({
     imageContainer:{
         flex: 2,
         borderRadius :5,
-        justifyContent:'center',
+        // justifyContent:'center',
         padding: 10,
         marginTop:5,
+        // backgroundColor:'green'
     },
 
     programListStyle : {
@@ -251,7 +432,7 @@ const styles = StyleSheet.create({
     },
     itemImage: {
         width: PROGRAM_IMAGE_WIDTH,
-        height : PROGRAM_IMAGE_HEIGHT -5,
+        height : PROGRAM_IMAGE_HEIGHT + 5,
         borderRadius: 5,
     },
     titleStyle : {
@@ -260,13 +441,44 @@ const styles = StyleSheet.create({
     },
     info: {
         marginLeft:5,
-        flex: 2.2,
+        flex: 2.5,
         // backgroundColor : 'red',
         marginTop : 5,
         // justifyContent: 'space-around',
         // paddingVertical: 5,
         // backgroundColor : 'red'
-    }
+    },
+    modalStyle: {
+        width : width,
+        height: 300,
+        marginTop : 20,
+        backgroundColor:'green'
+    },
+    requestDetailModalView : {
+        padding: 5,
+        paddingVertical : 0,
+        height :height,
+        width : width,
+        shadowOpacity:1,
+        shadowRadius: 3.84,
+        justifyContent : 'center',
+        alignItems : 'center',
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    requestSignatureModalView : {
+        padding: 5,
+        paddingVertical : 0,
+        height :height,
+        width : width,
+        shadowOpacity:1,
+        shadowRadius: 3.84,
+        justifyContent : 'center',
+        alignItems : 'center',
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+
 });
 
 export default FlatDetailScreen;

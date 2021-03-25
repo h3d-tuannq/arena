@@ -8,15 +8,27 @@ import FlatDetailScreen from './views/flat/FlatDetailScreen';
 import ProductDetailScreen from './views/flat/ProductDetailScreen'
 import MenuIcon from '../assets/icon/menu.svg';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+
 import BackIconSvg from '../assets/icon/icon-back.svg'
 
 import Style from './def/Style'
+import Def from './def/Def'
+import FlatHelper from "./def/FlatHelper";
+
+
+
 
 const RootStack = createStackNavigator();
 
 class FlatStack extends React.Component {
     constructor(props){
         super(props);
+    }
+
+    goToSendRequestRepairScreen = (flat) => {
+        console.log('');
     }
 
     render() {
@@ -55,7 +67,9 @@ class FlatStack extends React.Component {
                         return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
                     }
                 }} />
-                <RootStack.Screen name="flat-detail" component={FlatDetailScreen} options={{
+                <RootStack.Screen name="flat-detail" component={FlatDetailScreen} options={({route}) => {
+                    // console.log("Route : " + JSON.stringify(route.params.item.id));
+                    return ({
                     title: 'Chi tiết căn hộ',
                     headerStyle: {
                         backgroundColor: Style.DEFAUT_BLUE_COLOR,
@@ -65,10 +79,35 @@ class FlatStack extends React.Component {
                     headerTitleStyle: {
 
                     },
+                    headerRight: Def.user_info && FlatHelper.canSendRequestRepair(route.params.item,Def.user_info) ?  () => (
+
+                        <TouchableOpacity
+                            style=  {
+                                {
+                                    width: Style.DRAWER_MENU_SIZE,
+                                    height: Style.DRAWER_MENU_SIZE,
+                                    justifyContent: 'center',
+                                    paddingRight:15 ,
+                                    alignItems : 'center'
+                                }
+                            }
+                            onPress={() => this.goProductList}>
+                            {console.log('Route : ' + JSON.stringify(route.params.item.id))}
+                            <Icon name="paper-plane" size={30} color="#fff" />
+                            {/*<Text style={{color:'#fff'}}>*/}
+                                {/*{route.params.item.id}*/}
+                            {/*</Text>*/}
+
+                        </TouchableOpacity>
+
+
+                    ) : null,
+
                     headerBackImage: ()=> {
                         return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
                     }
-                }} />
+                })}
+                } />
 
                 <RootStack.Screen name="product-detail" component={ProductDetailScreen} options={{
                     title: 'Chi tiết sản phẩm',
