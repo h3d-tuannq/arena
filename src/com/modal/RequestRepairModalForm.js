@@ -94,6 +94,7 @@ class RequestRepairModalForm extends React.Component {
         ImagePicker.showImagePicker(options, response => {
                 console.log('Attr res' + attr);
                 if (response.uri) {
+                    console.log('Reponse browser image : ' + JSON.stringify(response));
                     let maxsize = response.width > response.height ? response.width : response.height;
                     if (maxsize > Def.DEFAULT_MAX_SIZE) {
                         let compressType = response.type == "image/jpeg" ? "JPEG" : "PNG";

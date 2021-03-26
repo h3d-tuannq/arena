@@ -24,6 +24,8 @@ const carouselItems = [
 ];
 
 const decline_deliver_form = 0;
+const update_status_form = 1;
+const signature_form = 2;
 
 class FlatDetailScreen extends React.Component {
 
@@ -57,6 +59,9 @@ class FlatDetailScreen extends React.Component {
         if(type == decline_deliver_form) {
             this.setState({displayDeclineForm : true, type:type});
         }
+        if(type == signature_form) {
+            this.setState({displaySignatureForm : true, type:type});
+        }
     }
 
     refresh()
@@ -72,6 +77,10 @@ class FlatDetailScreen extends React.Component {
     closeFunction = () => {
         if(this.state.type == decline_deliver_form) {
             this.setState({displayDeclineForm : false});
+        }
+
+        if(this.state.type == signature_form) {
+            this.setState({displaySignatureForm : false});
         }
 
     };
@@ -269,7 +278,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canSigning(this.state.item, Def.user_info) ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(signature_form)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Ký nhận
                                             </Text>
@@ -368,8 +377,7 @@ class FlatDetailScreen extends React.Component {
                     </TouchableOpacity>
                 </Modal>
 
-                <Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displaySignatureForm} >
-                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestSignatureModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                <Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displaySignatureForm} style={styles.requestSignatureModalView}>
                         {/*<TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.5*height,  alignItems: "center",*/}
                             {/*justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {*/}
                             {/*// props.closeFun(props.selectedDate)*/}
@@ -377,12 +385,11 @@ class FlatDetailScreen extends React.Component {
                             {/*e.preventDefault()*/}
                         {/*}}>*/}
                             <View style={{zIndex : 5 }}>
-                                <SignatureModalForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item}  />
+                                <SignatureModalForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item} closeFunction={this.closeFunction} />
                             </View>
 
                         {/*</TouchableWithoutFeedback>*/}
 
-                    </TouchableOpacity>
                 </Modal>
 
 
