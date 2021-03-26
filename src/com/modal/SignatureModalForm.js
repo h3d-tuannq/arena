@@ -35,6 +35,7 @@ class SignatureModalForm extends React.Component {
         this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
         this.changeStatusFalse = this.changeStatusFalse.bind(this);
         this.updateImage = this.updateImage.bind(this);
+        this.saveSignatureToServer = this.saveSignatureToServer.bind(this);
         this._onSaveEvent = this._onSaveEvent.bind(this);
     }
 
@@ -47,10 +48,19 @@ class SignatureModalForm extends React.Component {
         }
     };
 
+    saveSignatureToServer = (data) => {
+        console.log("Request button click");
+        if (Def.user_info) {
+            FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'], this.state.flat.id, FlatHelper.SIGNED_STATUS, 0, data ? data.encoded : null, this.state.note, FlatHelper.SIGNATURE_PAD_TYPE);
+        } else {
+            console.log('User info not exits');
+        }
+    };
+
+
     changeStatusSuccess = (data) => {
-        console.log('Change Status Sucsess ' + JSON.stringify(data));
+        console.log('Change Status Sucsess ' + data['msg'] + data['result'] );
         if (data['msg'] == "Ok") {
-            console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
             this.props.updateFlatStatus(data['flat']);
         } else {
             Alert.alert(
@@ -82,12 +92,13 @@ class SignatureModalForm extends React.Component {
         //result.pathName - for the file path name
         // this.setState({image_path: result.pathName});
         this.updateImage(result);
-        console.log(result);
+        this.saveSignatureToServer(result);
+
     }
 
     updateImage = (data) => {
         this.setState({data:data,image_path: data.pathName});
-         console.log('base64 encode : ' + base64.decode(data.encoded))
+        this.requestBtnClick();
     }
 
     _onDragEvent() {
@@ -126,15 +137,15 @@ class SignatureModalForm extends React.Component {
                     viewMode={"portrait"}/>
                 </View>
 
-                <View>
-                    {
-                        this.state.data ?
-                            <Image  style={[{width: width -10, height : height/2-100} ]} source={{uri:'data:image/png;base64,'+this.state.data.encoded}} />
-                            : null
+                {/*<View>*/}
+                    {/*{*/}
+                        {/*this.state.data ?*/}
+                            {/*<Image  style={[{width: width -10, height : height/2-100} ]} source={{uri:'data:image/png;base64,'+this.state.data.encoded}} />*/}
+                            {/*: null*/}
 
-                    }
+                    {/*}*/}
 
-                </View>
+                {/*</View>*/}
 
                 <View style={{ flexDirection: "row"}}>
                     <TouchableOpacity style={styles.buttonStyle}
@@ -160,7 +171,7 @@ class SignatureModalForm extends React.Component {
 const styles = StyleSheet.create({
     signature: {
         width : width - 10,
-        height: height/2 -100,
+        height: height -100,
         borderColor: '#000033',
         borderWidth: 1,
     },

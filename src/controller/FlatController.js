@@ -20,7 +20,7 @@ export default class FlatController {
     }
 
     static changeStatusFlat(callback, errCallback, token, flat_id, status, is_decline = null , image, note, type ){
-        let param = {'flat_id' : flat_id, 'token' : token, 'type' : type , 'note': note, 'image':image, 'status' : status , 'is_decline' : is_decline};
+        let param = {'flat_id' : flat_id, 'token' : token, 'type' : type , 'note': note, 'image_data':image, 'status' : status , 'is_decline' : is_decline};
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/change-flat-status" ,Def.POST_METHOD, param);
     }
 }
