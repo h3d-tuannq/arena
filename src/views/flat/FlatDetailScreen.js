@@ -1,5 +1,18 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, FlatList, TouchableWithoutFeedback, Modal} from 'react-native'
+import {
+    Text,
+    View,
+    Button,
+    StyleSheet,
+    Dimensions,
+    ScrollView,
+    TouchableOpacity,
+    Image,
+    FlatList,
+    TouchableWithoutFeedback,
+    Modal,
+    Alert,
+} from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Style from '../../def/Style';
@@ -7,8 +20,10 @@ import FlatHelper from  '../../def/FlatHelper'
 
 import DeclineDeliverModalForm from  '../../../src/com/modal/DeclineDeliverModalForm'
 import SignatureModalForm from  '../../../src/com/modal/SignatureModalForm'
+import SendRepairReportForm from '../../../src/com/modal/SendRepairReportForm'
 
 import ProgramVerList from '../../com/common/ProgramVerList';
+import FlatController from '../../controller/FlatController';
 
 const PROGRAM_IMAGE_WIDTH = (width - 38) /2;
 const PROGRAM_IMAGE_HEIGHT = (width) /3;
@@ -26,6 +41,7 @@ const carouselItems = [
 const decline_deliver_form = 0;
 const update_status_form = 1;
 const signature_form = 2;
+const sendmail_form = 3;
 
 class FlatDetailScreen extends React.Component {
 
@@ -49,20 +65,57 @@ class FlatDetailScreen extends React.Component {
             activeSlide : 0,
             displayDeclineForm : false,
             displaySignatureForm : false,
+            displaySendMailForm : false,
             type : -1
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
+        this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
+        this.changeStatusFalse = this.changeStatusFalse.bind(this);
 
     }
 
-    changeFlatStatus = (type) => {
+    changeFlatStatus = (type, status = null) => {
         if(type == decline_deliver_form) {
             this.setState({displayDeclineForm : true, type:type});
         }
         if(type == signature_form) {
             this.setState({displaySignatureForm : true, type:type});
         }
+        if (type == update_status_form) {
+            if(Def.user_info){
+                FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, status, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE);
+            }
+        }
     }
+
+    openSendMailModal = () => {
+            this.setState({displaySendMailForm : true, type:sendmail_form});
+    }
+
+
+    changeStatusSuccess = (data) => {
+        if(data['msg'] == "Ok"){
+            this.updateFlatStatus(data['flat']);
+        } else {
+            Alert.alert(
+                "Thông báo",
+                data['msg'],
+                [
+                    {
+                        text: "Ok",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+    };
+
+    changeStatusFalse = (data) => {
+        console.log('Change Status False ' + JSON.stringify(data));
+    };
+
+
 
     refresh()
     {
@@ -70,7 +123,10 @@ class FlatDetailScreen extends React.Component {
     }
 
     updateFlatStatus =(flat) => {
-        this.setState({item:flat});
+        if(flat) {
+            this.setState({item:flat});
+        }
+
         this.closeFunction();
     };
 
@@ -82,6 +138,11 @@ class FlatDetailScreen extends React.Component {
         if(this.state.type == signature_form) {
             this.setState({displaySignatureForm : false});
         }
+
+        if(this.state.type == sendmail_form) {
+            this.setState({displaySendMailForm : false});
+        }
+
 
     };
 
@@ -139,16 +200,7 @@ class FlatDetailScreen extends React.Component {
         Def.order_number = 20;
         const ListHeader = () => (
             <View>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
-                    <View style={{marginLeft:15, paddingBottom:8}}>
-                        <Text style={styles.titleStyle}>{(this.state.item.productInstanceFlat ? this.state.item.productInstanceFlat.length : 0) + " Sản phẩm"}</Text>
-                    </View>
-                </View>
-            </View>
-        );
-        return (
-            <View style={{flex:1}}>
-                <View style={{width : width,height:PROGRAM_IMAGE_HEIGHT + 80 , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
+                <View style={{width : width , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <View style={styles.imageContainer}>
                         {item.design && item.design.image_path ?
                             <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.design.image_path)}}  />
@@ -162,20 +214,37 @@ class FlatDetailScreen extends React.Component {
                                 {Def.formatText(item.code, 15)}
                             </Text>
                         </View>
-
                     </View>
-                    <View style={styles.info}>
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Tình trạng:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5 , width: width /2 - 60}}>
-                                {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
-                            </Text>
-                        </View>
 
-                        {
-                            item.is_decline ?
+                    {
+                        this.state.item.signature && this.state.item.signature['image_path'] ?
+                            <View style={styles.imageContainer}>
+                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.signature.image_path)}}  />
+                                <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
+                                    <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
+                                        {"Chữ Ký"}
+                                    </Text>
+                                </View>
+                            </View>
+                            : null
+
+                    }
+
+
+                </View>
+
+                <View style={styles.info}>
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Tình trạng:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5 , width: width /2 - 60}}>
+                            {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
+                        </Text>
+                    </View>
+
+                    {
+                        item.is_decline ?
                             <View style={{flexDirection:'row'}}>
                                 <Text>
                                     {"Lý do từ chối bàn giao:" + ' '}
@@ -184,71 +253,78 @@ class FlatDetailScreen extends React.Component {
                                     {item.decline_note}
                                 </Text>
                             </View> : null
-                        }
+                    }
 
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Cán bộ bàn giao:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {item.handover ? item.handover.username+"" : ""}
-                            </Text>
-                        </View>
-
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"CSKH:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {item.handover ? item.handover.username+"" : ""}
-                            </Text>
-                        </View>
-
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Dự án:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {item.building ? item.building.name+"" : ""}
-                            </Text>
-                        </View>
-
-
-
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Khách hàng:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                { item.customer? item.customer.name+"" : ""}
-                            </Text>
-                        </View>
-
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Ngày bàn giao:" + ''}
-                            </Text>
-
-                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : ""}
-                            </Text>
-                        </View>
-
-
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Deadline hoàn thiện:" + ''}
-                            </Text>
-
-                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : "Không có"}
-                            </Text>
-                        </View>
-
-
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Cán bộ bàn giao:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            {item.handover ? item.handover.username+"" : ""}
+                        </Text>
                     </View>
 
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"CSKH:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            {item.handover ? item.handover.username+"" : ""}
+                        </Text>
+                    </View>
+
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Dự án:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            {item.building ? item.building.name+"" : ""}
+                        </Text>
+                    </View>
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Chủ sở hữu :" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                            { item.customer? item.customer.name+"" : ""}
+                        </Text>
+                    </View>
+
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Ngày bàn giao:" + ''}
+                        </Text>
+
+                        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                            { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : ""}
+                        </Text>
+                    </View>
+
+
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Deadline hoàn thiện:" + ''}
+                        </Text>
+
+                        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                            { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : "Không có"}
+                        </Text>
+                    </View>
+
+
                 </View>
+
+
+
+                <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>
+                    <View style={{marginLeft:15, paddingBottom:8}}>
+                        <Text style={styles.titleStyle}>{(this.state.item.productInstanceFlat ? this.state.item.productInstanceFlat.length : 0) + " Sản phẩm"}</Text>
+                    </View>
+                </View>
+            </View>
+        );
+        return (
+            <View style={{flex:1}}>
                 <View style={{flex:1, paddingTop:5 , paddingBottom : 5 }}>
                     <ProgramVerList
                         data={this.state.item.productInstanceFlat}
@@ -287,7 +363,7 @@ class FlatDetailScreen extends React.Component {
 
                                 {FlatHelper.canSendRequestRepair(this.state.item, Def.user_info) ?
                                     <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                      onPress={this.openRequestForm}>
+                                                      onPress={this.openSendMailModal}>
                                         <Text style={Style.text_styles.whiteTitleText}>
                                             Gửi biên bản
                                         </Text>
@@ -296,7 +372,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canDone(this.state.item,Def.user_info) ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.DONE_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Hoàn thành
                                             </Text>
@@ -308,7 +384,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canChangeDeliverStatus(this.state.item,Def.user_info)  ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.CAN_DELIVER_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Đủ điều kiện
                                             </Text>
@@ -318,7 +394,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canPerformDelivering(this.state.item,Def.user_info) ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.DELIVERING_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Thực hiện bàn giao
                                             </Text>
@@ -328,7 +404,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canCompleteProfile(this.state.item,Def.user_info) ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.PROFILE_COMPLETED_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Hoàn thiện hồ sơ
                                             </Text>
@@ -338,9 +414,9 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canRepairAfterSigned(this.state.item,Def.user_info) ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.REPAIR_AFTER_SIGN_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
-                                                Sửa chữa sau bàn giao
+                                                Yêu cầu sửa
                                             </Text>
                                         </TouchableOpacity> : null
                                 }
@@ -348,7 +424,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.canRollbackFinalDone(this.state.item,Def.user_info)  ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.openFixedForm(1)}>
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.FINANCE_DONE_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Chưa đủ điều kiện
                                             </Text>
@@ -390,6 +466,12 @@ class FlatDetailScreen extends React.Component {
 
                         {/*</TouchableWithoutFeedback>*/}
 
+                </Modal>
+
+                <Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displaySendMailForm} style={styles.requestSignatureModalView}>
+                    <View style={{zIndex : 5 }}>
+                        <SendRepairReportForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item} closeFunction={this.closeFunction} />
+                    </View>
                 </Modal>
 
 
@@ -447,8 +529,8 @@ const styles = StyleSheet.create({
         color: Style.GREY_TEXT_COLOR,
     },
     info: {
-        marginLeft:5,
-        flex: 2.5,
+        paddingHorizontal:10,
+        // flex: 2.5,
         // backgroundColor : 'red',
         marginTop : 5,
         // justifyContent: 'space-around',

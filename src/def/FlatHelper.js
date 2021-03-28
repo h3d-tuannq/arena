@@ -39,7 +39,7 @@ export default class FlatHelper {
 
     static FlatSTatusList = {0: "Chưa kích hoạt", 1: "Hoạt động", 2: "Hoàn thành nghĩa vụ tài chính", 3: "Đủ điều kiện bàn giao", 4: "Đang bàn giao", 5:"Đã ký nhận bàn giao" , 6:"Sữa chữa sau bàn giao", 8:"Đã hoàn thiện hồ sơ", 7:"Đã hoàn thành"};
     static FlatSTatusColorList = {0: '#D33724', 1: '#008D4C', 2: '#337AB7', 3: '#605CA8', 4: '#F39C12', 5:'#FF851B' , 6:' #000', 8:'#ccc', 7:'#000'};
-    
+
     static getFlatStatusName( statusFilter = 0 ){
         return FlatHelper.FlatSTatusList[statusFilter];
     }
@@ -170,6 +170,19 @@ export default class FlatHelper {
         return isSignedStatus && isHandover;
     }
 
+    static getRepairItemList(flat){
+        let repairList = [];
+        if(flat.productInstanceFlat){
+            flat.productInstanceFlat.forEach((productInstance) => {
+                if(productInstance.status == FlatHelper.INACTIVE_STATUS) {
+                    repairList.push(productInstance);
+                }
+            })
+        }
+        return repairList;
+    }
 
-    
+
+
+
 }
