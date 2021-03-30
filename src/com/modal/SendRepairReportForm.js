@@ -6,6 +6,7 @@ import {
 import Def from '../../def/Def'
 import FlatHelper from '../../def/FlatHelper'
 const {width, height} = Dimensions.get('window');
+import MailProductItemrenderer from  '../item-render/MailProductItemrenderer'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 
@@ -31,24 +32,50 @@ class SendRepairReportForm extends React.Component {
         this.sendMailFalse = this.sendMailFalse.bind(this);
         this.getPifIds = this.getPifIds.bind(this);
         this.resetButtonClick = this.resetButtonClick.bind(this);
+        this.itemChange = this.itemChange.bind(this);
     }
 
     requestBtnClick = () => {
         console.log("Request button click");
         if(Def.user_info) {
-            FlatController.sendRepairList(this.sendMailSuccess, this.sendMailFalse, Def.user_info['access_token'], this.props.flat.id, this.getPifIds() );
+            console.log("Pifs : " + this.getPifIds());
+            // FlatController.sendRepairList(this.sendMailSuccess, this.sendMailFalse, Def.user_info['access_token'], this.props.flat.id, this.getPifIds() );
         } else  {
             console.log('User info not exits');
         }
     };
 
     resetButtonClick = () => {
-
+        let data = this.state.repairList;
+        for ( let i = 0 ; i < data.length ; i++) {
+            data[i].selectValue = false;
+        }
+        this.setState({repairList:data});
     }
 
     getPifIds = () => {
-
+        let rs = '';
+        let data = this.state.repairList;
+            if(data){
+                data.forEach(item => {
+                    if(item.selectValue) {
+                        rs = rs + item.pif.id;
+                    }
+                }
+            );
+        }
+        return rs;
     }
+
+    itemChange = (item) => {
+        let data = this.state.repairList;
+        const found = data.findIndex(element => element.pif.id == item.pif.id);
+        if(found !== -1){
+            data[found].selectValue = item.selectValue;
+            this.setState({repairList:data});
+        }
+    }
+
 
     sendMailSuccess = (data) => {
         console.log('Change Status Sucsess ' + JSON.stringify(data));
@@ -81,6 +108,20 @@ class SendRepairReportForm extends React.Component {
                 </View>
             </View>);
 
+        const renderItem = ({item}) => {
+
+            return (
+                <View style={{}}>
+                    <MailProductItemrenderer
+                        item ={item} click={this.itemClick} itemChange={this.itemChange}
+                        styleImage={{width: (width - 30) / 2, height: (width - 30) / 2}}
+                        type={this.props.type}
+                    />
+
+                </View>
+            )
+        }
+
         return (
             <View style={{height:height}}>
                 <View style={{height:50,  justifyContent:'flex-start' ,flexDirection:'row', alignItems:'center'}}>
@@ -99,24 +140,25 @@ class SendRepairReportForm extends React.Component {
                         type={'product'}
                         numColumns={2}
                         stack={'Flat'}
+                        renderFunction={renderItem}
                         screen={'product-detail'}
                         addToCart={this.addToCart}
                     />
                 </View>
-                    <View style={{ flexDirection: "row"}}>
-                        <TouchableOpacity style={styles.buttonStyle}
-                                          onPress={
-                                              this.requestBtnClick
-                                          }>
-                            <Text>Gửi</Text>
-                        </TouchableOpacity>
+                <View style={{ flexDirection: "row"}}>
+                    <TouchableOpacity style={styles.buttonStyle}
+                                      onPress={
+                                          this.requestBtnClick
+                                      }>
+                        <Text>Gửi</Text>
+                    </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.buttonStyle}
-                                          onPress={this.resetButtonClick}>
-                            <Text>Bỏ chọn</Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonStyle}
+                                      onPress={this.resetButtonClick}>
+                        <Text>Bỏ chọn</Text>
+                    </TouchableOpacity>
 
-                    </View>
+                </View>
             </View>
 
         )
@@ -124,7 +166,7 @@ class SendRepairReportForm extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    container: {
+    container:{
         width:width ,
         height:height,
         backgroundColor : '#fff',

@@ -172,10 +172,15 @@ export default class FlatHelper {
 
     static getRepairItemList(flat){
         let repairList = [];
+        // const mailPif = {};
         if(flat.productInstanceFlat){
             flat.productInstanceFlat.forEach((productInstance) => {
                 if(productInstance.status == FlatHelper.INACTIVE_STATUS) {
-                    repairList.push(productInstance);
+                    let mailPif = {
+                        pif: productInstance,
+                        selectValue: productInstance['send_status'] == 0 ? true : false
+                    };
+                    repairList.push(mailPif);
                 }
             })
         }
