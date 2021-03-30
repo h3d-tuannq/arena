@@ -77,7 +77,10 @@ export default class Def {
     static design_cate = null;
     static product_data = [];
     static cart_data = [];
+
     static flat_data = [];
+    static refresh_flat_data = false;
+    static refeshFlatList = [];
 
     static customer = [];
     static currentOrder = null; // Model đang thực hiện thao tác

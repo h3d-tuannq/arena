@@ -92,13 +92,14 @@ class SignatureModalForm extends React.Component {
         //result.pathName - for the file path name
         // this.setState({image_path: result.pathName});
         this.updateImage(result);
-        this.saveSignatureToServer(result);
-
+        if(result['encoded']) {
+            this.saveSignatureToServer(result);
+        }
     }
 
     updateImage = (data) => {
         this.setState({data:data,image_path: data.pathName});
-        this.requestBtnClick();
+        // this.requestBtnClick();
     }
 
     _onDragEvent() {

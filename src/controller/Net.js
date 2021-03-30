@@ -64,7 +64,7 @@ export default class Net{
           }
       }
 
-             console.log('SendingData: ' + JSON.stringify(sendObj));
+      console.log('SendingData: ' + JSON.stringify(sendObj));
 
 
       fetch(url, sendObj)

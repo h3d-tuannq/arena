@@ -41,7 +41,7 @@ class SendRepairReportForm extends React.Component {
         console.log("Request button click");
         if(Def.user_info) {
             console.log("Pifs : " + this.getPifIds());
-            // FlatController.sendRepairList(this.sendMailSuccess, this.sendMailFalse, Def.user_info['access_token'], this.props.flat.id, this.getPifIds() );
+            FlatController.sendRepairList(this.sendMailSuccess, this.sendMailFalse, Def.user_info['access_token'], this.props.flat.id, this.getPifIds() );
         } else  {
             console.log('User info not exits');
         }
@@ -62,12 +62,13 @@ class SendRepairReportForm extends React.Component {
             if(data){
                 data.forEach(item => {
                     if(item.selectValue) {
-                        rs = rs + item.pif.id;
+                        rs += item.pif.id + ',';
                     }
                 }
             );
         }
-        return rs;
+
+        return rs.length > 0 ? rs.slice(0, -1) : '';
     }
 
     itemChange = (item) => {
@@ -82,8 +83,8 @@ class SendRepairReportForm extends React.Component {
 
     sendMailSuccess = (data) => {
         console.log('Change Status Sucsess ' + JSON.stringify(data));
-        if(data['msg'] == "Ok"){
-            console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
+        if(data['result'] == 1){
+            this.setState({repairList: FlatHelper.getRepairItemList(data['flat']), refresh: Math.random()});
             this.props.updateFlatStatus(data['flat']);
         } else {
             Alert.alert(
@@ -104,7 +105,7 @@ class SendRepairReportForm extends React.Component {
         console.log('Change Status False ' + JSON.stringify(data));
     };
 
-    keyExtractorFun = ({item,index}) => {
+    keyExtractorFun = (item,index) => {
         return ((item.pif ? item.pif.id : item.id) + "" + index.toString() + ( item.selectValue ? item.selectValue + "" : "false") + this.state.refresh);
     }
 

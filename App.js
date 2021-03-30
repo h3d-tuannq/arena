@@ -14,6 +14,8 @@ import { createDrawerNavigator,
     DrawerContentScrollView,
     DrawerItem } from '@react-navigation/drawer';
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 
 import Style from './src/def/Style'
 import Def from './src/def/Def'
@@ -21,6 +23,7 @@ import Def from './src/def/Def'
 import PolicyIcon from './assets/icon/icon-policy.svg';
 import GuideIcon from './assets/icon/icon-how-to-use.svg'
 import RuleIcon from './assets/icon/icon-rule.svg';
+import UserController from './src/controller/UserController'
 
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -204,6 +207,30 @@ function AppDrawer() {
 
 
 class App extends React.Component {
+
+    constructor(props){
+        super(props);
+    }
+
+    componentDidMount(){
+        AsyncStorage.getItem('user_info').then((value) => {
+            if(value){
+                Def.user_info = JSON.parse(value);
+                Def.username = Def.user_info['user_name'];
+                Def.email = Def.user_info['email'];
+            }
+        });
+
+        AsyncStorage.getItem('flat_data').then((value) => {
+            if(value){
+                Def.flat_data = JSON.parse(value);
+                console.log("FlatData Length : " + Def.flat_data.length);
+            }
+        });
+    }
+
+
+
     render() {
         return (
             <NavigationContainer>

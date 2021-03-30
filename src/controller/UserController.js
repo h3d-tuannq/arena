@@ -1,6 +1,9 @@
 import Def from "../def/Def";
 import {Alert, Platform} from 'react-native'
 import Net from  './Net'
+import AsyncStorage  from '@react-native-async-storage/async-storage'
+
+import RNRestart from 'react-native-restart';
 
 export default class UserController{
 
@@ -31,6 +34,44 @@ export default class UserController{
         Net.sendRequest(this.logoutCallback,this.onLoginFalse,Def.ARENA_BASE + '/api/user/logout' , Def.POST_METHOD , param);
     }
 
+    static  logoutCallback = async (data) => {
+        if(data['err_code']){
+            Alert.alert(
+                "Cảnh báo",
+                data['msg'],
+                [
+                    {
+                        text: "Thử lại",
+                        onPress: () => {Def.setIsLogin(false)},
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+            return ;
+        }
+
+        try {
+            let keys = ['user_info'];
+            await AsyncStorage.multiRemove(keys);
+        }catch (e){
+
+        }
+        RNRestart.Restart();
+    }
+
+    static logoutLocal = async () => {
+        try {
+            Def.user_info = null;
+            let keys = ['user_info'];
+            await AsyncStorage.multiRemove(keys);
+        }catch (e){
+
+        }
+        RNRestart.Restart();
+    }
+
+
     static async onLoginSuccess(data){
         console.log("Data return : " + JSON.stringify(data));
         try {
@@ -58,7 +99,7 @@ export default class UserController{
                 Def.email = data['email'];
                 Def.username = data['username'];
                 Def.user_info = data;
-
+                AsyncStorage.setItem('user_info', JSON.stringify(data));
 
 
                 // let token = await messaging().getToken();

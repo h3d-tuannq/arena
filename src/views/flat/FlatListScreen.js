@@ -7,6 +7,7 @@ import ProgramVerList from '../../com/common/ProgramVerList';
 import FlatController from  '../../controller/FlatController';
 const PROGRAM_IMAGE_WIDTH = (width - 30-8) ;
 const PROGRAM_IMAGE_HEIGHT = (width - 30-8) ;
+import AsyncStorage  from '@react-native-async-storage/async-storage'
 
 class FlatListScreen extends React.Component {
 
@@ -17,6 +18,7 @@ class FlatListScreen extends React.Component {
         this.formatText    = this.formatText.bind(this);
         this.refresh     = this.refresh.bind(this);
         Def.mainNavigate = this.props.navigation;
+        Def.refeshFlatList = this.refresh.bind(this);
         let title = "Căn hộ bàn giao";
 
         this.state = {
@@ -29,13 +31,15 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
-        this.setState({ stateCount: Math.random() });
+        this.setState({ stateCount: Math.random() , data : Def.flat_data });
     }
 
     onGetFlatSuccess(data){
         Def.flat_data = data["data"];
         let title = "Danh sách thiết kế";
         design_list = Def.flat_data;
+        AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+
         this.setState({data:design_list});
     }
 
@@ -54,17 +58,21 @@ class FlatListScreen extends React.Component {
 
 
     shouldComponentUpdate(){
+        console.log("shouldComponentUpdate list");
         // this.setState({ configMenu: Def.config_news_menu});
         // console.log('SortData ddd:' + JSON.stringify(this.props.route));
         return true;
     }
 
     componentDidMount() {
-        if (Def.flat_data.length > 0) {
-
-        } else {
-            FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
-
+        console.log("Component Did Mount list");
+        if(Def.refresh_flat_data || Def.flat_data.length == 0){
+            if (Def.flat_data.length > 0 && Def.flat_data) {
+                this.setState({data:Def.flat_data});
+            } else {
+                FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+            }
+            Def.refresh_flat_data = false;
         }
     }
     render() {

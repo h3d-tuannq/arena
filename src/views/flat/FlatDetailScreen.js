@@ -25,6 +25,8 @@ import SendRepairReportForm from '../../../src/com/modal/SendRepairReportForm'
 import ProgramVerList from '../../com/common/ProgramVerList';
 import FlatController from '../../controller/FlatController';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 const PROGRAM_IMAGE_WIDTH = (width - 38) /2;
 const PROGRAM_IMAGE_HEIGHT = (width) /3;
 const carouselItems = [
@@ -71,7 +73,7 @@ class FlatDetailScreen extends React.Component {
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
         this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
         this.changeStatusFalse = this.changeStatusFalse.bind(this);
-
+        this.clickSignature = this.clickSignature.bind(this);
     }
 
     changeFlatStatus = (type, status = null) => {
@@ -86,6 +88,10 @@ class FlatDetailScreen extends React.Component {
                 FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, status, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE);
             }
         }
+    }
+
+    clickSignature = () => {
+        this.setState({displaySignatureForm : true, type:signature_form});
     }
 
     openSendMailModal = () => {
@@ -125,6 +131,18 @@ class FlatDetailScreen extends React.Component {
     updateFlatStatus =(flat) => {
         if(flat) {
             this.setState({item:flat});
+            if(Def.flat_data) { // Update dữ liệu
+                let index = Def.flat_data.findIndex((element) => element.id == flat.id );
+                if(index > -1){
+                    Def.flat_data[index] = flat;
+                    Def.refresh_flat_data = true;
+                    if (Def.refeshFlatList){
+                        Def.refeshFlatList();
+                    }
+
+
+                }
+            }
         }
 
         this.closeFunction();
@@ -188,7 +206,12 @@ class FlatDetailScreen extends React.Component {
     shouldComponentUpdate(){
         // this.setState({ configMenu: Def.config_news_menu});
         // console.log('SortData ddd:' + JSON.stringify(this.props.route));
+        console.log('shouldComponentUpdate - flat');
         return true;
+    }
+
+    componentDidMount() {
+        console.log('Component did mount -flat');
     }
 
 
@@ -200,7 +223,7 @@ class FlatDetailScreen extends React.Component {
         Def.order_number = 20;
         const ListHeader = () => (
             <View>
-                <View style={{width : width , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
+                <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <View style={styles.imageContainer}>
                         {item.design && item.design.image_path ?
                             <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.design.image_path)}}  />
@@ -221,9 +244,19 @@ class FlatDetailScreen extends React.Component {
                             <View style={styles.imageContainer}>
                                 <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.signature.image_path)}}  />
                                 <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
-                                    <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                                        {"Chữ Ký"}
-                                    </Text>
+                                    <TouchableOpacity style={[{   paddingVertical:1 , flexDirection:'row' , justifyContent:'space-around' , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, {}]}
+                                        onPress={this.clickSignature}
+                                    >
+                                        { FlatHelper.canReSigning(this.state.item, Def.user_info) ?
+                                            <Icon name="pencil" size={20} color="#fff" />
+                                            : <View/>
+                                        }
+                                        <Text style={Style.text_styles.whiteTitleText}>
+                                            {"Chữ Ký"}
+                                        </Text>
+                                        <View/>
+
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                             : null
@@ -238,7 +271,7 @@ class FlatDetailScreen extends React.Component {
                         <Text>
                             {"Tình trạng:" + ' '}
                         </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5 , width: width /2 - 60}}>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
                             {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
                         </Text>
                     </View>
@@ -508,11 +541,12 @@ const styles = StyleSheet.create({
 
     },
     imageContainer:{
-        flex: 2,
+        flex: 1,
         borderRadius :5,
         // justifyContent:'center',
         padding: 10,
         marginTop:5,
+        alignItems:'center'
         // backgroundColor:'green'
     },
 
