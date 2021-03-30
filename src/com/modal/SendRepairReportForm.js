@@ -25,7 +25,8 @@ class SendRepairReportForm extends React.Component {
             flat: props.flat ,
             repairList : FlatHelper.getRepairItemList(this.props.flat),
             note:'',
-            type: 0
+            type: 0,
+            refresh:0,
         };
         this.requestBtnClick = this.requestBtnClick.bind(this);
         this.sendMailSuccess = this.sendMailSuccess.bind(this);
@@ -33,6 +34,7 @@ class SendRepairReportForm extends React.Component {
         this.getPifIds = this.getPifIds.bind(this);
         this.resetButtonClick = this.resetButtonClick.bind(this);
         this.itemChange = this.itemChange.bind(this);
+        this.keyExtractorFun = this.keyExtractorFun.bind(this);
     }
 
     requestBtnClick = () => {
@@ -46,11 +48,12 @@ class SendRepairReportForm extends React.Component {
     };
 
     resetButtonClick = () => {
+        console.log('Reset button click');
         let data = this.state.repairList;
         for ( let i = 0 ; i < data.length ; i++) {
             data[i].selectValue = false;
         }
-        this.setState({repairList:data});
+        this.setState({repairList:data,  refresh: Math.random() });
     }
 
     getPifIds = () => {
@@ -100,6 +103,11 @@ class SendRepairReportForm extends React.Component {
     sendMailFalse = (data) => {
         console.log('Change Status False ' + JSON.stringify(data));
     };
+
+    keyExtractorFun = ({item,index}) => {
+        return ((item.pif ? item.pif.id : item.id) + "" + index.toString() + ( item.selectValue ? item.selectValue + "" : "false") + this.state.refresh);
+    }
+
     render() {
         const ListHeader = () => (
             <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>
@@ -115,12 +123,14 @@ class SendRepairReportForm extends React.Component {
                     <MailProductItemrenderer
                         item ={item} click={this.itemClick} itemChange={this.itemChange}
                         styleImage={{width: (width - 30) / 2, height: (width - 30) / 2}}
-                        type={this.props.type}
+                        type={this.props.type} selectValue={item.selectValue}
                     />
 
                 </View>
             )
         }
+
+
 
         return (
             <View style={{height:height}}>
@@ -139,6 +149,7 @@ class SendRepairReportForm extends React.Component {
                         header={ListHeader}
                         type={'product'}
                         numColumns={2}
+                        keyExtractorFunc={this.keyExtractorFun}
                         stack={'Flat'}
                         renderFunction={renderItem}
                         screen={'product-detail'}

@@ -82,7 +82,13 @@ class ProgramVerList extends React.Component{
                     style={[this.props.styleList,{ marginBottom :  0 , backgroundColor:'#fff'}]}
                     data={this.props.data ? this.props.data : [] }
                     renderItem={this.props.renderFunction ? this.props.renderFunction :renderItem}
-                    keyExtractor={(item,index) => item.id + "" + index.toString()}
+                    keyExtractor={(item,index) => {
+                        if(this.props.keyExtractorFunc){
+                           return this.props.keyExtractorFunc(item, index);
+                        }
+                        return ((item.pif ? item.pif.id : item.id) + "" + index.toString() + ( item.selectValue ? item.selectValue + "" : "false"));
+                    } }
+
                     showsHorizontalScrollIndicator={false}
                     numColumns={this.props.numColumns ?  this.props.numColumns : 1}
                     ListHeaderComponent={this.props.header}

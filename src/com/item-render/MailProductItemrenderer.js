@@ -29,14 +29,15 @@ class MailProductItemrenderer extends PureComponent{
 
     constructor(props) {
         super(props);
+        console.log('Run on props');
         this.state =  {
             item : this.props.item,
             stateCount: 0.0,
-            selectValue: this.props.item.selectValue
+            selectValue: this.props.selectValue
         };
     }
     render(){
-        const model = this.props.item ? this.props.item.pif : null;
+        const model = this.state.item ? this.state.item.pif : null;
         const click = this.props.click;
         return (
             <View style={{justifyContent : 'center', alignItems:'center' , marginVertical : 3 , marginLeft:1}}>
