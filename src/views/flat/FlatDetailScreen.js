@@ -12,6 +12,7 @@ import {
     TouchableWithoutFeedback,
     Modal,
     Alert,
+    RefreshControl
 } from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
@@ -73,13 +74,21 @@ class FlatDetailScreen extends React.Component {
             type : -1,
             totalProduct:calPif.total ? calPif.total : 0,
             passProduct:calPif.pass ? calPif.pass : 0,
+            isRefresh : false
 
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
         this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
         this.changeStatusFalse = this.changeStatusFalse.bind(this);
         this.clickSignature = this.clickSignature.bind(this);
+        this.onRefresh = this.onRefresh.bind(this);
     }
+
+    onRefresh = () => {
+        console.log('Refresh News');
+        this.setState({isRefresh:true});
+        // FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+    };
 
     changeFlatStatus = (type, status = null) => {
         if(type == decline_deliver_form) {
@@ -264,8 +273,6 @@ class FlatDetailScreen extends React.Component {
                             : null
 
                     }
-
-
                 </View>
 
                 <View style={styles.info}>
@@ -364,6 +371,9 @@ class FlatDetailScreen extends React.Component {
             <View style={{flex:1}}>
                 <View style={{flex:1, paddingTop:5 , paddingBottom : 5 }}>
                     <ProgramVerList
+                        refreshControl={
+                            <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
+                        }
                         data={this.state.item.productInstanceFlat}
                         navigation={this.props.navigation}
                         header={ListHeader}

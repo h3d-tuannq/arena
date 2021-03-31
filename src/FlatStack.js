@@ -1,18 +1,12 @@
 import React from 'react';
-import {Text, View, Button, TouchableOpacity} from 'react-native';
+import {Text, View, Button, TouchableOpacity, RefreshControl} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
-
-
 import FlatListScreen from './views/flat/FlatListScreen';
 import FlatDetailScreen from './views/flat/FlatDetailScreen';
 import ProductDetailScreen from './views/flat/ProductDetailScreen'
 import MenuIcon from '../assets/icon/menu.svg';
-
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-
 import BackIconSvg from '../assets/icon/icon-back.svg'
-
 import Style from './def/Style'
 import Def from './def/Def'
 import FlatHelper from "./def/FlatHelper";
@@ -68,7 +62,6 @@ class FlatStack extends React.Component {
                     }
                 }} />
                 <RootStack.Screen name="flat-detail" component={FlatDetailScreen} options={({route}) => {
-                    // console.log("Route : " + JSON.stringify(route.params.item.id));
                     return ({
                     title: 'Chi tiết căn hộ',
                     headerStyle: {
@@ -92,7 +85,6 @@ class FlatStack extends React.Component {
                                 }
                             }
                             onPress={() => this.goProductList}>
-                            {console.log('Route : ' + JSON.stringify(route.params.item.id))}
                             <Icon name="paper-plane" size={30} color="#fff" />
                             {/*<Text style={{color:'#fff'}}>*/}
                                 {/*{route.params.item.id}*/}

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, FlatList} from 'react-native'
+import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, FlatList, RefreshControl} from 'react-native'
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Style from '../../def/Style';
@@ -19,12 +19,14 @@ class FlatListScreen extends React.Component {
         this.refresh     = this.refresh.bind(this);
         Def.mainNavigate = this.props.navigation;
         Def.refeshFlatList = this.refresh.bind(this);
+        this.onRefresh = this.onRefresh.bind(this);
         let title = "Căn hộ bàn giao";
 
         this.state = {
             data: Def.flat_data,
             title: title,
             stateCount: 0.0,
+            isRefresh : false
         };
 
     }
@@ -34,18 +36,25 @@ class FlatListScreen extends React.Component {
         this.setState({ stateCount: Math.random() , data : Def.flat_data });
     }
 
+    onRefresh = () => {
+        console.log('Refresh News');
+        this.setState({isRefresh:true});
+        FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+    };
+
     onGetFlatSuccess(data){
+        console.log("Flat Success !");
         Def.flat_data = data["data"];
         let title = "Danh sách thiết kế";
         design_list = Def.flat_data;
         AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
-
-        this.setState({data:design_list});
+        this.setState({data:design_list, isRefresh:false});
     }
 
 
     onGetFlatFalse(data){
         console.log("false data : " + data);
+        his.setState({isRefresh:false});
     }
 
     formatText(text){
@@ -65,7 +74,6 @@ class FlatListScreen extends React.Component {
     }
 
     componentDidMount() {
-        console.log("Component Did Mount list");
         if(Def.refresh_flat_data || Def.flat_data.length == 0){
             if (Def.flat_data.length > 0 && Def.flat_data) {
                 this.setState({data:Def.flat_data});
@@ -96,6 +104,9 @@ class FlatListScreen extends React.Component {
                     data={this.state.data}
                     navigation={this.props.navigation}
                     header={ListHeader}
+                    refreshControl={
+                        <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
+                    }
                     type={'flat'}
                     numColumns={1}
                     screen={'flat-detail'}

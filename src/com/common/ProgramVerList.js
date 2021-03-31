@@ -79,6 +79,9 @@ class ProgramVerList extends React.Component{
         return (
             <View style={styles.container}>
                 <FlatList
+                    refreshControl={
+                        this.props.refreshControl ? this.props.refreshControl : null
+                    }
                     style={[this.props.styleList,{ marginBottom :  0 , backgroundColor:'#fff'}]}
                     data={this.props.data ? this.props.data : [] }
                     renderItem={this.props.renderFunction ? this.props.renderFunction :renderItem}
