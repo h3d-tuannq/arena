@@ -36,21 +36,12 @@ class ProductItemrenderer extends PureComponent{
                     click(model);
                 }
             } >
-                {this.props.favorite ?
-                    <TouchableOpacity style={[styles.favoriteIcon, {width:30, height:30, backgroundColor : Style.GREY_TEXT_COLOR, alignItems : 'center', justifyContent:'center', borderRadius: 15}]}
-                          onPress={
-                              () => {
-                                  click(model);
-                              }
-                          }
+                {
+                    <TouchableOpacity style={[styles.favoriteIcon, {width:10, height:10, backgroundColor : Def.ProductStatusColor[model.status], alignItems : 'center', justifyContent:'center', borderRadius: 5}]}
+
                     >
-                        <PlusCircleIcon />
                     </TouchableOpacity>
-                    :
-                    <View/>
                 }
-
-
                 {
                     model.productInstance && model.productInstance && model.productInstance.product.image_path ?
 
@@ -59,8 +50,8 @@ class ProductItemrenderer extends PureComponent{
                         <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
 
                 }
+                    </TouchableOpacity>
 
-                </TouchableOpacity>
 
                 <View style = {{width:this.props.styleImage.width, justifyContent:'center', alignItems: (this.props.type == 'product' ? 'flex-start' :'center')}}>
 

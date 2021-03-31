@@ -354,7 +354,7 @@ export default class Def {
     static PRODUCT_UNACTIVE_STATUS = 0; // Không đạt
 
     static ProductStatusName = {0:"Không đạt", 1:"Đạt", 2:'Đã chỉnh sửa'};
-    static ProductStatusColor = {0:"#FF0000", 1:"'#00FF04'", 2: '#FFAE00'};
+    static ProductStatusColor = {0:"#FF0000", 1:"#00FF04", 2: '#FFAE00'};
 
     static getProductStatusName(status){
         return  Def.ProductStatusName[status];
@@ -366,11 +366,33 @@ export default class Def {
 
     static requestRepairsTree = [];
 
+    static refeshFlat = []; // Danh sách dự án cần được load lại trang chi tiết
 
+    static refeshPIF = [] ;// Danh sách dữ liệu trang PIF cần load lại
 
+    static updateFlatToFlatList(flat){
+        let index = Def.flat_data.findIndex((element) => element.id == flat.id );
+        if(index > -1){
+            Def.flat_data[index] = flat;
+            Def.refresh_flat_data = true;
+        }
+        return index> -1;
+    }
 
+    static updateProductToFlat(pif){
+        let flat = Def.flat_data.findIndex((element) => element.id == pif.flat_id );
+        if(flat){
+            let index = flat.productInstanceFlat.findIndex((element) => element.id == pif.id );
+            if(index > -1){
+                flat.productInstanceFlat[index] = pif;
+                Def.refresh_flat_data = true;
 
+            }
+        }
 
+        return index> -1;
+
+    }
 
 
 }

@@ -57,6 +57,8 @@ class FlatDetailScreen extends React.Component {
         let title = "Gian hàng";
 
         this.closeFunction = this.closeFunction.bind(this);
+        let calPif = FlatHelper.calPassPif(this.props.route.params.item);
+        console.log('CanPif : ' + JSON.stringify(calPif));
 
 
         this.state = {
@@ -68,7 +70,10 @@ class FlatDetailScreen extends React.Component {
             displayDeclineForm : false,
             displaySignatureForm : false,
             displaySendMailForm : false,
-            type : -1
+            type : -1,
+            totalProduct:calPif.total ? calPif.total : 0,
+            passProduct:calPif.pass ? calPif.pass : 0,
+
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
         this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
@@ -132,15 +137,12 @@ class FlatDetailScreen extends React.Component {
         if(flat) {
             this.setState({item:flat});
             if(Def.flat_data) { // Update dữ liệu
-                let index = Def.flat_data.findIndex((element) => element.id == flat.id );
-                if(index > -1){
-                    Def.flat_data[index] = flat;
+                let updated = Def.updateFlatToFlatList(flat);
+                if(updated){
                     Def.refresh_flat_data = true;
                     if (Def.refeshFlatList){
                         Def.refeshFlatList();
                     }
-
-
                 }
             }
         }
@@ -349,11 +351,13 @@ class FlatDetailScreen extends React.Component {
 
 
 
-                <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>
-                    <View style={{marginLeft:15, paddingBottom:8}}>
-                        <Text style={styles.titleStyle}>{(this.state.item.productInstanceFlat ? this.state.item.productInstanceFlat.length : 0) + " Sản phẩm"}</Text>
+                {/*<View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>*/}
+                    <View style={{paddingHorizontal:10, paddingBottom:8 , flexDirection:'row', justifyContent:'space-between'}}>
+
+                        <Text style={styles.titleStyle}>{"Thiết bị nội thất"}</Text>
+                        <Text style={styles.titleStyle}>{(this.state.passProduct +"/" +this.state.totalProduct )}</Text>
                     </View>
-                </View>
+                {/*</View>*/}
             </View>
         );
         return (

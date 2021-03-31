@@ -187,6 +187,19 @@ export default class FlatHelper {
         return repairList;
     }
 
+    static calPassPif(flat){
+        let pifs = flat.productInstanceFlat;
+        let activePif = pifs.filter(function (item) {
+            return item.is_deleted != 1;
+        });
+        let passPif = activePif.filter(function (activeItem) {
+            return activeItem.status == Def.PRODUCT_ACTIVE_STATUS;
+        })
+        return {pass:passPif.length, total:activePif.length};
+
+    }
+
+
 
 
 
