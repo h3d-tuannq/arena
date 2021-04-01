@@ -7,6 +7,22 @@ export default class FlatController {
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat" ,Def.POST_METHOD);
     }
 
+    static getbuilding(callback,errCallback , params = null) {
+
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-bulding" ,Def.POST_METHOD, params);
+    }
+
+    static getCustomer(callback,errCallback ) {
+
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-customer" ,Def.POST_METHOD);
+    }
+
+
+    static getFlatById(callback,errCallback, flatId ) {
+        let param = {'flat_id' : flatId};
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat-by-id" ,Def.POST_METHOD, param);
+    }
+
     static getRequestRepair(callback, errCallback , product_flat_id){
        let param = {'product_flat_id' : product_flat_id};
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-request-repair-by-pif" ,Def.POST_METHOD, param);

@@ -30,7 +30,8 @@
     "react-native-signature-capture": "^0.4.11",
     "react-native-svg": "^12.1.0",
     "react-native-svg-transformer": "^0.14.3",
-    "react-native-vector-icons": "^8.1.0"
+    "react-native-vector-icons": "^8.1.0",
+    "react-native-autocomplete-input": "github:mrlaessig/react-native-autocomplete-input"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",

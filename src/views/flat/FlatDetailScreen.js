@@ -82,13 +82,38 @@ class FlatDetailScreen extends React.Component {
         this.changeStatusFalse = this.changeStatusFalse.bind(this);
         this.clickSignature = this.clickSignature.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
+        this.onGetFlatDetailSuccess = this.onGetFlatDetailSuccess.bind(this);
+        this.onGetFlatDetailFalse = this.onGetFlatDetailFalse.bind(this);
     }
 
     onRefresh = () => {
         console.log('Refresh News');
         this.setState({isRefresh:true});
-        // FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+        FlatController.getFlatById(this.onGetFlatSuccess, this.onGetDesignFalse, this.state.item.id);
     };
+
+    onGetFlatDetailSuccess(data){
+        this.setState({isRefresh:false});
+        if(data['result'] == 1){
+            this.updateFlatStatus(data['flat']);
+        } else {
+            Alert.alert(
+                "Thông báo",
+                data['msg'],
+                [
+                    {
+                        text: "Ok",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+    }
+    onGetFlatDetailFalse(data){
+        this.setState({isRefresh:false});
+        console.log("false data : " + data);
+    }
 
     changeFlatStatus = (type, status = null) => {
         if(type == decline_deliver_form) {
@@ -201,9 +226,7 @@ class FlatDetailScreen extends React.Component {
     }
 
 
-    onGetDesignFalse(data){
-        console.log("false data : " + data);
-    }
+
 
     formatText(text){
         let rs = text;

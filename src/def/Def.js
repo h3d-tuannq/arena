@@ -394,5 +394,6 @@ export default class Def {
 
     }
 
-
+    static buildingData = [];
+    static customerData = [];
 }
