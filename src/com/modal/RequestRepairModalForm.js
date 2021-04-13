@@ -92,7 +92,7 @@ class RequestRepairModalForm extends React.Component {
 
 
         ImagePicker.showImagePicker(options, response => {
-                console.log('Attr res' + attr);
+                console.log('Attr res++' + attr);
                 if (response.uri) {
                     console.log('Reponse browser image : ' + JSON.stringify(response));
                     let maxsize = response.width > response.height ? response.width : response.height;
@@ -114,7 +114,9 @@ class RequestRepairModalForm extends React.Component {
                     } else {
                         this.setState({[attr]: response})
                     }
-                }
+                } else {
+                    console.log("Response : " + JSON.stringify(response));
+            }
             }
         )
     }
