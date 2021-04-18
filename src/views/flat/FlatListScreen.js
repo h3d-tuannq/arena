@@ -12,7 +12,7 @@ import {
     RefreshControl,
     TextInput,
     Modal,
-    Alert,
+    Alert, Platform, PermissionsAndroid,
 } from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
@@ -50,6 +50,7 @@ class FlatListScreen extends React.Component {
         this.closeFunction = this.closeFunction.bind(this);
         this.filterDataByCondition = this.filterDataByCondition.bind(this);
         this.filterFunc = this.filterFunc.bind(this);
+        this.checkPermission = this.checkPermission.bind(this);
         let title = "Căn hộ bàn giao";
 
         this.state = {
@@ -221,6 +222,41 @@ class FlatListScreen extends React.Component {
             Def.refresh_flat_data = false;
         }
     }
+
+    checkPermission = async () => {
+
+        // Function to check the platform
+        // If iOS then start downloading
+        // If Android then ask for permission
+
+        if (Platform.OS === 'ios') {
+            FlatHelper.downloadImage();
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'Storage Permission Required',
+                        message:
+                            'App needs access to your storage to download Photos',
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    // Once user grant the permission start downloading
+                    console.log('Storage Permission Granted.');
+                    FlatHelper.downloadImage();
+
+                } else {
+                    // If permission denied then show alert
+                    alert('Storage Permission Not Granted');
+                }
+            } catch (err) {
+                // To handle permission related exception
+                console.warn(err);
+            }
+        }
+    };
+
     render() {
         const {navigation} = this.props;
         const configMenu = Def.config_design_menu;
@@ -318,7 +354,7 @@ class FlatListScreen extends React.Component {
                         </TextInput>
                     </View>
 
-                    <TouchableOpacity onPress={ () => FlatHelper.downloadImage()}>
+                    <TouchableOpacity onPress={this.checkPermission}>
                         <Text>
                             Download
                         </Text>

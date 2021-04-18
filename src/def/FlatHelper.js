@@ -1,5 +1,9 @@
 import Def from './Def'
 import RNFetchBlob from 'rn-fetch-blob';
+import {
+    PermissionsAndroid,
+    Platform,
+} from 'react-native';
 
 export default class FlatHelper {
 
@@ -211,13 +215,16 @@ export default class FlatHelper {
             /[^.]+$/.exec(filename) : undefined;
     };
 
+
+
+
     static downloadImage = (product= null) => {
         // Main function to download the image
 
         // To add the time suffix in filename
         let date = new Date();
         // Image URL which we want to download
-        let image_URL = 'http://admbangiao.thearena.vn/data/acceptanceData/product/202101/23/19/product_img.png?v=1';
+        let image_URL = 'https://arenaadmin.house3d.com/data/acceptanceData/product/202101/23/19/product_img.png';
         // Getting the extention of the file
         let ext = FlatHelper.getExtention(image_URL);
         ext = '.' + ext[0];
@@ -226,14 +233,23 @@ export default class FlatHelper {
         // fs: Directory path where we want our image to download
         const { config, fs } = RNFetchBlob;
 
-        let dir = RNFetchBlob.fs.dirs.DownloadDir + '/arena';
+        let dir = fs.dirs.DownloadDir + '/arena/';
 
-        RNFetchBlob.fs.mkdir(dir).then(() => {
-            console.log("App directory created..");
-        })
-        .catch((err) => {
-            console.log("Err : " + JSON.stringify(err));
+        fs.isDir(dir).then((isDir) => {
+            if(!isDir){
+                RNFetchBlob.fs.mkdir(dir).then(() => {
+                    console.log("App directory created..");
+                    FlatHelper.downloadFile(image_URL, dir, ext);
+                })
+                    .catch((err) => {
+                        console.log("Err : " + JSON.stringify(err));
+                    });
+            } else {
+                FlatHelper.downloadFile(image_URL, dir, ext);
+            }
         });
+
+
 
         // let PictureDir = fs.dirs.PictureDir;
         // let options = {
@@ -248,7 +264,7 @@ export default class FlatHelper {
         //     //         ext,
         //     //     description: 'Image',
         //     // },
-        //      path : RNFetchBlob.fs.mkdir('/arena/') + date.getTime() + ext
+        //     // path : PictureDir + '/image_' + Math.floor(date.getTime() + date.getSeconds() / 2) + ext
         // };
         // config(options)
         //     .fetch('GET', image_URL)
@@ -262,5 +278,41 @@ export default class FlatHelper {
         //     })
         // ;
     };
+
+    static downloadFile(url, path, ext) {
+        console.log('Start download image');
+        let date = new Date();
+        const { config, fs } = RNFetchBlob;
+        let path_url =   date.getTime() + '.png'
+        console.log('Url : ' + url);
+        console.log('Path Url : ' + path_url);
+
+
+        let options = {
+            fileCache: true,
+            // addAndroidDownloads: {
+            //     // Related to the Android only
+            //     useDownloadManager: true,
+            //     notification: true,
+            //     path:
+            //         PictureDir +
+            //         '/image_' + Math.floor(date.getTime() + date.getSeconds() / 2) +
+            //         ext,
+            //     description: 'Image',
+            // },
+            //  path : path_url
+        };
+        config(options)
+            .fetch('GET', url)
+            .then(res => {
+                // Showing alert after successful downloading
+                console.log('res -> ', JSON.stringify(res));
+                alert('Image Downloaded Successfully.'  + res.path());
+            })
+            .catch(err => {
+                console.log("Err download image : " + JSON.stringify(err));
+            })
+        ;
+    }
 
 }
