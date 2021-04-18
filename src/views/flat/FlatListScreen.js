@@ -24,6 +24,7 @@ const PROGRAM_IMAGE_HEIGHT = (width - 30-8) ;
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import AutocompleteModal from '../../com/common/AutocompleteModal';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import FlatHelper from '../../def/FlatHelper';
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -65,7 +66,6 @@ class FlatListScreen extends React.Component {
             displayModal: false,
             filterAttr:"name",
             filterData: [],
-            title:"",
             choseMode:0 // 0 chọn dự án, 1 chọn khách hàng
 
         };
@@ -126,7 +126,7 @@ class FlatListScreen extends React.Component {
         console.log("Flat Success !");
         Def.flat_data = data["data"];
         let title = "Danh sách thiết kế";
-        design_list = Def.flat_data;
+        let design_list = Def.flat_data;
         AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
         this.setState({data:design_list, isRefresh:false});
     }
@@ -253,7 +253,7 @@ class FlatListScreen extends React.Component {
             if (Def.flat_data.length > 0 && Def.flat_data) {
                 this.setState({data:Def.flat_data});
             } else {
-                FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+                // FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
             }
             Def.refresh_flat_data = false;
         }
@@ -356,6 +356,12 @@ class FlatListScreen extends React.Component {
                             <Icon style={styles.searchIcon} name="search" size={27} color={Style.GREY_TEXT_COLOR}/>
                         </TouchableOpacity>
                     </View>
+
+                    <TouchableOpacity onPress={ () => FlatHelper.downloadImage()}>
+                        <Text>
+                            Download
+                        </Text>
+                    </TouchableOpacity>
 
                     <Modal onRequestClose={() => {this.closeFunction(null)}} visible={this.state.displayModal}  transparent={false} styles={{backgroundColor : 'green'}} >
                         {/*{this.state.choseAddress ?*/}

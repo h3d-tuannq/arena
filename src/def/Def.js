@@ -6,10 +6,10 @@ export default class Def {
     static VIETCRAFT_URL_CONTENT_BASE = "https://fairadmin.house3d.com/data/vietcraftData/";
     static URL_DEFAULT_AVATAR = "https://cdn-content1.house3d.com/uploads/2019/07/02/5d1aa12048236.jpg";
     static LIFE_STYLE_BASE = "https://lifestylevietnamonline.com";
-    static LIFE_STYLE_BASE_ASSET = "https://arenaadmin.house3d.com/data/acceptanceData/";
+    static LIFE_STYLE_BASE_ASSET = "http://admbangiao.thearena.vn/data/acceptanceData/";
 
 
-    static ARENA_BASE = "https://arena.house3d.com";
+    static ARENA_BASE = "http://bangiao.thearena.vn";
 
     static PARTNER_ACTIVE_STATUS = 1;
 
