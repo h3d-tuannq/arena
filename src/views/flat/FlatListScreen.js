@@ -32,6 +32,8 @@ const CHOSE_CUSTOMER = 1;
 
 class FlatListScreen extends React.Component {
 
+    criteria = {};
+
     constructor(props){
         super(props);
         this.onGetFlatSuccess     = this.onGetFlatSuccess.bind(this);
@@ -49,10 +51,11 @@ class FlatListScreen extends React.Component {
         this.getFilterDataFalse = this.getFilterDataFalse.bind(this)
         this.closeFunction = this.closeFunction.bind(this);
         this.filterDataByCondition = this.filterDataByCondition.bind(this);
+        this.searchButtonClick = this.searchButtonClick.bind(this);
         this.filterFunc = this.filterFunc.bind(this);
+        this.resetCriteria = this.resetCriteria.bind(this);
         this.checkPermission = this.checkPermission.bind(this);
         let title = "Căn hộ bàn giao";
-
         this.state = {
             data: Def.flat_data,
             title: title,
@@ -74,26 +77,51 @@ class FlatListScreen extends React.Component {
         this.setState({ stateCount: Math.random() , data : Def.flat_data });
     }
 
+    searchButtonClick = () => {
+        if(this.state.name){
+            this.criteria['name'] = this.state.name;
+            this.filterDataByCondition();
+        }
+    }
+
     filterDataByCondition = () => {
+       console.log('Run Filter : ');
+       this.criteria['name'] = this.state.name;
        let dataFilter =  Def.flat_data.filter(this.filterFunc);
+       console.log('Filter-Data : ' + dataFilter.length)
        this.setState({data:dataFilter});
     }
 
     filterFunc = (item) => {
         let rs = true;
-        if(this.state.building){
-            rs = item.building_id == this.state.building.id;
+        if(this.criteria.building){
+            console.log('filter building');
+            rs = item.building_id == this.criteria.building.id;
         }
-        if(rs && this.state.customer){
-            rs = item.customer_code == this.state.customer.code;
+        if(rs && this.criteria.customer){
+            rs = item.customer_code == this.criteria.customer.code;
         }
+
+        if(rs && this.criteria.name && this.criteria.name.length > 0){
+            const regex = new RegExp(`${this.criteria.name.trim()}`, 'i');
+
+            rs = item.code.search(regex) >= 0;
+        }
+        return rs;
     }
 
     onRefresh = () => {
         console.log('Refresh News');
         this.setState({isRefresh:true});
+        this.resetCriteria();
         FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
     };
+
+    resetCriteria = () => {
+        this.setState({building: null, customer:null, name: ""});
+        this.criteria = {};
+    }
+
 
     onGetFlatSuccess(data){
         console.log("Flat Success !");
@@ -107,7 +135,7 @@ class FlatListScreen extends React.Component {
 
     onGetFlatFalse(data){
         console.log("false data : " + data);
-        his.setState({isRefresh:false});
+        this.setState({isRefresh:false});
     }
 
     formatText(text){
@@ -128,10 +156,10 @@ class FlatListScreen extends React.Component {
 
     choseBuildingClick = ()=> {
         console.log('Chose Building Click');
-        if(!Def.buildingData){
+        if(!Def.buildingData && Def.buildingData.length < 1 ){
             FlatController.getCustomer(this.getBuildingSuccess, this.getFilterDataFalse);
         } else {
-            this.showModal([], 'Chọn Dự án', CHOSE_BUILDING);
+            this.showModal(Def.buildingData, 'Chọn Dự án', CHOSE_BUILDING);
         }
 
     }
@@ -165,8 +193,9 @@ class FlatListScreen extends React.Component {
     getCustomerSuccess = (data) => {
         if(data['result'] == 1){
             Def.customerData = data['customer'];
+            console.log('Customer Length : ' + Def.customerData.length);
             AsyncStorage.setItem('customerData', JSON.stringify(Def.customerData));
-            this.showModal(Def.customerData, 'Chọn Chủ sở hữu', CHOSE_CUSTOMER);
+            this.showModal(Def.customerData, 'Chọn Chủ sở hữu', CHOSE_CUSTOMER );
 
         }else {
             Alert.alert(
@@ -187,23 +216,31 @@ class FlatListScreen extends React.Component {
 
 
     choseCustomerClick = ()=> {
-        console.log('Chose Building Click');
-        if(!Def.customerData){
+        console.log('Chose Customer Click');
+        if(!Def.customerData || Def.customerData.length < 1){
             FlatController.getCustomer(this.getCustomerSuccess, this.getFilterDataFalse);
         } else {
-            this.showModal([], 'Chọn Chủ sở hữu', CHOSE_CUSTOMER);
+            this.showModal(Def.customerData, 'Chọn Chủ sở hữu', CHOSE_CUSTOMER);
         }
 
     }
 
-    showModal =(data, title, type) => {
-        this.setState({displayModal:true, title:title, type:type})
+    showModal =(data, title, type ) => {
+        this.setState({displayModal:true, title:title, type:type , filterData:data})
     }
 
     closeFunction = (data) => {
         let state = {displayModal:false};
+
         if(data){
+            console.log("DAta :" + JSON.stringify(data))
+            if(data && data['id'] == -1){
+                data = null;
+            }
+
+
           this.state.type ?  state['customer'] = data : state['building'] = data;
+            this.state.type ?  this.criteria['customer'] = data : this.criteria['building'] = data;
           this.filterDataByCondition();
         }
 
@@ -264,7 +301,7 @@ class FlatListScreen extends React.Component {
         const ListHeader = () => (
             <View>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
-                    <View style={{marginLeft:15, paddingBottom:8}}>
+                    <View style={{marginLeft:15, paddingBottom:5}}>
                         <Text style={styles.titleStyle}>{this.state.data.length + " Căn hộ"}</Text>
                     </View>
                 </View>
@@ -275,7 +312,7 @@ class FlatListScreen extends React.Component {
         return (
             <View style={{flex:1, paddingTop:5}}>
                 <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>
-                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 10, backgroundColor : '#fff', marginTop:5}}
+                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseBuildingClick}
                     >
                         <Text style={[Style.text_styles.middleText,{}]}>
@@ -289,7 +326,7 @@ class FlatListScreen extends React.Component {
                             <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 10, backgroundColor : '#fff', marginTop:5}}
+                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseCustomerClick}
                     >
                         <Text style={[Style.text_styles.middleText,{}]}>
@@ -348,10 +385,12 @@ class FlatListScreen extends React.Component {
                     {/*        <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR}/>*/}
                     {/*    </View>*/}
                     {/*</TouchableOpacity>*/}
-                    <View style={{ width : width -40, borderWidth : 0, borderBottomWidth:1 ,borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginHorizontal : 10, marginBottom : 10}}>
-                        <Icon style={styles.searchIcon} name="search" size={24} color={Style.GREY_TEXT_COLOR}/>
-                        <TextInput value={this.state.name} onChangeText={text => this.setState({ name : text })} placeholder={"Tìm kiếm"} style={[styles.textInput, {marginTop:10, width: width -60}]}>
+                    <View style={{ width : width -20, borderWidth : 0, borderBottomWidth:1 ,borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginTop : 2, marginBottom : 10}}>
+                        <TextInput value={this.state.name} onChangeText={text => this.setState({ name : text })} placeholder={"Tìm kiếm"} style={[styles.textInput, {backgroundColor:'#fff',marginTop:5, width: width -70, paddingHorizontal:10}]}>
                         </TextInput>
+                        <TouchableOpacity onPress={this.searchButtonClick} style={{paddingLeft:5,paddingRight:10, paddingVertical:5 ,  }} >
+                            <Icon style={styles.searchIcon} name="search" size={27} color={Style.GREY_TEXT_COLOR}/>
+                        </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity onPress={this.checkPermission}>
@@ -367,6 +406,7 @@ class FlatListScreen extends React.Component {
                             filterAttr={this.state.filterAttr}
                             closeFunction={this.closeFunction}
                             title={this.state.title}
+                            type={this.state.type}
 
                         />
                     </Modal>
@@ -435,7 +475,8 @@ const styles = StyleSheet.create({
     titleStyle : {
         fontSize : Style.BIG_SIZE,
         color: Style.GREY_TEXT_COLOR,
-    }
+    },
+    textInput : {height: 40,  borderColor: "#9e9e9e", borderWidth : 0, borderBottomWidth:0 ,color:'black', fontSize : Style.MIDLE_SIZE, borderRadius: 5, paddingHorizontal: 5  },
 });
 
 export default FlatListScreen;

@@ -12,12 +12,27 @@ const initData = [
     {"id":2,"code":"TTCR","name":"Arena Cam ranh2"},
     ];
 
+const BUILD_TYPE = 0;
+const CUSTOMER_TYPE = 1;
+
+
+
 class AutocompleteModal extends React.Component {
     constructor(props){
         super(props);
+        let data = this.props.data && this.props.data.length > 0 ? (this.props.data) : initData;
+        if(data[0].id != -1){
+            let firstItem = {
+                'id' : -1
+            };
+            firstItem[this.props.filterAttr] = "Bỏ chọn",
+                data.unshift(firstItem);
+        }
+
         this.state = {
-            data :this.props.data && this.props.data.length > 0 ? this.props.data : initData,
-            query : ""
+            data :this.props.data && this.props.data.length > 0 ? (this.props.data) : initData,
+            query : "",
+            type: 0
         };
     }
 
@@ -42,7 +57,7 @@ class AutocompleteModal extends React.Component {
             <View style={{height: height, paddingBottom :50}}>
                 <View style={{justifyContent: 'center', alignItems : 'center', paddingVertical: 10}}>
                     <Text style={Style.text_styles.titleTextNotBold}>
-                        {this.props.addressTitle}
+                        {this.props.title}
                     </Text>
                 </View>
                 <Autocomplete
@@ -54,8 +69,14 @@ class AutocompleteModal extends React.Component {
                         <TouchableOpacity style={styles.itemStyle} onPress={() => {
                             this.item_click(item)
                         }}>
-                            <LocationIcon width={25} height={25} style={{padding:5}}/>
-                            <Text style={{paddingHorizontal:10}} >{item[this.props.filterAttr] + ""}</Text>
+                            {
+                                this.props.type == 1 ?
+                                    <Icon name="user" size={25} color={Style.GREY_TEXT_COLOR} />:
+                                    <LocationIcon width={25} height={25} style={{padding:5}}/>
+
+                            }
+
+                            <Text style={{paddingHorizontal:10}} >{item[this.props.filterAttr] + "" +  (this.props.type == 1  && item['phone'] ?  " - " + item['phone'] : "")}</Text>
                         </TouchableOpacity>
                     )}
                     renderTextInput={()=> (
@@ -97,7 +118,7 @@ const styles = StyleSheet.create({
         // backgroundColor: 'red',
     },
 
-    textInput : {height: 40, backgroundColor : '#fff', borderColor: "#9e9e9e", borderWidth : 0, borderBottomWidth:0 ,color:'black', fontSize : Style.MIDLE_SIZE, borderRadius: 5, paddingHorizontal: 10  },
+    textInput : {height: 35,  borderColor: "#9e9e9e", borderWidth : 0, borderBottomWidth:0 ,color:'black', fontSize : Style.MIDLE_SIZE, borderRadius: 5, paddingHorizontal: 5  },
 
 });
 
