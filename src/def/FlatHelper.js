@@ -216,15 +216,20 @@ export default class FlatHelper {
     };
 
 
+    static downloadDesignImage = (design = null) => {
+        return FlatHelper.downloadImage(design.image_path);
+    }
 
-
-    static downloadImage = (product= null) => {
+    static downloadProductImage = (product = null) => {
+        return FlatHelper.downloadImage(product.image_path);
+    }
+    static downloadImage = (sourcePath) => {
         // Main function to download the image
 
         // To add the time suffix in filename
         let date = new Date();
         // Image URL which we want to download
-        let image_URL = 'https://arenaadmin.house3d.com/data/acceptanceData/product/202101/23/19/product_img.png';
+        let image_URL = Def.getThumnailImg(sourcePath);
         // Getting the extention of the file
         let ext = FlatHelper.getExtention(image_URL);
         ext = '.' + ext[0];
@@ -234,20 +239,23 @@ export default class FlatHelper {
         const { config, fs } = RNFetchBlob;
 
         let dir = fs.dirs.DownloadDir + '/arena/';
+        let path = dir + 'product_' + product.id + ext;
 
         fs.isDir(dir).then((isDir) => {
             if(!isDir){
                 RNFetchBlob.fs.mkdir(dir).then(() => {
                     console.log("App directory created..");
-                    FlatHelper.downloadFile(image_URL, dir, ext);
+                    FlatHelper.downloadFile(image_URL, path, ext);
                 })
                     .catch((err) => {
                         console.log("Err : " + JSON.stringify(err));
                     });
             } else {
-                FlatHelper.downloadFile(image_URL, dir, ext);
+                FlatHelper.downloadFile(image_URL, path, ext);
             }
         });
+
+        return path;
 
 
 
@@ -283,9 +291,8 @@ export default class FlatHelper {
         console.log('Start download image');
         let date = new Date();
         const { config, fs } = RNFetchBlob;
-        let path_url =   date.getTime() + '.png'
         console.log('Url : ' + url);
-        console.log('Path Url : ' + path_url);
+        console.log('Path Url : ' + path);
 
 
         let options = {
@@ -300,7 +307,7 @@ export default class FlatHelper {
             //         ext,
             //     description: 'Image',
             // },
-            //  path : path_url
+             path : path
         };
         config(options)
             .fetch('GET', url)
