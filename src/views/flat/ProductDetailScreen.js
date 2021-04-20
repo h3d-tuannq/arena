@@ -18,6 +18,8 @@ import Def from "../../def/Def";
 const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
 const PROGRAM_IMAGE_HEIGHT = (width - 30-8) /2;
 
+
+
 class ProductDetailScreen extends React.Component {
 
     constructor(props){
@@ -30,6 +32,7 @@ class ProductDetailScreen extends React.Component {
         this.appendRepairItem = this.appendRepairItem.bind(this);
         this.openFixedForm = this.openFixedForm.bind(this);
         this.approveRepair = this.approveRepair.bind(this);
+        this.openCommentForm = this.openCommentForm.bind(this);
         this.closeFunction = this.closeFunction.bind(this);
 
         Def.product_detail_data = this.props.route.params.item;
@@ -65,15 +68,21 @@ class ProductDetailScreen extends React.Component {
 
     };
 
-    openRequestForm = (type = 0) => {
-        console.log("Open Form");
-        this.setState({displayRequestForm:true , displayRequestModal: false, requestType: 0});
-    };
-
-    openFixedForm = (type = 1) => {
+    openRequestForm = (type = FlatHelper.REQUEST_TYPE) => {
         console.log("Open Form");
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
+
+    openFixedForm = (type = REPAIRED_TYPE) => {
+        console.log("Open Form");
+        this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
+    };
+
+    openCommentForm = (type = COMMENT_TYPE) => {
+        console.log("Open Comment Form");
+        this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
+    };
+
 
     approveRepair = (status = 1) => {
         if(Def.user_info) {
@@ -274,6 +283,16 @@ class ProductDetailScreen extends React.Component {
                                 </Text>
                             </TouchableOpacity> : null
                     }
+
+                    {
+                        FlatHelper.canComment(this.state.item, Def.user_info) ?
+                            <TouchableOpacity style={styles.bookingBtn} onPress={() => this.openCommentForm(FlatHelper.COMMENT_TYPE)}>
+                                <Text style={Style.text_styles.whiteTitleText}>
+                                    Bình luận
+                                </Text>
+                            </TouchableOpacity> : null
+                    }
+
                 </View>
                 <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestModal} >
                     <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>

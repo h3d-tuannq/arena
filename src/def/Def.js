@@ -351,6 +351,7 @@ export default class Def {
     static PRODUCT_ACTIVE_STATUS = 1; // Đạt
     static PRODUCT_REPAIRED_STATUS = 2 ; // Đã chỉnh sửa
     static PRODUCT_UNACTIVE_STATUS = 0; // Không đạt
+    static PRODUCT_CANCEL_STATUS = -1; // Không đạt
 
     static ProductStatusName = {0:"Không đạt", 1:"Đạt", 2:'Đã chỉnh sửa'};
     static ProductStatusColor = {0:"#FF0000", 1:"#00FF04", 2: '#FFAE00'};

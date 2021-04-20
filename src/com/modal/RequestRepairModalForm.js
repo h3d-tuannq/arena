@@ -13,6 +13,7 @@ import Style from '../../def/Style';
 import FlatController from "../../controller/FlatController";
 import ImagePicker  from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer';
+import FlatHelper from "../../def/FlatHelper";
 
 const PROGRAM_IMAGE_WIDTH = width * 0.6;
 const PROGRAM_IMAGE_HEIGHT = width * 0.6;
@@ -47,7 +48,8 @@ class RequestRepairModalForm extends React.Component {
                     uri: Platform.OS === "android" ? this.state.image.uri : this.state.image.uri.replace("file://", "")
                 };
             }
-            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product.id, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.props.type, this.state.note, img, (this.state.type == 1 ? 2 :  0));
+            let status = this.state.type == FlatHelper.REPAIRED_TYPE ? 2 : (this.state.type == FlatHelper.COMMENT_TYPE  ? 3 :  0);
+            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product.id, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.props.type, this.state.note, img, status);
         } else  {
             console.log('User info not exits');
         }

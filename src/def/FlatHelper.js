@@ -40,6 +40,11 @@ export default class FlatHelper {
     static ROLE_ADMINISTRATOR = 'administrator';
     static ROLE_MANAGER = 'manager';
 
+    static COMMENT_TYPE = 2;
+    static REPAIRED_TYPE = 1;
+    static REQUEST_TYPE = 0;
+
+
     static PriorityRoles = [FlatHelper.ROLE_ADMINISTRATOR,FlatHelper.ROLE_WSH,FlatHelper.ROLE_QUALITY_ASSURANCE,FlatHelper.ROLE_DEFECT,FlatHelper.ROLE_CSKH,FlatHelper.ROLE_HANDOVER, FlatHelper.ROLE_OWNER];
 
 
@@ -125,8 +130,9 @@ export default class FlatHelper {
         return (product.status == Def.PRODUCT_REPAIRED_STATUS)  && FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
     }
 
-
-
+    static canComment(product, user){
+        return (product.status !== Def.PRODUCT_CANCEL_STATUS)  && (FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH) || FlatHelper.checkCanPermission(user, FlatHelper.ROLE_DEFECT) || FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER));
+    }
 
     static canChangeDeliverStatus(flat, user){
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
