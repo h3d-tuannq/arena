@@ -142,9 +142,6 @@ const  styles = StyleSheet.create({
             marginTop: 10,
             paddingVertical : 10,
             flexDirection : 'row',
-
-
-
     },
     imageStyle : {
 

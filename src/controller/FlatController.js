@@ -4,7 +4,8 @@ import Net from  './Net'
 
 export default class FlatController {
     static getFlat(callback,errCallback ) {
-       Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat" ,Def.POST_METHOD);
+       let param = {'token' : Def.user_info['access_token']};
+       Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat" ,Def.POST_METHOD, param);
     }
 
     static getbuilding(callback,errCallback , params = null) {
@@ -13,13 +14,17 @@ export default class FlatController {
     }
 
     static getCustomer(callback,errCallback ) {
+        let param = {'token' : Def.user_info['access_token']};
+
+       console.log(JSON.stringify(param));
 
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-customer" ,Def.POST_METHOD);
     }
 
 
     static getFlatById(callback,errCallback, flatId ) {
-        let param = {'flat_id' : flatId};
+        let param = {'flat_id' : flatId, 'token' : Def.user_info['access_token']};
+        console.log(JSON.stringify(param));
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat-by-id" ,Def.POST_METHOD, param);
     }
 
@@ -29,9 +34,8 @@ export default class FlatController {
     }
 
     static changeStatusProduct(callback, errCallback, product_instance_id, role, token , type, note, image, status ){
-       let param = {'product_instance_id' : product_instance_id, 'token' : token, 'role': role, 'type' : type, 'note': note, 'image':image, 'status' : 0};
-       console.log("Change-status-product : " + JSON.stringify(param));
-
+       let param = {'product_instance_id' : product_instance_id, 'token' : token, 'role': role, 'type' : type, 'note': note, 'image':image, 'status' :status};
+       console.log("Change-status-product : " + type);
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/change-product-status" ,Def.POST_METHOD, param);
     }
 

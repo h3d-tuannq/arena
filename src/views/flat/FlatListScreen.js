@@ -28,11 +28,13 @@ import FlatHelper from '../../def/FlatHelper';
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
+const CHOSE_STATUS = 2;
 
 
 class FlatListScreen extends React.Component {
 
     criteria = {};
+    imageView = null;
 
     constructor(props){
         super(props);
@@ -55,6 +57,9 @@ class FlatListScreen extends React.Component {
         this.filterFunc = this.filterFunc.bind(this);
         this.resetCriteria = this.resetCriteria.bind(this);
         this.checkPermission = this.checkPermission.bind(this);
+        this.displayImageLoaded = this.displayImageLoaded.bind(this);
+        this.choseStatusClick = this.choseStatusClick.bind(this);
+        this.signInBtnClick = this.signInBtnClick.bind(this);
         let title = "Căn hộ bàn giao";
         this.state = {
             data: Def.flat_data,
@@ -67,7 +72,9 @@ class FlatListScreen extends React.Component {
             displayModal: false,
             filterAttr:"name",
             filterData: [],
-            choseMode:0 // 0 chọn dự án, 1 chọn khách hàng
+            choseMode:0, // 0 chọn dự án, 1 chọn khách hàng
+            displayLoadedImage: false,
+            status:null
 
         };
     }
@@ -78,10 +85,8 @@ class FlatListScreen extends React.Component {
     }
 
     searchButtonClick = () => {
-        if(this.state.name){
-            this.criteria['name'] = this.state.name;
-            this.filterDataByCondition();
-        }
+        this.criteria['name'] = this.state.name;
+        this.filterDataByCondition();
     }
 
     filterDataByCondition = () => {
@@ -102,6 +107,10 @@ class FlatListScreen extends React.Component {
             rs = item.customer_code == this.criteria.customer.code;
         }
 
+        if(rs && this.criteria.status){
+            rs = item.status == this.criteria.status['id'];
+        }
+
         if(rs && this.criteria.name && this.criteria.name.length > 0){
             const regex = new RegExp(`${this.criteria.name.trim()}`, 'i');
 
@@ -114,7 +123,9 @@ class FlatListScreen extends React.Component {
         console.log('Refresh News');
         this.setState({isRefresh:true});
         this.resetCriteria();
-        FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+        if(Def.user_info){
+            FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+        }
     };
 
     resetCriteria = () => {
@@ -149,15 +160,23 @@ class FlatListScreen extends React.Component {
 
     shouldComponentUpdate(){
         console.log("shouldComponentUpdate list");
+        console.log('Flat-Screen Constructor : ' + this.props.route.paramó );
         // this.setState({ configMenu: Def.config_news_menu});
         // console.log('SortData ddd:' + JSON.stringify(this.props.route));
         return true;
     }
 
+    choseStatusClick = () => {
+        console.log('Chose status click');
+
+        this.showModal(FlatHelper.FlatStatusData, 'Chọn Trạng thái', CHOSE_STATUS);
+    };
+
+
     choseBuildingClick = ()=> {
         console.log('Chose Building Click');
         if(!Def.buildingData && Def.buildingData.length < 1 ){
-            FlatController.getCustomer(this.getBuildingSuccess, this.getFilterDataFalse);
+            FlatController.getbuilding(this.getBuildingSuccess, this.getFilterDataFalse);
         } else {
             this.showModal(Def.buildingData, 'Chọn Dự án', CHOSE_BUILDING);
         }
@@ -225,7 +244,12 @@ class FlatListScreen extends React.Component {
 
     }
 
+    signInBtnClick(){
+        this.props.navigation.navigate('Login', {'screen': 'signIn'});
+    }
+
     showModal =(data, title, type ) => {
+
         this.setState({displayModal:true, title:title, type:type , filterData:data})
     }
 
@@ -239,8 +263,8 @@ class FlatListScreen extends React.Component {
             }
 
 
-          this.state.type ?  state['customer'] = data : state['building'] = data;
-            this.state.type ?  this.criteria['customer'] = data : this.criteria['building'] = data;
+          this.state.type == CHOSE_CUSTOMER?  state['customer'] = data : state['status'] = data;
+            this.state.type == CHOSE_CUSTOMER ?  this.criteria['customer'] = data : this.criteria['status'] = data;
           this.filterDataByCondition();
         }
 
@@ -254,11 +278,44 @@ class FlatListScreen extends React.Component {
             if (Def.flat_data.length > 0 && Def.flat_data) {
                 this.setState({data:Def.flat_data});
             } else {
-                // FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+                AsyncStorage.getItem('user_info').then((value) => {
+                    if(value){
+                        Def.user_info = JSON.parse(value);
+                        Def.username = Def.user_info['user_name'];
+                        Def.email = Def.user_info['email'];
+
+                        AsyncStorage.getItem('flat_data').then((value) => {
+                            if(value){
+                                Def.flat_data = JSON.parse(value);
+                                console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
+                                this.setState({data:Def.flat_data});
+                            } else {
+                                FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+                            }
+
+                        });
+
+                    } else {
+                        AsyncStorage.set('flat_data', null);
+                    }
+                });
+
+                if(Def.user_info){
+
+                }
             }
             Def.refresh_flat_data = false;
         }
     }
+
+    displayImageLoaded = (res) => {
+       let path = Def.remoteVersion(res.path());
+        console.log('File Path : ' + path);
+        this.imageView =
+            <Image style={{width:width, height:300, backgroundColor:'red'}} source={{ uri : Platform.OS === 'android' ? 'file://' +path : '' + path }}/>
+        this.setState({displayLoadedImage: true});
+    };
+
 
     checkPermission = async () => {
 
@@ -267,7 +324,7 @@ class FlatListScreen extends React.Component {
         // If Android then ask for permission
 
         if (Platform.OS === 'ios') {
-            FlatHelper.downloadImage();
+            FlatHelper.downloadImage('', this.displayImageLoaded);
         } else {
             try {
                 const granted = await PermissionsAndroid.request(
@@ -281,7 +338,7 @@ class FlatListScreen extends React.Component {
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     // Once user grant the permission start downloading
                     console.log('Storage Permission Granted.');
-                    FlatHelper.downloadImage();
+                    FlatHelper.downloadImage('', this.displayImageLoaded);
 
                 } else {
                     // If permission denied then show alert
@@ -302,7 +359,7 @@ class FlatListScreen extends React.Component {
             <View>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
                     <View style={{marginLeft:15, paddingBottom:5}}>
-                        <Text style={styles.titleStyle}>{this.state.data.length + " Căn hộ"}</Text>
+                        <Text style={styles.titleStyle}>{ (this.state.data ? this.state.data.length : 0 )+ " Căn hộ"}</Text>
                     </View>
                 </View>
             </View>
@@ -310,18 +367,40 @@ class FlatListScreen extends React.Component {
 
 
         return (
+
+            !Def.user_info ?
+
+                <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
+                            Vui lòng
+                        </Text>
+                        <TouchableOpacity onPress={this.signInBtnClick}>
+                            <Text style={{fontSize:Style.TITLE_SIZE, marginLeft:5 , color:Style.DEFAUT_RED_COLOR}}>
+                                đăng nhập
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
+                        để sử dụng đầy đủ tính năng cá nhân
+                    </Text>
+
+                </View>
+                :
+
+
             <View style={{flex:1, paddingTop:5}}>
                 <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>
                     <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
-                                      onPress={this.choseBuildingClick}
+                                      onPress={this.choseStatusClick}
                     >
                         <Text style={[Style.text_styles.middleText,{}]}>
-                            Dự án
+                            Trạng thái
                         </Text>
                         <View style={{flexDirection : 'row', alignItems : 'center'}}>
 
                             <Text style={[Style.text_styles.middleText,{ marginRight : 5}]}>
-                                {this.state.building ? this.state.building.name : 'Chọn Dự án'}
+                                {this.state.status ? this.state.status.name : 'Chọn Trạng thái'}
                             </Text>
                             <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />
                         </View>
@@ -393,11 +472,20 @@ class FlatListScreen extends React.Component {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity onPress={this.checkPermission}>
-                        <Text>
-                            Download
-                        </Text>
-                    </TouchableOpacity>
+                    {/*<TouchableOpacity onPress={this.checkPermission}>*/}
+                        {/*<Text>*/}
+                            {/*Download*/}
+                        {/*</Text>*/}
+                    {/*</TouchableOpacity>*/}
+
+                    {/*{*/}
+                        {/*this.state.displayLoadedImage ?*/}
+                            {/*<View>*/}
+                                {/*{this.imageView}*/}
+                            {/*</View>*/}
+                             {/*: null*/}
+
+                    {/*}*/}
 
                     <Modal onRequestClose={() => {this.closeFunction(null)}} visible={this.state.displayModal}  transparent={false} styles={{backgroundColor : 'green'}} >
                         {/*{this.state.choseAddress ?*/}
@@ -412,7 +500,7 @@ class FlatListScreen extends React.Component {
                     </Modal>
 
                 </View>
-                <ProgramVerList
+                 <ProgramVerList
                     data={this.state.data}
                     navigation={this.props.navigation}
                     header={ListHeader}
@@ -423,7 +511,6 @@ class FlatListScreen extends React.Component {
                     numColumns={1}
                     screen={'flat-detail'}
                     itemSeparatorComponent={
-
                         (({ highlighted }) => (
                             <View
                                 style={[
@@ -433,8 +520,9 @@ class FlatListScreen extends React.Component {
                             />
                         ))
                     }
-                />
+                    />
             </View>
+
         )
     }
 }

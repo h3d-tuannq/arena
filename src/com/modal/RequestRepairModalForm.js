@@ -21,18 +21,23 @@ class RequestRepairModalForm extends React.Component {
 
     constructor(props) {
         super(props);
+        let title = props.type == 0 ? 'Tạo yêu cầu chỉnh sửa' : 'Hoàn thành chỉnh sửa';
+
         this.state = {
-            title: 'Tạo yêu cầu chỉnh sửa',
+            title: title,
             product: props.product ,
             note:'',
             image: '',
-            type: 0
+            type: props.type , // 0 Tạo yêu cầu chỉnh sửa, 1 Hoàn thành chỉnh sửa, 2 wsh cho yêu cầu đạt
         };
         this.handleChoosePhoto = this.handleChoosePhoto.bind(this);
         this.requestBtnClick = this.requestBtnClick.bind(this);
     }
 
     requestBtnClick = () => {
+        let param = {'token' : Def.user_info['access_token']};
+
+        console.log(JSON.stringify(param));
         if(Def.user_info) {
             let img ;
             if(this.state.image){
@@ -42,7 +47,7 @@ class RequestRepairModalForm extends React.Component {
                     uri: Platform.OS === "android" ? this.state.image.uri : this.state.image.uri.replace("file://", "")
                 };
             }
-            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product.id, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.state.type, this.state.note, img, 0);
+            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product.id, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.props.type, this.state.note, img, (this.state.type == 1 ? 2 :  0));
         } else  {
             console.log('User info not exits');
         }
@@ -52,7 +57,7 @@ class RequestRepairModalForm extends React.Component {
         console.log('Change Status Sucsess ' + JSON.stringify(data));
         if(data['msg'] == "Ok"){
             console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
-            this.props.appendRepairItem(data['requestRepair']);
+            this.props.appendRepairItem(data);
         } else {
             Alert.alert(
                 "Thông báo",

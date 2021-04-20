@@ -218,15 +218,20 @@ class App extends React.Component {
                 Def.user_info = JSON.parse(value);
                 Def.username = Def.user_info['user_name'];
                 Def.email = Def.user_info['email'];
+
+                AsyncStorage.getItem('flat_data').then((value) => {
+                    if(value){
+                        Def.flat_data = JSON.parse(value);
+                        console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
+                    }
+                });
+
+            } else {
+                AsyncStorage.set('flat_data', null);
             }
         });
 
-        AsyncStorage.getItem('flat_data').then((value) => {
-            if(value){
-                Def.flat_data = JSON.parse(value);
-                console.log("FlatData Length : " + Def.flat_data.length);
-            }
-        });
+
     }
 
 

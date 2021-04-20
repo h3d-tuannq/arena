@@ -1,5 +1,8 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList , Modal, TouchableWithoutFeedback} from 'react-native'
+import {
+    Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList, Modal,
+    TouchableWithoutFeedback, Platform
+} from 'react-native'
 const {width, height} = Dimensions.get('window');
 import RequestRepairRenderer from '../../../src/com/item-render/RequestRepairRenderer';
 import ProgramVerList from  '../../../src/com/common/ProgramVerList'
@@ -25,6 +28,8 @@ class ProductDetailScreen extends React.Component {
         this.itemClick = this.itemClick.bind(this);
         this.openRequestForm = this.openRequestForm.bind(this);
         this.appendRepairItem = this.appendRepairItem.bind(this);
+        this.openFixedForm = this.openFixedForm.bind(this);
+        this.approveRepair = this.approveRepair.bind(this);
         this.closeFunction = this.closeFunction.bind(this);
 
         Def.product_detail_data = this.props.route.params.item;
@@ -49,16 +54,48 @@ class ProductDetailScreen extends React.Component {
         this.setState({requestDetail:item, displayRequestModal : true});
     };
 
-    appendRepairItem = (item) => {
+    appendRepairItem = (data) => {
         let currentList = this.state.requestRepairs;
-        currentList.push(item);
-        this.setState({requestRepairs : currentList, displayRequestForm : false});
+        currentList.push(data['requestRepair']);
+        if(data['pif']){
+            this.setState({requestRepairs : currentList, displayRequestForm : false, item:data['pif']});
+        } else {
+            this.setState({requestRepairs : currentList, displayRequestForm : false});
+        }
+
     };
 
     openRequestForm = (type = 0) => {
         console.log("Open Form");
+        this.setState({displayRequestForm:true , displayRequestModal: false, requestType: 0});
+    };
+
+    openFixedForm = (type = 1) => {
+        console.log("Open Form");
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
+
+    approveRepair = (status = 1) => {
+        if(Def.user_info) {
+            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.item.id,  'wsh' , Def.user_info['access_token'] ,2, '', null, status);
+        } else  {
+            console.log('User info not exits');
+        }
+
+    };
+
+    changeStatusSuccess = (data) => {
+        if(data['pif']){
+           this.setState({ item:data['pif']});
+        }
+
+    };
+
+    changeStatusFalse = (data) => {
+        console.log('Change Status False');
+    };
+
+
 
 
     closeFunction = () => {
@@ -182,10 +219,7 @@ class ProductDetailScreen extends React.Component {
                     </Text>
                     <ScrollView style={{maxHeight:120, width:width, paddingHorizontal:10, minHeight:60}}>
                         <Text>
-                            {product ? product.description : "sdfsdfsdfsdfsdfsdfsdfsdfsdfgfhdfasdfgfgasgfgjđjdjdjdjdjdjjjjjjddsdfsdfsdfsdf" + '\n' +
-                                "sdfsdfsdfgfhfjghjhjghjghjghjghjgjghjgjhddddsdfsdfdddddddddddddddddddddddddddddddddddddddđffffffffffffffffffffff" +
-                                "sdfsdfsdfsdfsdfsdfsdfsdfsdfgfhdfasdfgfgasgfgjđjdjdjdjdjdjjjjjjddsdfsdfsdfsdf" + '\n' +
-                                "sdfsdfsdfgfhfjghjhjghjghjghjghjgjghjgjhddddsdfsdfdddddddddddddddddddddddddddddddddddddddđffffffffffffffffffffff"}
+                            {product ? product.description : "Sản phẩm chưa có mô tả"}
                         </Text>
                     </ScrollView>
                 </View>
@@ -224,6 +258,22 @@ class ProductDetailScreen extends React.Component {
                     </TouchableOpacity> : null
                     }
 
+                    {
+                        FlatHelper.canApproveRepairedProduct(this.state.item, Def.user_info) ?
+                            <TouchableOpacity style={styles.bookingBtn} onPress={() => this.approveRepair(1)}>
+                                <Text style={Style.text_styles.whiteTitleText}>
+                                    Đạt yêu cầu
+                                </Text>
+                            </TouchableOpacity> : null
+                    }
+                    {
+                        FlatHelper.canApproveRepairedProduct(this.state.item, Def.user_info) ?
+                            <TouchableOpacity style={styles.bookingBtn} onPress={() => this.approveRepair(0)}>
+                                <Text style={Style.text_styles.whiteTitleText}>
+                                    Không đạt
+                                </Text>
+                            </TouchableOpacity> : null
+                    }
                 </View>
                 <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestModal} >
                     <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>

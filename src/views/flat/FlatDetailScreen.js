@@ -83,13 +83,13 @@ class FlatDetailScreen extends React.Component {
         this.clickSignature = this.clickSignature.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
         this.onGetFlatDetailSuccess = this.onGetFlatDetailSuccess.bind(this);
-        this.onGetFlatDetailFalse = this.onGetFlatDetailFalse.bind(this);
+        this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
     }
 
     onRefresh = () => {
         console.log('Refresh News');
         this.setState({isRefresh:true});
-        FlatController.getFlatById(this.onGetFlatSuccess, this.onGetDesignFalse, this.state.item.id);
+        FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
     };
 
     onGetFlatDetailSuccess(data){
@@ -110,7 +110,7 @@ class FlatDetailScreen extends React.Component {
             );
         }
     }
-    onGetFlatDetailFalse(data){
+    onGetDesignFalse(data){
         this.setState({isRefresh:false});
         console.log("false data : " + data);
     }
@@ -246,7 +246,21 @@ class FlatDetailScreen extends React.Component {
 
     componentDidMount() {
         console.log('Component did mount -flat');
+        let {navigation} = this.props;
+        navigation =  this.props.navigation ? this.props.navigation : Def.mainNavigate ;
+
+        if(navigation){
+            console.log('Isset Navigation : ' + JSON.stringify(navigation));
+            this.focusListener = navigation.addListener("focus", this.forcusFunction);
+        }
     }
+
+    forcusFunction = () => {
+        console.log('Forcus function');
+        if(Def.user_info){
+            FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+        }
+    };
 
 
 
@@ -384,7 +398,7 @@ class FlatDetailScreen extends React.Component {
                 {/*<View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>*/}
                     <View style={{paddingHorizontal:10, paddingBottom:8 , flexDirection:'row', justifyContent:'space-between'}}>
 
-                        <Text style={styles.titleStyle}>{"Thiết bị nội thất"}</Text>
+                        <Text style={styles.titleStyle}>{"Hạng mục bàn giao"}</Text>
                         <Text style={styles.titleStyle}>{(this.state.passProduct +"/" +this.state.totalProduct )}</Text>
                     </View>
                 {/*</View>*/}

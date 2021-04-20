@@ -6,10 +6,10 @@ export default class Def {
     static VIETCRAFT_URL_CONTENT_BASE = "https://fairadmin.house3d.com/data/vietcraftData/";
     static URL_DEFAULT_AVATAR = "https://cdn-content1.house3d.com/uploads/2019/07/02/5d1aa12048236.jpg";
     static LIFE_STYLE_BASE = "https://lifestylevietnamonline.com";
-    static LIFE_STYLE_BASE_ASSET = "http://admbangiao.thearena.vn/data/acceptanceData/";
+    static LIFE_STYLE_BASE_ASSET = "https://arenaadmin.house3d.com/data/acceptanceData/";
 
 
-    static ARENA_BASE = "http://bangiao.thearena.vn";
+    static ARENA_BASE = "https://arena.house3d.com";
 
     static PARTNER_ACTIVE_STATUS = 1;
 
@@ -221,7 +221,6 @@ export default class Def {
         let rs = img_path.split(".");
         let lastItem = rs.pop();
         rs = rs.join('.') + '_200x200.' + lastItem;
-        // console.log(rs);
         return rs;
     }
 
@@ -393,6 +392,17 @@ export default class Def {
         return index> -1;
 
     }
+
+    static remoteVersion(path){
+        console.log('path input ' + path);
+        let rs = path.split("?v=");
+        console.log('RS: '+ JSON.stringify(rs));
+        // rs.pop();
+        // rs.join("=?");
+        return rs[0];
+
+    }
+
 
     static buildingData = [];
     static customerData = [];

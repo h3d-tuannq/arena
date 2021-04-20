@@ -44,6 +44,17 @@ export default class FlatHelper {
 
 
     static FlatSTatusList = {0: "Chưa kích hoạt", 1: "Hoạt động", 2: "Hoàn thành nghĩa vụ tài chính", 3: "Đủ điều kiện bàn giao", 4: "Đang bàn giao", 5:"Đã ký nhận bàn giao" , 6:"Sữa chữa sau bàn giao", 8:"Đã hoàn thiện hồ sơ", 7:"Đã hoàn thành"};
+    static FlatStatusData = [
+            // {'id': 0 , 'name': "Chưa kích hoạt"},
+            // {'id': 1 , 'name' :"Hoạt động"},
+            {'id': 2 , 'name': "Hoàn thành nghĩa vụ tài chính"},
+            {'id': 3 , 'name': "Đủ điều kiện bàn giao"},
+            {'id': 4 , 'name': "Đang bàn giao"},
+            {'id': 5 , 'name':"Đã ký nhận bàn giao"} ,
+            {'id': 6 , 'name':"Sữa chữa sau bàn giao"},
+            {'id': 8 , 'name':"Đã hoàn thiện hồ sơ"},
+            {'id': 7 , 'name':"Đã hoàn thành"}
+        ];
     static FlatSTatusColorList = {0: '#D33724', 1: '#008D4C', 2: '#337AB7', 3: '#605CA8', 4: '#F39C12', 5:'#FF851B' , 6:' #000', 8:'#ccc', 7:'#000'};
 
     static getFlatStatusName( statusFilter = 0 ){
@@ -97,7 +108,8 @@ export default class FlatHelper {
     }
 
     static checkCanPermission(user, permission){
-        let userPermission = user ? user.listRoleName.split() : [];
+        let userPermission = user ? user.listRoleName : [];
+        // console.log('User Permission : ' + userPermission  + ' permision' + permission  +' -- '+ userPermission.indexOf(permission));
         return userPermission.indexOf(permission) != -1;
     }
 
@@ -106,8 +118,15 @@ export default class FlatHelper {
     }
 
     static canFixRepair(product, user){
-        return (product.status == Def.PRODUCT_UNACTIVE_STATUS || product.status == Def.PRODUCT_REPAIRED_STATUS)  && FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        return (product.status == Def.PRODUCT_UNACTIVE_STATUS )  && FlatHelper.checkCanPermission(user, FlatHelper.ROLE_DEFECT);
     }
+
+    static canApproveRepairedProduct(product, user){
+        return (product.status == Def.PRODUCT_REPAIRED_STATUS)  && FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+    }
+
+
+
 
     static canChangeDeliverStatus(flat, user){
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
@@ -216,15 +235,21 @@ export default class FlatHelper {
     };
 
 
-    static downloadDesignImage = (design = null) => {
-        return FlatHelper.downloadImage(design.image_path);
+    static downloadDesignImage = (design = null, callback) => {
+        return FlatHelper.downloadImage(design.image_path, callback);
     }
 
-    static downloadProductImage = (product = null) => {
+    static downloadProductImage = (product = null, callback) => {
         return FlatHelper.downloadImage(product.image_path);
     }
-    static downloadImage = (sourcePath) => {
+    static downloadImage = (sourcePath, callback, obj) => {
         // Main function to download the image
+
+        if(!sourcePath){
+            sourcePath = 'product/202102/24/81/product_img.jpg?v=2';
+        }
+
+        console.log('Source Path : ' + sourcePath);
 
         // To add the time suffix in filename
         let date = new Date();
@@ -239,19 +264,18 @@ export default class FlatHelper {
         const { config, fs } = RNFetchBlob;
 
         let dir = fs.dirs.DownloadDir + '/arena/';
-        let path = dir + 'product_' + product.id + ext;
-
+        let path = Def.remoteVersion(dir +  (obj ? 'product_' +   obj.id : date.getTime()) + ext);
         fs.isDir(dir).then((isDir) => {
             if(!isDir){
                 RNFetchBlob.fs.mkdir(dir).then(() => {
                     console.log("App directory created..");
-                    FlatHelper.downloadFile(image_URL, path, ext);
+                    FlatHelper.downloadFile(image_URL, path, ext, callback);
                 })
                     .catch((err) => {
                         console.log("Err : " + JSON.stringify(err));
                     });
             } else {
-                FlatHelper.downloadFile(image_URL, path, ext);
+                FlatHelper.downloadFile(image_URL, path, ext, callback);
             }
         });
 
@@ -287,7 +311,7 @@ export default class FlatHelper {
         // ;
     };
 
-    static downloadFile(url, path, ext) {
+    static downloadFile(url, path, ext, callback) {
         console.log('Start download image');
         let date = new Date();
         const { config, fs } = RNFetchBlob;
@@ -313,8 +337,12 @@ export default class FlatHelper {
             .fetch('GET', url)
             .then(res => {
                 // Showing alert after successful downloading
-                console.log('res -> ', JSON.stringify(res));
-                alert('Image Downloaded Successfully.'  + res.path());
+                // console.log('res -> ', JSON.stringify(res));
+                if(res && callback){
+                    console.log("Call back set Image");
+                    callback(res);
+                }
+                // alert('Image Downloaded Successfully.'  + res.path());
             })
             .catch(err => {
                 console.log("Err download image : " + JSON.stringify(err));

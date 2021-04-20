@@ -29,12 +29,12 @@ class RequestRepairRenderer extends React.PureComponent{
                                 {item.reporter ? item.reporter.username :  item.reporter_id}
                             </Text>
                             <View style={styles.date}>
-                            <Text style={{fontSize: Style.SMALL_SIZE, color: Style.GREY_TEXT_COLOR}}>{Def.getDateString(new Date(item.date * 1000), "dd-MM-yyyy")}
+                            <Text style={{fontSize: Style.SMALL_SIZE, color: Style.GREY_TEXT_COLOR}}>{Def.getDateString(new Date(item.status == 1 ?  item.completed_repair *1000 : item.date * 1000), "dd-MM-yyyy")}
                             </Text>
                             </View>
                         </View>
                         <Text style={styles.commentContent}>
-                            {item.note ? Def.formatText(item.note , 100) : "" }
+                            {item.note ? Def.formatText(item.note , 100): "" }
                         </Text>
                     </View>
 

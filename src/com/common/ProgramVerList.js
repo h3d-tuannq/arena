@@ -82,7 +82,7 @@ class ProgramVerList extends React.Component{
                     refreshControl={
                         this.props.refreshControl ? this.props.refreshControl : null
                     }
-                    style={[this.props.styleList,{ marginBottom :  0 , backgroundColor:'#fff'}]}
+                    style={[this.props.styleList,{ marginBottom :  0 , backgroundColor:'#fff', width: width}]}
                     data={this.props.data ? this.props.data : [] }
                     renderItem={this.props.renderFunction ? this.props.renderFunction :renderItem}
                     keyExtractor={(item,index) => {
