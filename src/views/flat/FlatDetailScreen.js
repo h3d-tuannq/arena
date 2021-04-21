@@ -19,7 +19,7 @@ const {width, height} = Dimensions.get('window');
 import Style from '../../def/Style';
 import FlatHelper from  '../../def/FlatHelper'
 
-import DeclineDeliverModalForm from  '../../../src/com/modal/DeclineDeliverModalForm'
+import DeclineDeliverModalForm from '../../com/modal/DeclineDeliverModalForm'
 import SignatureModalForm from  '../../../src/com/modal/SignatureModalForm'
 import SendRepairReportForm from '../../../src/com/modal/SendRepairReportForm'
 
@@ -27,6 +27,9 @@ import ProgramVerList from '../../com/common/ProgramVerList';
 import FlatController from '../../controller/FlatController';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import UpdateDeadlineModal from '../../com/modal/UpdateDeadlineModal';
 
 const PROGRAM_IMAGE_WIDTH = (width - 38) /2;
 const PROGRAM_IMAGE_HEIGHT = (width) /3;
@@ -45,6 +48,8 @@ const decline_deliver_form = 0;
 const update_status_form = 1;
 const signature_form = 2;
 const sendmail_form = 3;
+const update_deadline_form = 4;
+
 
 class FlatDetailScreen extends React.Component {
 
@@ -71,17 +76,24 @@ class FlatDetailScreen extends React.Component {
             displayDeclineForm : false,
             displaySignatureForm : false,
             displaySendMailForm : false,
+            displayUpdateDeadline: false,
+            canSaveDeadline:false,
             type : -1,
             totalProduct:calPif.total ? calPif.total : 0,
             passProduct:calPif.pass ? calPif.pass : 0,
-            isRefresh : false
+            isRefresh : false,
+            deadlineCompleted: new Date(),
 
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
         this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
         this.changeStatusFalse = this.changeStatusFalse.bind(this);
         this.clickSignature = this.clickSignature.bind(this);
+        this.updateDeadlineCompleted = this.updateDeadlineCompleted.bind(this);
+        this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
+        this.handleDatePicked = this.handleDatePicked.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
+        this.saveDeadline = this.saveDeadline.bind(this);
         this.onGetFlatDetailSuccess = this.onGetFlatDetailSuccess.bind(this);
         this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
     }
@@ -129,8 +141,16 @@ class FlatDetailScreen extends React.Component {
         }
     }
 
+    saveDeadline = () => {
+        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE, this.state.deadlineCompleted);
+    }
+
     clickSignature = () => {
         this.setState({displaySignatureForm : true, type:signature_form});
+    }
+
+    updateDeadlineCompleted = () => {
+        this.setState({displayUpdateDeadline : true, type:update_deadline_form});
     }
 
     openSendMailModal = () => {
@@ -141,6 +161,7 @@ class FlatDetailScreen extends React.Component {
     changeStatusSuccess = (data) => {
         if(data['msg'] == "Ok"){
             this.updateFlatStatus(data['flat']);
+            this.setState({canSaveDeadline:false});
         } else {
             Alert.alert(
                 "Thông báo",
@@ -195,6 +216,9 @@ class FlatDetailScreen extends React.Component {
 
         if(this.state.type == sendmail_form) {
             this.setState({displaySendMailForm : false});
+        }
+        if(this.state.type == update_deadline_form) {
+            this.setState({displayUpdateDeadline : false});
         }
 
 
@@ -260,6 +284,15 @@ class FlatDetailScreen extends React.Component {
         if(Def.user_info){
             FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
         }
+    };
+
+    handleDatePicked = date => {
+        this.hideDateTimePicker();
+        this.setState({ deadlineCompleted : date, canSaveDeadline:true });
+    };
+
+    hideDateTimePicker = () => {
+        this.setState({ displayUpdateDeadline : false });
     };
 
 
@@ -515,6 +548,36 @@ class FlatDetailScreen extends React.Component {
                                         </TouchableOpacity> : null
                                 }
 
+                                {
+                                    FlatHelper.canChangeDeadlineCompleted(this.state.item,Def.user_info)  ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={this.updateDeadlineCompleted}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Deadline hoàn thiện
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {/*{*/}
+                                {/*    FlatHelper.canChangeDeadlineCompleted(this.state.item,Def.user_info) && this.state.item.deadlineCompleted ?*/}
+                                {/*        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}*/}
+                                {/*                          onPress={this.updateDeadlineCompleted}>*/}
+                                {/*            <Text style={Style.text_styles.whiteTitleText}>*/}
+                                {/*                Xóa Deadline*/}
+                                {/*            </Text>*/}
+                                {/*        </TouchableOpacity> : null*/}
+                                {/*}*/}
+
+                                {
+                                    FlatHelper.canChangeDeadlineCompleted(this.state.item,Def.user_info) && this.state.canSaveDeadline  ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={this.saveDeadline}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Lưu Deadline
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
 
                             </View> :  null
                     }
@@ -558,6 +621,26 @@ class FlatDetailScreen extends React.Component {
                     </View>
                 </Modal>
 
+                {/*<Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displayUpdateDeadline} style={styles.requestSignatureModalView}>*/}
+                {/*    <View style={{zIndex : 5 }}>*/}
+                {/*        <UpdateDeadlineModal updateFlatStatus={this.updateFlatStatus} flat={this.state.item} closeFunction={this.closeFunction} />*/}
+                {/*    </View>*/}
+                {/*</Modal>*/}
+
+                <DateTimePickerModal
+                    isVisible={this.state.displayUpdateDeadline}
+                    onConfirm={(date) => {
+                        this.handleDatePicked(date);
+                        // this.hideDateTimePicker();
+                    }}
+                    onCancel={this.hideDateTimePicker}
+                    date={this.state.deadlineCompleted}
+                    mode={'datetime'}
+                    display='spinner'
+                    style={{width: 400, opacity: 1, height: 100, marginTop: 540}}
+                    datePickerModeAndroid='spinner'
+                    timePickerModeAndroid='spinner'
+                />
 
 
 

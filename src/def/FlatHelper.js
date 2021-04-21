@@ -40,7 +40,8 @@ export default class FlatHelper {
     static ROLE_ADMINISTRATOR = 'administrator';
     static ROLE_MANAGER = 'manager';
 
-    static COMMENT_TYPE = 2;
+    static COMMENT_TYPE = 3;
+    static APPROVE_REPAIR_TYPE = 2;
     static REPAIRED_TYPE = 1;
     static REQUEST_TYPE = 0;
 
@@ -194,6 +195,13 @@ export default class FlatHelper {
         let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
         return (isHandover && isProfileCompleted) ;
     }
+
+    static canChangeDeadlineCompleted(flat, user){
+            let isDefect =  FlatHelper.checkCanPermission(user, FlatHelper.ROLE_DEFECT);
+
+            return isDefect && (flat.status) != FlatHelper.DONE_STATUS;
+    }
+
 
     static canRepairAfterSigned(flat, user){
         let isSignedStatus = flat.status == FlatHelper.SIGNED_STATUS;

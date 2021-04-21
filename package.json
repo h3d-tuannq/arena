@@ -31,6 +31,8 @@
     "react-native-signature-capture": "^0.4.11",
     "react-native-svg": "^12.1.0",
     "react-native-svg-transformer": "^0.14.3",
+    "@react-native-community/datetimepicker": "^3.0.3",
+    "react-native-modal-datetime-picker": "^9.0.0",
     "react-native-vector-icons": "^8.1.0",
     "rn-fetch-blob": "^0.12.0"
   },

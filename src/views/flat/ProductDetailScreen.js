@@ -59,8 +59,10 @@ class ProductDetailScreen extends React.Component {
 
     appendRepairItem = (data) => {
         let currentList = this.state.requestRepairs;
-        currentList.push(data['requestRepair']);
-        if(data['pif']){
+        if(data['requestRepair']){
+            currentList.push(data['requestRepair']);
+        }
+        if( data['pif']){
             this.setState({requestRepairs : currentList, displayRequestForm : false, item:data['pif']});
         } else {
             this.setState({requestRepairs : currentList, displayRequestForm : false});
@@ -73,12 +75,12 @@ class ProductDetailScreen extends React.Component {
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
 
-    openFixedForm = (type = REPAIRED_TYPE) => {
+    openFixedForm = (type = FlatHelper.REPAIRED_TYPE) => {
         console.log("Open Form");
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
 
-    openCommentForm = (type = COMMENT_TYPE) => {
+    openCommentForm = (type = FlatHelper.COMMENT_TYPE) => {
         console.log("Open Comment Form");
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };

@@ -25,10 +25,15 @@ import AsyncStorage  from '@react-native-async-storage/async-storage';
 import AutocompleteModal from '../../com/common/AutocompleteModal';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FlatHelper from '../../def/FlatHelper';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
 const CHOSE_STATUS = 2;
+const CHOSE_DELIVER_DATE = 3;
+
+
+const ITEM_HEIGHT = 40;
 
 
 class FlatListScreen extends React.Component {
@@ -74,10 +79,35 @@ class FlatListScreen extends React.Component {
             filterData: [],
             choseMode:0, // 0 chọn dự án, 1 chọn khách hàng
             displayLoadedImage: false,
-            status:null
+            status:null,
+            selectedDate: new Date(),
+            filterDate: null,
+            displaySelectDate: false,
 
         };
+
+        console.log('Flat-Screen Constructor : ' + JSON.stringify(this.props.route));
+        this.handleDatePicked = this.handleDatePicked.bind(this);
+        this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
+        this.displayFilterDate = this.displayFilterDate.bind(this);
+
     }
+
+    handleDatePicked = date => {
+        this.hideDateTimePicker();
+        this.setState({ selectedDate : date, filterDate:date, type:CHOSE_DELIVER_DATE });
+        this.criteria['deliverDate'] = date;
+        this.filterDataByCondition();
+    };
+
+    hideDateTimePicker = () => {
+        this.setState({ displaySelectDate : false });
+    };
+
+    displayFilterDate = () => {
+        this.setState({ displaySelectDate : true });
+    };
+
 
     refresh()
     {
@@ -110,6 +140,10 @@ class FlatListScreen extends React.Component {
         if(rs && this.criteria.status){
             rs = item.status == this.criteria.status['id'];
         }
+        if(rs && this.criteria.filterDate){
+            rs = item.deliver_date == this.criteria.filterDate.getTime();
+        }
+
 
         if(rs && this.criteria.name && this.criteria.name.length > 0){
             const regex = new RegExp(`${this.criteria.name.trim()}`, 'i');
@@ -129,7 +163,7 @@ class FlatListScreen extends React.Component {
     };
 
     resetCriteria = () => {
-        this.setState({building: null, customer:null, name: ""});
+        this.setState({building: null, customer:null, name: "", deliverDate: null});
         this.criteria = {};
     }
 
@@ -160,9 +194,16 @@ class FlatListScreen extends React.Component {
 
     shouldComponentUpdate(){
         console.log("shouldComponentUpdate list");
-        console.log('Flat-Screen Constructor : ' + this.props.route.paramó );
-        // this.setState({ configMenu: Def.config_news_menu});
-        // console.log('SortData ddd:' + JSON.stringify(this.props.route));
+        console.log('Flat-Screen Constructor : ' + JSON.stringify(this.props.route));
+        const index = Def.REFESH_SCREEN.indexOf('flat-screen');
+
+        if (index > -1 || (this.props.route && this.props.route.param && this.props.route.param.refresh)) {
+            if(index > -1){
+                Def.REFESH_SCREEN.splice(index, 1);
+            }
+            this.onRefresh();
+        }
+
         return true;
     }
 
@@ -420,50 +461,46 @@ class FlatListScreen extends React.Component {
                         </View>
                     </TouchableOpacity>
 
-                    {/*<TouchableOpacity style={{*/}
-                    {/*    flexDirection: 'row',*/}
-                    {/*    alignItems: 'center',*/}
-                    {/*    justifyContent: 'space-between',*/}
-                    {/*    paddingHorizontal: 10,*/}
-                    {/*    paddingVertical: 5,*/}
-                    {/*    backgroundColor: '#fff',*/}
-                    {/*    marginTop: 1*/}
-                    {/*}}>*/}
-                    {/*    <Text style={[Style.text_styles.middleText, {}]}>*/}
-                    {/*        Ngày bàn giao*/}
-                    {/*    </Text>*/}
-                    {/*    <View style={{flexDirection: 'row', alignItems: 'center'}}>*/}
-                    {/*        <TouchableOpacity style={{*/}
-                    {/*            marginRight: 5,*/}
-                    {/*            height: ITEM_HEIGHT,*/}
-                    {/*            justifyContent: 'center',*/}
-                    {/*            borderColor: Style.GREY_TEXT_COLOR*/}
-                    {/*        }} onPress={() => this.showDateTimePicker('birth_day')}>*/}
-                    {/*            <Text style={[Style.text_styles.titleTextNotBold, {*/}
-                    {/*                justifyContent: 'center',*/}
-                    {/*                paddingLeft: 5,*/}
-                    {/*                color: Style.GREY_TEXT_COLOR*/}
-                    {/*            }]}>*/}
-                    {/*                {this.state.birth_day ? Def.getDateString(this.state.birth_day, "yyyy-MM-dd") : "Chọn ngày sinh"}*/}
-                    {/*            </Text>*/}
-                    {/*        </TouchableOpacity>*/}
-                    {/*        <DateTimePickerModal*/}
-                    {/*            isVisible={this.state.isDateTimePickerVisible}*/}
-                    {/*            onConfirm={(date) => {*/}
-                    {/*                this.handleDatePicked(date);*/}
-                    {/*                // this.hideDateTimePicker();*/}
-                    {/*            }}*/}
-                    {/*            onCancel={this.hideDateTimePicker}*/}
-                    {/*            date={this.state.birth_day}*/}
-                    {/*            mode={'date'}*/}
-                    {/*            display='spinner'*/}
-                    {/*            style={{width: 400, opacity: 1, height: 100, marginTop: 540}}*/}
-                    {/*            datePickerModeAndroid='spinner'*/}
-                    {/*            timePickerModeAndroid='spinner'*/}
-                    {/*        />*/}
-                    {/*        <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR}/>*/}
-                    {/*    </View>*/}
-                    {/*</TouchableOpacity>*/}
+                    <TouchableOpacity style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        backgroundColor: '#fff',
+                        marginTop: 1
+                    }}>
+                        <Text style={[Style.text_styles.middleText, {}]}>
+                            Ngày bàn giao
+                        </Text>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <TouchableOpacity style={{
+                                marginRight: 5,
+                                height: ITEM_HEIGHT,
+                                justifyContent: 'center',
+                                borderColor: Style.GREY_TEXT_COLOR
+                            }} onPress={ this.displayFilterDate}>
+                                <Text style={[Style.text_styles.middleText,{}]}>
+                                    {this.state.filterDate ? Def.getDateString(this.state.filterDate, "yyyy-MM-dd") : "Chọn ngày bàn giao"}
+                                </Text>
+                            </TouchableOpacity>
+                            <DateTimePickerModal
+                                isVisible={this.state.displaySelectDate}
+                                onConfirm={(date) => {
+                                    this.handleDatePicked(date);
+                                    // this.hideDateTimePicker();
+                                }}
+                                onCancel={this.hideDateTimePicker}
+                                date={this.state.selectedDate}
+                                mode={'date'}
+                                display='spinner'
+                                style={{width: 400, opacity: 1, height: 100, marginTop: 540}}
+                                datePickerModeAndroid='spinner'
+                                timePickerModeAndroid='spinner'
+                            />
+                            <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR}/>
+                        </View>
+                    </TouchableOpacity>
                     <View style={{ width : width -20, borderWidth : 0, borderBottomWidth:1 ,borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginTop : 2, marginBottom : 10}}>
                         <TextInput value={this.state.name} onChangeText={text => this.setState({ name : text })} placeholder={"Tìm kiếm"} style={[styles.textInput, {backgroundColor:'#fff',marginTop:5, width: width -70, paddingHorizontal:10}]}>
                         </TextInput>

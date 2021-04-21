@@ -80,12 +80,12 @@ class FlatStack extends React.Component {
                                     width: Style.DRAWER_MENU_SIZE,
                                     height: Style.DRAWER_MENU_SIZE,
                                     justifyContent: 'center',
-                                    paddingRight:15 ,
+                                    paddingRight:5 ,
                                     alignItems : 'center'
                                 }
                             }
                             onPress={() => this.goProductList}>
-                            <Icon name="paper-plane" size={30} color="#fff" />
+                            <Icon name="calendar" size={30} color="#fff" />
                             {/*<Text style={{color:'#fff'}}>*/}
                                 {/*{route.params.item.id}*/}
                             {/*</Text>*/}
