@@ -10,6 +10,7 @@ export default class FlatHelper {
     static DECLINE_DELIVER_TYPE = 0;
     static UPDATE_STATUS_TYPE = 1;
     static SIGNATURE_PAD_TYPE = 2;
+    static UPDATE_DEADLINE = 3;
 
 
     static INACTIVE_STATUS = 0; // Trạng thái mặc định khi đưa lên hệ thống
@@ -137,7 +138,8 @@ export default class FlatHelper {
 
     static canChangeDeliverStatus(flat, user){
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
-        let status = flat.status == FlatHelper.FINANCE_DONE_STATUSS;
+        let status = flat.status == FlatHelper.FINANCE_DONE_STATUS;
+        console.log('IsQA : ' + isQa + 'Status : ' + status);
         return isQa && status;
     }
 

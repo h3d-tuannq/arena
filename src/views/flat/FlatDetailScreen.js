@@ -82,7 +82,8 @@ class FlatDetailScreen extends React.Component {
             totalProduct:calPif.total ? calPif.total : 0,
             passProduct:calPif.pass ? calPif.pass : 0,
             isRefresh : false,
-            deadlineCompleted: new Date(),
+            selectedDate: new Date(),
+            deadlineCompleted: null,
 
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
@@ -142,7 +143,7 @@ class FlatDetailScreen extends React.Component {
     }
 
     saveDeadline = () => {
-        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE, this.state.deadlineCompleted);
+        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_DEADLINE, this.state.deadlineCompleted.getTime()/1000);
     }
 
     clickSignature = () => {
@@ -185,12 +186,12 @@ class FlatDetailScreen extends React.Component {
 
     refresh()
     {
-        this.setState({ stateCount: Math.random() });
+        this.setState({ stateCount: Math.random(), deadlineCompleted: null });
     }
 
     updateFlatStatus =(flat) => {
         if(flat) {
-            this.setState({item:flat});
+            this.setState({item:flat, deadlineCompleted: null});
             if(Def.flat_data) { // Update dữ liệu
                 let updated = Def.updateFlatToFlatList(flat);
                 if(updated){
@@ -404,7 +405,7 @@ class FlatDetailScreen extends React.Component {
 
                     <View style={{flexDirection:'row'}}>
                         <Text>
-                            {"Ngày bàn giao:" + ''}
+                            {"Ngày bàn giao: "}
                         </Text>
 
                         <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
@@ -415,11 +416,11 @@ class FlatDetailScreen extends React.Component {
 
                     <View style={{flexDirection:'row'}}>
                         <Text>
-                            {"Deadline hoàn thiện:" + ''}
+                            {"Deadline hoàn thiện: "}
                         </Text>
 
-                        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                            { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : "Không có"}
+                        <Text style={[{fontSize:Style.MIDLE_SIZE, paddingRight:5}, {color: this.state.canSaveDeadline ? Style.DEFAUT_RED_COLOR : '#000'}]}>
+                            { this.state.deadlineCompleted ? Def.getDateString(this.state.deadlineCompleted, "dd-MM-yyyy") : ( item.deadline_date ? Def.getDateString(new Date(item.deadline_date *1000), "dd-MM-yyyy") : "Không có")}
                         </Text>
                     </View>
 
@@ -634,7 +635,7 @@ class FlatDetailScreen extends React.Component {
                         // this.hideDateTimePicker();
                     }}
                     onCancel={this.hideDateTimePicker}
-                    date={this.state.deadlineCompleted}
+                    date={this.state.selectedDate}
                     mode={'datetime'}
                     display='spinner'
                     style={{width: 400, opacity: 1, height: 100, marginTop: 540}}

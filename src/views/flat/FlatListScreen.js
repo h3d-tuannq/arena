@@ -123,7 +123,7 @@ class FlatListScreen extends React.Component {
        console.log('Run Filter : ');
        this.criteria['name'] = this.state.name;
        let dataFilter =  Def.flat_data.filter(this.filterFunc);
-       console.log('Filter-Data : ' + dataFilter.length)
+       console.log('Filter-Data : ' + dataFilter.length);
        this.setState({data:dataFilter});
     }
 
