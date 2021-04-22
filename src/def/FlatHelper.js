@@ -63,6 +63,9 @@ export default class FlatHelper {
             {'id': 8 , 'name':"Đã hoàn thiện hồ sơ"},
             {'id': 7 , 'name':"Đã hoàn thành"}
         ];
+
+    static RoleName = {'handover' : 'NVBG', 'guest' : 'Khách', 'wsh' : 'WSH', 'defect':'Defect' , 'owner':'Chủ nhà'};
+
     static FlatSTatusColorList = {0: '#D33724', 1: '#008D4C', 2: '#337AB7', 3: '#605CA8', 4: '#F39C12', 5:'#FF851B' , 6:' #000', 8:'#ccc', 7:'#000'};
 
     static getFlatStatusName( statusFilter = 0 ){
@@ -384,6 +387,13 @@ export default class FlatHelper {
                 console.log("Err download image : " + JSON.stringify(err));
             })
         ;
+    }
+
+    static getRoleName(role){
+        if(FlatHelper.RoleName[role]){
+            return FlatHelper.RoleName[role];
+        }
+        return '';
     }
 
 }

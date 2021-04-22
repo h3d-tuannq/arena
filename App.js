@@ -37,6 +37,7 @@ const Drawer = createDrawerNavigator();
 
 import {StyleSheet} from 'react-native'
 import LoginStack from "./src/LoginStack";
+import FlatHelper from "./src/def/FlatHelper";
 
 function CustomDrawerContent(props) {
     return (
@@ -104,13 +105,26 @@ function CustomDrawerContent(props) {
                     ) : (
                         <View
                             style={{
-                                flexDirection: 'row',
+                                // flexDirection: 'row',
                                 justifyContent: 'space-between',
                                 paddingVertical: PixelRatio.get() < 2 ? 3 :5,
                                 paddingHorizontal: 10,
                                 marginTop: PixelRatio.get() < 2 ? 6 :10,
                                 marginBottom: PixelRatio.get() < 2 ? 6 :10,
                             }}>
+
+                            <View style={{paddingBottom:10}}>
+                                <Text>
+                                    {Def.user_info['username']}
+                                </Text>
+
+                                <Text>
+                                    {FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info))}
+                                </Text>
+
+                            </View>
+
+
                             <TouchableOpacity
                                 style={{
                                     width: width * 0.35,
