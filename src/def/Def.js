@@ -142,8 +142,6 @@ export default class Def {
         date1 = Number.isInteger(date1) ? new Date(date1) : date1;
         date2 = Number.isInteger(date2) ? new Date(date2) : date2;
 
-        console.log('Date1: ' + Def.getDateString(date1, "dd-MM-yyyy"));
-        console.log('Date2: ' + Def.getDateString(date2, "dd-MM-yyyy"));
 
         if(type == Def.COMPARE_DATETIME) {
             rs = date1.getTime() == date2.getTime();
@@ -152,9 +150,6 @@ export default class Def {
         if(type == Def.COMPARE_DATE){
             rs = date1.getDate() == date2.getDate() && date1.getFullYear() == date2.getFullYear() && date1.getMonth()== date2.getMonth();
         }
-
-        console.log('RS : ' + rs)
-
         return rs;
     }
 

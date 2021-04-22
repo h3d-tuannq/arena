@@ -138,10 +138,8 @@ class FlatListScreen extends React.Component {
     }
 
     filterFunc = (item) => {
-        console.log('Filter Function');
         let rs = true;
         if(this.criteria.building){
-            console.log('filter building');
             rs = item.building_id == this.criteria.building.id;
         }
         if(rs && this.criteria.customer){
@@ -163,7 +161,6 @@ class FlatListScreen extends React.Component {
     }
 
     onRefresh = () => {
-        console.log('Refresh News');
         this.setState({isRefresh:true});
         this.resetCriteria();
         if(Def.user_info){
