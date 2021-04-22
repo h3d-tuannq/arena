@@ -11,7 +11,7 @@ import FlatController from "../../controller/FlatController";
 const PROGRAM_IMAGE_WIDTH = width ;
 const PROGRAM_IMAGE_HEIGHT = height ;
 
-class RequestRepairDetailModal extends React.Component {
+class FullImageModal extends React.Component {
     render() {
         const {item} = this.props;
         console.log("Item: " + JSON.stringify(item));
@@ -26,24 +26,6 @@ class RequestRepairDetailModal extends React.Component {
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }
                 </View>
-                {/*<View style={styles.infoContainer}>*/}
-                    {/*<Text style={styles.author}>*/}
-                        {/*{ "Tác giả: " + (item.reporter ? item.reporter.name : item.reporter_id)}*/}
-                    {/*</Text>*/}
-                    {/*<Text style={styles.commentContent}>*/}
-                        {/*{ "Vai trò: " + (item.type ? item.type : "Yêu cầu chỉnh sửa")}*/}
-                    {/*</Text>*/}
-                    {/*<Text style={styles.commentContent}>*/}
-                        {/*{"Thời gian : " + (Def.getDateString(new Date(item.date * 1000), "dd-MM-yyyy")) }*/}
-                    {/*</Text>*/}
-                    {/*<Text style={styles.commentContent}>*/}
-                        {/*{"Trạng thái : " + (item.status ? Def.formatText(item.status , 100) : "") }*/}
-                    {/*</Text>*/}
-                    {/*<Text style={styles.commentContent}>*/}
-                        {/*{"Nội dung : " + (item.note ? Def.formatText(item.note , 100) : "") }*/}
-                    {/*</Text>*/}
-
-                {/*</View>*/}
             </View>
         )
     }
@@ -88,4 +70,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default RequestRepairDetailModal;
+export default FullImageModal;

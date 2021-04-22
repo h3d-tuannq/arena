@@ -31,6 +31,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import UpdateDeadlineModal from '../../com/modal/UpdateDeadlineModal';
 
+
+import FullImageModal from  '../../../src/com/modal/FullImageModal'
+
+
 const PROGRAM_IMAGE_WIDTH = (width - 38) /2;
 const PROGRAM_IMAGE_HEIGHT = (width) /3;
 const carouselItems = [
@@ -84,6 +88,7 @@ class FlatDetailScreen extends React.Component {
             isRefresh : false,
             selectedDate: new Date(),
             deadlineCompleted: null,
+            displayFullFlatImg : false,
 
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
@@ -98,6 +103,7 @@ class FlatDetailScreen extends React.Component {
         this.readyToDeliver = this.readyToDeliver.bind(this);
         this.onGetFlatDetailSuccess = this.onGetFlatDetailSuccess.bind(this);
         this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
+        this.displayFullImg = this.displayFullImg.bind(this);
     }
 
     onRefresh = () => {
@@ -105,6 +111,10 @@ class FlatDetailScreen extends React.Component {
         this.setState({isRefresh:true});
         FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
     };
+
+    displayFullImg =  ()=> {
+        this.setState({'displayFullFlatImg' : true});
+    }
 
     onGetFlatDetailSuccess(data){
         this.setState({isRefresh:false});
@@ -225,8 +235,10 @@ class FlatDetailScreen extends React.Component {
         if(this.state.type == update_deadline_form) {
             this.setState({displayUpdateDeadline : false});
         }
+    };
 
-
+    closeFullImgFunc = () => {
+        this.setState({displayFullFlatImg:false});
     };
 
     onGetDesignSuccess(data){
@@ -310,7 +322,7 @@ class FlatDetailScreen extends React.Component {
         const ListHeader = () => (
             <View>
                 <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
-                    <View style={styles.imageContainer}>
+                    <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
                         {item.design && item.design.image_path ?
                             <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.design.image_path)}}  />
                             :
@@ -323,7 +335,7 @@ class FlatDetailScreen extends React.Component {
                                 {Def.formatText(item.code, 15)}
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
                     {
                         this.state.item.signature && this.state.item.signature['image_path'] ?
@@ -657,6 +669,22 @@ class FlatDetailScreen extends React.Component {
                     datePickerModeAndroid='spinner'
                     timePickerModeAndroid='spinner'
                 />
+
+                <Modal  onRequestClose={this.closeFullImgFunc}  transparent={true}  visible={this.state.displayFullFlatImg} >
+                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width, height : height,  alignItems: "center",
+                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
+                            console.log('prevent click');
+                            e.preventDefault()
+                        }}>
+                            <View>
+                                <FullImageModal item={this.state.item ? this.state.item.design : null } />
+                            </View>
+
+                        </TouchableWithoutFeedback>
+
+                    </TouchableOpacity>
+                </Modal>
 
 
 

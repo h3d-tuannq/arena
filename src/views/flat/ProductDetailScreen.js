@@ -13,6 +13,7 @@ import FlatController from "../../controller/FlatController";
 import RequestRepairModalForm from "../../com/modal/RequestRepairModalForm";
 import FlatHelper from "../../def/FlatHelper";
 import Def from "../../def/Def";
+import FullImageModal from  '../../../src/com/modal/FullImageModal'
 
 
 const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
@@ -35,6 +36,9 @@ class ProductDetailScreen extends React.Component {
         this.openCommentForm = this.openCommentForm.bind(this);
         this.closeFunction = this.closeFunction.bind(this);
 
+        this.displayFullProduct = this.displayFullProduct.bind(this);
+
+
         Def.product_detail_data = this.props.route.params.item;
         let item = this.props.route.params.item;
 
@@ -47,6 +51,7 @@ class ProductDetailScreen extends React.Component {
             requestDetail:null,
             displayRequestForm: false,
             requestType:0,
+            displayFullProductImg: false,
 
         };
         Def.mainNavigate = this.props.navigation;
@@ -56,6 +61,11 @@ class ProductDetailScreen extends React.Component {
         console.log('item click');
         this.setState({requestDetail:item, displayRequestModal : true});
     };
+
+    displayFullProduct = () => {
+        console.log('show full image');
+        this.setState({ displayFullProductImg : true});
+    }
 
     appendRepairItem = (data) => {
         let currentList = this.state.requestRepairs;
@@ -106,11 +116,8 @@ class ProductDetailScreen extends React.Component {
         console.log('Change Status False');
     };
 
-
-
-
     closeFunction = () => {
-        this.setState({requestDetail:null, displayRequestModal : false , displayRequestForm : false});
+        this.setState({requestDetail:null, displayRequestModal : false , displayRequestForm : false, displayFullProductImg : false });
     };
     getImageForCollection(item){
         let collectionImages;
@@ -165,8 +172,10 @@ class ProductDetailScreen extends React.Component {
     render() {
         const {navigation} = this.props;
         const item = this.state.item;
-        const productInstance = item ? this.state.item : null;
+        const productInstance = item ? item.productInstance : null;
         const product = productInstance ? productInstance.product : null;
+
+        console.log('product : '  + JSON.stringify(product));
 
         const renderItem = ({item}) => {
             return (
@@ -186,12 +195,16 @@ class ProductDetailScreen extends React.Component {
             <View style={{flex:1, backgroundColor:'#fff'}}>
                 <View style={{width : width,height:PROGRAM_IMAGE_HEIGHT + 10 , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <View style={styles.imageContainer}>
+                        <TouchableOpacity onPress={this.displayFullProduct}>
                         {product &&  product.image_path ?
 
-                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(product.image_path)}}  />
+                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(product.image_path)}}  />
+
                             :
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
+
                         }
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.info}>
                         <View style={{flexDirection:'row'}}>
@@ -323,6 +336,22 @@ class ProductDetailScreen extends React.Component {
                         }}>
                             <View style={{zIndex : 5 , height :0.5*height}}>
                                 <RequestRepairModalForm appendRepairItem={this.appendRepairItem} product={this.state.item} type={this.state.requestType} />
+                            </View>
+
+                        </TouchableWithoutFeedback>
+
+                    </TouchableOpacity>
+                </Modal>
+
+                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayFullProductImg} >
+                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
+                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width, height : height,  alignItems: "center",
+                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
+                            console.log('prevent click');
+                            e.preventDefault()
+                        }}>
+                            <View>
+                                <FullImageModal item={product} />
                             </View>
 
                         </TouchableWithoutFeedback>
