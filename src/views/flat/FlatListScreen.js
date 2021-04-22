@@ -90,6 +90,7 @@ class FlatListScreen extends React.Component {
         this.handleDatePicked = this.handleDatePicked.bind(this);
         this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
         this.displayFilterDate = this.displayFilterDate.bind(this);
+        this.cancelDateFilter = this.cancelDateFilter.bind(this);
 
     }
 
@@ -99,6 +100,15 @@ class FlatListScreen extends React.Component {
         this.criteria['deliverDate'] = date;
         this.filterDataByCondition();
     };
+
+    cancelDateFilter = () => {
+        this.setState({filterDate : null});
+        if(this.criteria['deliverDate']){
+            this.criteria['deliverDate'] = null;
+            this.filterDataByCondition();
+        }
+    }
+
 
     hideDateTimePicker = () => {
         this.setState({ displaySelectDate : false });
@@ -471,6 +481,15 @@ class FlatListScreen extends React.Component {
                             Ngày bàn giao
                         </Text>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            {
+                                this.state.filterDate ?
+                                    <TouchableOpacity style={{paddingHorizontal:5}} onPress={this.cancelDateFilter}>
+                                        <Icon name="trash" size={18} color={Style.DEFAUT_RED_COLOR}/>
+                                    </TouchableOpacity>
+                                    : null
+                            }
+
+
                             <TouchableOpacity style={{
                                 marginRight: 5,
                                 height: ITEM_HEIGHT,
