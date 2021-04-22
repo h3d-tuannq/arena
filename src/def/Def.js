@@ -135,6 +135,29 @@ export default class Def {
         return formattedDate;
     };
 
+    static COMPARE_DATE = 0;
+    static COMPARE_DATETIME = 1;
+    static compairDate(date1, date2, type = COMPARE_DATE ){
+        let rs = false;
+        date1 = Number.isInteger(date1) ? new Date(date1) : date1;
+        date2 = Number.isInteger(date2) ? new Date(date2) : date2;
+
+        console.log('Date1: ' + Def.getDateString(date1, "dd-MM-yyyy"));
+        console.log('Date2: ' + Def.getDateString(date2, "dd-MM-yyyy"));
+
+        if(type == Def.COMPARE_DATETIME) {
+            rs = date1.getTime() == date2.getTime();
+        }
+
+        if(type == Def.COMPARE_DATE){
+            rs = date1.getDate() == date2.getDate() && date1.getFullYear() == date2.getFullYear() && date1.getMonth()== date2.getMonth();
+        }
+
+        console.log('RS : ' + rs)
+
+        return rs;
+    }
+
     static getAvatarUrlFromUserInfo() {
         let rsUrl = Def.URL_DEFAULT_AVATAR;
         if (Def.user_info && Def.user_info['userProfile'] && Def.user_info['userProfile']['avatar_path']) {

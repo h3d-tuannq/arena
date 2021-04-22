@@ -120,14 +120,15 @@ class FlatListScreen extends React.Component {
     }
 
     filterDataByCondition = () => {
-       console.log('Run Filter : ');
-       this.criteria['name'] = this.state.name;
+        this.criteria['name'] = this.state.name;
+       console.log('Run Filter Criteria : ' + JSON.stringify(this.criteria));
        let dataFilter =  Def.flat_data.filter(this.filterFunc);
        console.log('Filter-Data : ' + dataFilter.length);
        this.setState({data:dataFilter});
     }
 
     filterFunc = (item) => {
+        console.log('Filter Function');
         let rs = true;
         if(this.criteria.building){
             console.log('filter building');
@@ -140,14 +141,12 @@ class FlatListScreen extends React.Component {
         if(rs && this.criteria.status){
             rs = item.status == this.criteria.status['id'];
         }
-        if(rs && this.criteria.filterDate){
-            rs = item.deliver_date == this.criteria.filterDate.getTime();
+        if(rs && this.criteria.deliverDate){
+            // console.log('Item : ' + JSON.stringify(item.deliverDate));
+            rs = item.deliver_date && Def.compairDate(item.deliver_date * 1000, this.criteria.deliverDate, Def.COMPARE_DATE);
         }
-
-
         if(rs && this.criteria.name && this.criteria.name.length > 0){
             const regex = new RegExp(`${this.criteria.name.trim()}`, 'i');
-
             rs = item.code.search(regex) >= 0;
         }
         return rs;
@@ -193,8 +192,6 @@ class FlatListScreen extends React.Component {
 
 
     shouldComponentUpdate(){
-        console.log("shouldComponentUpdate list");
-        console.log('Flat-Screen Constructor : ' + JSON.stringify(this.props.route));
         const index = Def.REFESH_SCREEN.indexOf('flat-screen');
 
         if (index > -1 || (this.props.route && this.props.route.param && this.props.route.param.refresh)) {

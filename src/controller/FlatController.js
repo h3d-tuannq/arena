@@ -39,8 +39,8 @@ export default class FlatController {
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/change-product-status" ,Def.POST_METHOD, param);
     }
 
-    static changeStatusFlat(callback, errCallback, token, flat_id, status, is_decline = null , image, note, type, newDeadline = null ){
-        let param = {'flat_id' : flat_id, 'token' : token, 'type' : type , 'note': note, 'image_data':image, 'status' : status , 'is_decline' : is_decline, 'new_deadline': newDeadline};
+    static changeStatusFlat(callback, errCallback, token, flat_id, status, is_decline = null , image, note, type, newDeadline = null, readyToDeliver = null ){
+        let param = {'flat_id' : flat_id, 'token' : token, 'type' : type , 'note': note, 'image_data':image, 'status' : status , 'is_decline' : is_decline, 'new_deadline': newDeadline, 'ready_deliver':readyToDeliver};
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/change-flat-status" ,Def.POST_METHOD, param);
     }
 

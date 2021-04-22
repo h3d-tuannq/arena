@@ -95,6 +95,7 @@ class FlatDetailScreen extends React.Component {
         this.handleDatePicked = this.handleDatePicked.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
         this.saveDeadline = this.saveDeadline.bind(this);
+        this.readyToDeliver = this.readyToDeliver.bind(this);
         this.onGetFlatDetailSuccess = this.onGetFlatDetailSuccess.bind(this);
         this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
     }
@@ -144,6 +145,9 @@ class FlatDetailScreen extends React.Component {
 
     saveDeadline = () => {
         FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_DEADLINE, this.state.deadlineCompleted.getTime()/1000);
+    }
+    readyToDeliver = () => {
+        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.READY_TO_DELIVER, null, 1);
     }
 
     clickSignature = () => {
@@ -508,6 +512,17 @@ class FlatDetailScreen extends React.Component {
                                             </Text>
                                         </TouchableOpacity> : null
                                 }
+
+                                {
+                                    FlatHelper.readyToDeliver(this.state.item,Def.user_info)  ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.CAN_DELIVER_STATUS)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Sẵn sàng bàn giao
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
 
                                 {
                                     FlatHelper.canPerformDelivering(this.state.item,Def.user_info) ?

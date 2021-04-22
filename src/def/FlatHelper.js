@@ -11,6 +11,7 @@ export default class FlatHelper {
     static UPDATE_STATUS_TYPE = 1;
     static SIGNATURE_PAD_TYPE = 2;
     static UPDATE_DEADLINE = 3;
+    static READY_TO_DELIVER = 4;
 
 
     static INACTIVE_STATUS = 0; // Trạng thái mặc định khi đưa lên hệ thống
@@ -138,9 +139,13 @@ export default class FlatHelper {
 
     static canChangeDeliverStatus(flat, user){
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
-        let status = flat.status == FlatHelper.FINANCE_DONE_STATUS;
-        console.log('IsQA : ' + isQa + 'Status : ' + status);
-        return isQa && status;
+        let financeDone = flat.status == FlatHelper.FINANCE_DONE_STATUS;
+        return isQa && financeDone;
+    }
+
+    static  readyToDeliver(flat, user){
+        let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        return  (isQa && !flat.deliverDate && flat.status > FlatHelper.FINANCE_DONE_STATUS && FlatHelper.checkCompletedProduct(flat));
     }
 
     static canRollbackFinalDone(flat, user){
@@ -239,6 +244,21 @@ export default class FlatHelper {
         return {pass:passPif.length, total:activePif.length};
 
     }
+
+
+    static checkCompletedProduct(flat){
+        let pifs = flat.productInstanceFlat;
+        let activePif = pifs.filter(function (item) {
+            return item.is_deleted != 1;
+        });
+        let passPif = activePif.filter(function (activeItem) {
+            return activeItem.status == Def.PRODUCT_ACTIVE_STATUS;
+        })
+        return passPif.length = activePif.length;
+
+    }
+
+
 
     static getDownloadProduct(product){
 
