@@ -72,7 +72,7 @@ class FlatStack extends React.Component {
                     headerTitleStyle: {
 
                     },
-                    headerRight: Def.user_info && FlatHelper.canSendRequestRepair(route.params.item,Def.user_info) ?  () => (
+                    headerRight: Def.user_info && FlatHelper.canSendRequestRepair(route.params.item,Def.user_info) && false ?  () => (
 
                         <TouchableOpacity
                             style=  {

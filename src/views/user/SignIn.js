@@ -30,7 +30,7 @@ export default class SignIn extends Component {
         super(props);
         this.state = {
             focus : 0,
-            email:"CBBG Lê Quang Hoà",
+            email:"nvbg1@wsh.com.vn",
             password:"123123",
             isLoging : false,
         }

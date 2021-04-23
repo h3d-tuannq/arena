@@ -116,6 +116,15 @@ export default class Style{
             marginHorizontal : 1,
             borderRadius:1
         },
+        bookingBtn : {
+            backgroundColor: Style.DEFAUT_RED_COLOR,
+            height: 45,
+            justifyContent : 'center',
+            alignItems: 'center',
+            flex:1, paddingHorizontal : 10,
+            marginHorizontal : 1,
+            borderRadius:1
+        },
 
     });
 

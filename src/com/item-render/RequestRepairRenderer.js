@@ -13,18 +13,15 @@ class RequestRepairRenderer extends React.PureComponent{
     render(){
         const {item} =  this.props;
         return (
-            <TouchableOpacity style={styles.comment} onPress={() => this.props.click(item)}>
+            <TouchableOpacity style={styles.comment} onPress={() => {
+                if(item.image_path){
+                    this.props.click(item)
+                }
+            }}>
                 <View style={styles.content}>
-                    <View style={styles.imageContainer}>
-                    {
-                        item.image_path ?
-                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
-                        :
-                        <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
-                    }
-                    </View>
+
                     <View style={styles.infoContainer}>
-                        <View style={{flexDirection:'row', justifyContent: 'space-between', paddingRight:5}}>
+                        <View style={{flexDirection:'row', justifyContent: 'space-between', paddingHorizontal:5 , width : width -30}}>
                             <Text style={styles.author}>
                                 {item.reporter ? item.reporter.username :  item.reporter_id}
                             </Text>
@@ -36,10 +33,21 @@ class RequestRepairRenderer extends React.PureComponent{
                         <Text style={styles.commentContent}>
                             {item.note ? Def.formatText(item.note , 100): "" }
                         </Text>
+
                     </View>
 
 
+
                 </View>
+
+                <View style={styles.imageContainer}>
+                    {
+                        item.image_path ?
+                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
+                            : null
+                    }
+                </View>
+
 
 
             </TouchableOpacity>
@@ -51,32 +59,45 @@ const styles = StyleSheet.create({
     comment: {
        backgroundColor : '#f0f1f2',
        minHeight: 60,
-       flexDirection : 'row',
+       // flexDirection : 'row',
        justifyContent : 'space-between',
        marginVertical :5,
        // marginHorizontal:10,
         borderRadius : 5,
         paddingVertical:5,
+        marginHorizontal : 10,
         // paddingHorizontal : 10
     },
     content: {
-        width : width - 20,
+        // width : width - 20,
         // paddingLeft : 10,
-        flexDirection: 'row'
+        // flexDirection: 'row',
 
     },
 
     itemImage: {
-        width : width / 5,
-        height : width / 7,
+         maxWidth : width - 30,
+         height : height /4,
+         // maxHeight : height /3,
+        // height : width / 7,
+       // resizeMode : 'center',
         borderRadius : 5,
+        backgroundColor: 'red'
     },
     imageContainer: {
-       flex:2,
+       // flex:2,
+       //  maxWidth : width - 30,
+       //  marginTop : 5,
+       //  backgroundColor: 'red'
+        // height : height /4,
+    },
+
+    commentContent : {
+        paddingHorizontal:5
     },
 
     infoContainer:{
-       flex:6,
+       // flex:6,
     },
     author : {
         fontSize : Style.MIDLE_SIZE,

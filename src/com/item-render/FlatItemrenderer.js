@@ -13,6 +13,7 @@ import FavoriteIconSelect from "../../../assets/icon/icon-like.svg";
 
 import Def from '../../def/Def'
 import Style from "../../def/Style";
+import FlatHelper from "../../def/FlatHelper";
 
 class FlatItemrenderer extends PureComponent{
     state = {
@@ -116,13 +117,23 @@ class FlatItemrenderer extends PureComponent{
 
                         <View style={{flexDirection:'row'}}>
                             <Text>
-                                {"Ngày bàn giao:" + ''}
+                                {"Ngày bàn giao: "}
                             </Text>
 
                             <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
                                 { model.deliver_date ? Def.getDateString(new Date(model.deliver_date *1000), "dd-MM-yyyy") : ""}
                             </Text>
                         </View>
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Hạng mục: "}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                {FlatHelper.calPassPifStr(model)}
+                            </Text>
+                        </View>
+
                 </View>
 
 

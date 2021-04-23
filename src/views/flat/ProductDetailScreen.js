@@ -221,7 +221,7 @@ class ProductDetailScreen extends React.Component {
                                 {"Tên sản phẩm:" + ' '}
                             </Text>
                             <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
-                                {(product && product.name ? "" : "")}
+                                {(product && product.name ? product.name : "")}
                             </Text>
                         </View>
 
@@ -267,15 +267,15 @@ class ProductDetailScreen extends React.Component {
 
                 <View style={{flexDirection:'row', paddingBottom : 5}}>
                     {FlatHelper.canRequestRepair(this.state.item, Def.user_info) ?
-                        <TouchableOpacity style={styles.bookingBtn} onPress={() => this.openRequestForm(FlatHelper.REQUEST_TYPE)}>
+                        <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.openRequestForm(FlatHelper.REQUEST_TYPE)}>
                             <Text style={Style.text_styles.whiteTitleText}>
-                                Yêu cầu sửa chữa
+                                Yêu cầu sửa
                             </Text>
                         </TouchableOpacity> : null
                     }
                     {
                     FlatHelper.canFixRepair(this.state.item, Def.user_info) ?
-                    <TouchableOpacity style={styles.bookingBtn} onPress={() => this.openFixedForm(1)}>
+                    <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.openFixedForm(1)}>
                         <Text style={Style.text_styles.whiteTitleText}>
                             Hoàn thành
                         </Text>
@@ -284,7 +284,7 @@ class ProductDetailScreen extends React.Component {
 
                     {
                         FlatHelper.canApproveRepairedProduct(this.state.item, Def.user_info) ?
-                            <TouchableOpacity style={styles.bookingBtn} onPress={() => this.approveRepair(1)}>
+                            <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.approveRepair(1)}>
                                 <Text style={Style.text_styles.whiteTitleText}>
                                     Đạt yêu cầu
                                 </Text>
@@ -292,7 +292,7 @@ class ProductDetailScreen extends React.Component {
                     }
                     {
                         FlatHelper.canApproveRepairedProduct(this.state.item, Def.user_info) ?
-                            <TouchableOpacity style={styles.bookingBtn} onPress={() => this.approveRepair(0)}>
+                            <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.approveRepair(0)}>
                                 <Text style={Style.text_styles.whiteTitleText}>
                                     Không đạt
                                 </Text>
@@ -301,7 +301,7 @@ class ProductDetailScreen extends React.Component {
 
                     {
                         FlatHelper.canComment(this.state.item, Def.user_info) ?
-                            <TouchableOpacity style={styles.bookingBtn} onPress={() => this.openCommentForm(FlatHelper.COMMENT_TYPE)}>
+                            <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.openCommentForm(FlatHelper.COMMENT_TYPE)}>
                                 <Text style={Style.text_styles.whiteTitleText}>
                                     Bình luận
                                 </Text>

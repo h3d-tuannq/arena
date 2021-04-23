@@ -157,6 +157,7 @@ class FlatDetailScreen extends React.Component {
         FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_DEADLINE, this.state.deadlineCompleted.getTime()/1000);
     }
     readyToDeliver = () => {
+        console.log('Ready To Send');
         FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.READY_TO_DELIVER, null, 1);
     }
 
@@ -174,9 +175,20 @@ class FlatDetailScreen extends React.Component {
 
 
     changeStatusSuccess = (data) => {
+        console.log('REady : '+ JSON.stringify(data['flat']['highlight_re_schedule']));
         if(data['msg'] == "Ok"){
+            // this.setState({canSaveDeadline:false});
+            Alert.alert(
+                "Thông báo",
+                'Cập nhật thành công',
+                [
+                    {
+                        text: "Ok",
+                    }
+                ],
+                {cancelable: false},
+            );
             this.updateFlatStatus(data['flat']);
-            this.setState({canSaveDeadline:false});
         } else {
             Alert.alert(
                 "Thông báo",
@@ -205,7 +217,7 @@ class FlatDetailScreen extends React.Component {
 
     updateFlatStatus =(flat) => {
         if(flat) {
-            this.setState({item:flat, deadlineCompleted: null});
+            this.setState({item:flat, deadlineCompleted: null, canSaveDeadline : false});
             if(Def.flat_data) { // Update dữ liệu
                 let updated = Def.updateFlatToFlatList(flat);
                 if(updated){
@@ -528,7 +540,7 @@ class FlatDetailScreen extends React.Component {
                                 {
                                     FlatHelper.readyToDeliver(this.state.item,Def.user_info)  ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.CAN_DELIVER_STATUS)}>
+                                                          onPress={() => this.readyToDeliver()}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Sẵn sàng bàn giao
                                             </Text>

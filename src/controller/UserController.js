@@ -9,7 +9,7 @@ export default class UserController{
 
     static async  login(email, password ,navigation=null, successCallback, falseCallback) {
 
-        let param = {'username' : email, 'password' : password};
+        let param = {'email' : email, 'password' : password};
         if(navigation){
             Def.mainNavigate = navigation;
         }

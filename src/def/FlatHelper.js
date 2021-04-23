@@ -125,7 +125,7 @@ export default class FlatHelper {
     }
 
     static canRequestRepair(product, user){
-        return FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) || FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        return FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) || FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH) || FlatHelper.checkCanPermission(user, FlatHelper.ROLE_DEFECT);
     }
 
     static canFixRepair(product, user){
@@ -148,7 +148,7 @@ export default class FlatHelper {
 
     static  readyToDeliver(flat, user){
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
-        return  (isQa && !flat.deliverDate && flat.status > FlatHelper.FINANCE_DONE_STATUS && FlatHelper.checkCompletedProduct(flat));
+        return  (isQa && !flat.highlight_re_schedule  && !flat.deliverDate && flat.status > FlatHelper.FINANCE_DONE_STATUS && FlatHelper.checkCompletedProduct(flat));
     }
 
     static canRollbackFinalDone(flat, user){
@@ -247,6 +247,10 @@ export default class FlatHelper {
         return {pass:passPif.length, total:activePif.length};
 
     }
+    static calPassPifStr(flat){
+        let calPassPif = FlatHelper.calPassPif(flat);
+        return calPassPif ?  calPassPif.pass + '/' + calPassPif.total : '0/0';
+    }
 
 
     static checkCompletedProduct(flat){
@@ -257,7 +261,7 @@ export default class FlatHelper {
         let passPif = activePif.filter(function (activeItem) {
             return activeItem.status == Def.PRODUCT_ACTIVE_STATUS;
         })
-        return passPif.length = activePif.length;
+        return passPif.length == activePif.length;
 
     }
 
