@@ -267,7 +267,7 @@ class ProductDetailScreen extends React.Component {
 
                 <View style={{flexDirection:'row', paddingBottom : 5}}>
                     {FlatHelper.canRequestRepair(this.state.item, Def.user_info) ?
-                        <TouchableOpacity style={styles.bookingBtn} onPress={this.openRequestForm}>
+                        <TouchableOpacity style={styles.bookingBtn} onPress={() => this.openRequestForm(FlatHelper.REQUEST_TYPE)}>
                             <Text style={Style.text_styles.whiteTitleText}>
                                 Yêu cầu sửa chữa
                             </Text>
