@@ -77,7 +77,7 @@ class NotificationItemrenderer extends React.PureComponent{
                         <Text style={styles.title}>
                             {item.title}
                         </Text>
-                        <Text style={styles.date}>{item.created_at ? Def.getDateString(new Date(item.created_at * 1000), "dd-MM-yyyy") : ""}
+                        <Text style={styles.date}>{item.created_at ? Def.getDateString(new Date(item.created_at * 1000), "dd-MM-yyyy hh:mm") : ""}
                         </Text>
 
                     </View>

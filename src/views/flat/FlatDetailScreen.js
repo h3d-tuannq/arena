@@ -410,7 +410,7 @@ class FlatDetailScreen extends React.Component {
                             {"CSKH:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {item.handover ? item.handover.username+"" : ""}
+                            {item.cskh ? item.cskh.username+"" : ""}
                         </Text>
                     </View>
 
@@ -422,14 +422,30 @@ class FlatDetailScreen extends React.Component {
                             {item.building ? item.building.name+"" : ""}
                         </Text>
                     </View>
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"Chủ sở hữu :" + ' '}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                            { item.customer? item.customer.name+"" : ""}
-                        </Text>
-                    </View>
+
+                    {
+                        item.authority_name ?
+                            <View style={{flexDirection:'row'}}>
+                                <Text>
+                                    {"Ủy quyền :" + ' '}
+                                </Text>
+                                <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                    { item.authority_name? item.authority_name+ (item.authority_phone ? '-' + item.authority_phone : '' ) : ""}
+                                </Text>
+                            </View>
+                            :
+                            <View style={{flexDirection:'row'}}>
+
+                                <Text>
+                                    {"Chủ sở hữu :" + ' '}
+                                </Text>
+                                <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                    { item.customer? item.customer.name+"" : ""}
+                                </Text>
+                            </View>
+                    }
+
+
 
                     <View style={{flexDirection:'row'}}>
                         <Text>
@@ -440,6 +456,20 @@ class FlatDetailScreen extends React.Component {
                             { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : ""}
                         </Text>
                     </View>
+                    {
+                        item.signature ?
+                            <View style={{flexDirection:'row'}}>
+                                <Text>
+                                    {"Ngày ký nhận: "}
+                                </Text>
+
+                                <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
+                                    { item.signature && item.signature.date_create ? Def.getDateString(new Date(item.signature.date_create *1000), "dd-MM-yyyy hh:mm") : ""}
+                                </Text>
+                            </View> : null
+                    }
+
+
 
 
                     <View style={{flexDirection:'row'}}>
@@ -448,7 +478,7 @@ class FlatDetailScreen extends React.Component {
                         </Text>
 
                         <Text style={[{fontSize:Style.MIDLE_SIZE, paddingRight:5}, {color: this.state.canSaveDeadline ? Style.DEFAUT_RED_COLOR : '#000'}]}>
-                            { this.state.deadlineCompleted ? Def.getDateString(this.state.deadlineCompleted, "dd-MM-yyyy") : ( item.deadline_date ? Def.getDateString(new Date(item.deadline_date *1000), "dd-MM-yyyy") : "Không có")}
+                            { this.state.deadlineCompleted ? Def.getDateString(this.state.deadlineCompleted, "dd-MM-yyyy hh:mm") : ( item.deadline_date ? Def.getDateString(new Date(item.deadline_date *1000), "dd-MM-yyyy hh:mm") : "Không có")}
                         </Text>
                     </View>
 

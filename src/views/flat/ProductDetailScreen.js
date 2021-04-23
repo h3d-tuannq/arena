@@ -207,20 +207,20 @@ class ProductDetailScreen extends React.Component {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.info}>
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Mã sản phẩm:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
-                                {(productInstance && productInstance.code ? "" : "")}
-                            </Text>
-                        </View>
+                        {/*<View style={{flexDirection:'row'}}>*/}
+                            {/*<Text>*/}
+                                {/*{"Mã sản phẩm:" + ' '}*/}
+                            {/*</Text>*/}
+                            {/*<Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>*/}
+                                {/*{(productInstance && productInstance.code ? "" : "")}*/}
+                            {/*</Text>*/}
+                        {/*</View>*/}
 
                         <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Tên sản phẩm:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
+                            {/*<Text>*/}
+                                {/*{"Tên sản phẩm:" + ' '}*/}
+                            {/*</Text>*/}
+                            <Text style={[{fontSize:Style.TITLE_SIZE , paddingRight:5}, Style.text_styles.titleTextNotBold]}>
                                 {(product && product.name ? product.name : "")}
                             </Text>
                         </View>
@@ -238,9 +238,9 @@ class ProductDetailScreen extends React.Component {
                 </View>
 
                 <View style={{flexDirection:'column'}}>
-                    <Text style={{paddingHorizontal : 10}}>
-                        {"Mô tả:" + ' '}
-                    </Text>
+                    {/*<Text style={{paddingHorizontal : 10}}>*/}
+                        {/*{"Mô tả:" + ' '}*/}
+                    {/*</Text>*/}
                     <ScrollView style={{maxHeight:120, width:width, paddingHorizontal:10, minHeight:60}}>
                         <Text>
                             {product ? product.description : "Sản phẩm chưa có mô tả"}
@@ -249,7 +249,7 @@ class ProductDetailScreen extends React.Component {
                 </View>
 
                 <View style={{marginTop:10, flex:1, marginBottom:25}}>
-                    <Text style={{paddingHorizontal : 10}}>
+                    <Text style={[{ paddingHorizontal : 10}, Style.text_styles.titleText]}>
                         {"Lịch sử chỉnh sửa:" + ' '}
                     </Text>
                     <ProgramVerList

@@ -17,16 +17,14 @@ class FullImageModal extends React.Component {
         console.log("Item: " + JSON.stringify(item));
 
         return (
-            <View style={styles.content}>
                 <View style={styles.imageContainer}>
                     {
                         item.image_path ?
-                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  resizeMode={'center'} />
+                            <Image  style={[styles.itemImage]}   source={{uri: Def.getThumnailImg(item.image_path)}}  />
                             :
-                            <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
+                            <Image  style={[styles.itemImage]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }
                 </View>
-            </View>
         )
     }
 }
@@ -46,14 +44,17 @@ const styles = StyleSheet.create({
     },
 
     itemImage: {
-         maxWidth : PROGRAM_IMAGE_WIDTH,
-
-        // height : PROGRAM_IMAGE_WIDTH,
+        width : width,
+        maxHeight : height,
+        height : PROGRAM_IMAGE_WIDTH,
+        resizeMode:'contain'
     },
     imageContainer: {
-        // flex:2,
-        justifyContent : 'center',
-        alignItems : 'center'
+        flex:1,
+        // justifyContent : 'center',
+        // alignItems : 'center',
+        // width : width,
+        // height : height,
     },
 
     infoContainer:{

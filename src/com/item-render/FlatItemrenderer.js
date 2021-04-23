@@ -121,7 +121,7 @@ class FlatItemrenderer extends PureComponent{
                             </Text>
 
                             <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                { model.deliver_date ? Def.getDateString(new Date(model.deliver_date *1000), "dd-MM-yyyy") : ""}
+                                { model.deliver_date ? Def.getDateString(new Date(model.deliver_date *1000), "dd-MM-yyyy hh:mm") : ""}
                             </Text>
                         </View>
                         <View style={{flexDirection:'row'}}>
