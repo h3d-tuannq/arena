@@ -175,7 +175,7 @@ class ProductDetailScreen extends React.Component {
         const productInstance = item ? item.productInstance : null;
         const product = productInstance ? productInstance.product : null;
 
-        console.log('product : '  + JSON.stringify(product));
+        console.log('item : '  + JSON.stringify(item));
 
         const renderItem = ({item}) => {
             return (
@@ -225,6 +225,14 @@ class ProductDetailScreen extends React.Component {
                             </Text>
                         </View>
 
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Căn hộ: "}
+                            </Text>
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {Def.getFlatFromFlatData(item.flat_id) ? Def.getFlatFromFlatData(item.flat_id).code : ""}
+                            </Text>
+                        </View>
 
                         <View style={{flexDirection:'row'}}>
                             <Text>

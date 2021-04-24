@@ -33,7 +33,7 @@ const CHOSE_STATUS = 2;
 const CHOSE_DELIVER_DATE = 3;
 
 
-const ITEM_HEIGHT = 40;
+const ITEM_HEIGHT = 38;
 
 
 class FlatListScreen extends React.Component {
@@ -175,7 +175,6 @@ class FlatListScreen extends React.Component {
 
 
     onGetFlatSuccess(data){
-        console.log("Flat Success !");
         Def.flat_data = data["data"];
         let title = "Danh sách thiết kế";
         let design_list = Def.flat_data;
@@ -436,7 +435,7 @@ class FlatListScreen extends React.Component {
 
             <View style={{flex:1, paddingTop:5}}>
                 <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>
-                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
+                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', height:ITEM_HEIGHT,justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseStatusClick}
                     >
                         <Text style={[Style.text_styles.middleText,{}]}>
@@ -450,7 +449,7 @@ class FlatListScreen extends React.Component {
                             <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
+                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center',height:ITEM_HEIGHT , justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseCustomerClick}
                     >
                         <Text style={[Style.text_styles.middleText,{}]}>
@@ -472,7 +471,7 @@ class FlatListScreen extends React.Component {
                         paddingHorizontal: 10,
                         paddingVertical: 5,
                         backgroundColor: '#fff',
-                        marginTop: 1
+                        marginTop: 1,
                     }}>
                         <Text style={[Style.text_styles.middleText, {}]}>
                             Ngày bàn giao
@@ -514,7 +513,7 @@ class FlatListScreen extends React.Component {
                             <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR}/>
                         </View>
                     </TouchableOpacity>
-                    <View style={{ width : width -20, borderWidth : 0, borderBottomWidth:1 ,borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginTop : 2, marginBottom : 10}}>
+                    <View style={{ width : width -20, borderWidth : 0, height:ITEM_HEIGHT + 10 ,borderBottomWidth:1 ,borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginTop : 0, marginBottom : 5,}}>
                         <TextInput value={this.state.name} onChangeText={text => this.setState({ name : text })} placeholder={"Tìm kiếm"} style={[styles.textInput, {backgroundColor:'#fff',marginTop:5, width: width -70, paddingHorizontal:10}]}>
                         </TextInput>
                         <TouchableOpacity onPress={this.searchButtonClick} style={{paddingLeft:5,paddingRight:10, paddingVertical:5 ,  }} >
@@ -551,9 +550,11 @@ class FlatListScreen extends React.Component {
 
                 </View>
                  <ProgramVerList
+
                     data={this.state.data}
                     navigation={this.props.navigation}
                     header={ListHeader}
+                    styleList={{height: height-(ITEM_HEIGHT * 5 + 20)}}
                     refreshControl={
                         <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
                     }
@@ -565,7 +566,7 @@ class FlatListScreen extends React.Component {
                             <View
                                 style={[
                                     {backgroundColor:Style.GREY_TEXT_COLOR, height:1, width:width -25, marginHorizontal: 10},
-                                    highlighted && { marginHorizontal: 10 }
+                                    highlighted && { marginHorizontal:10 }
                                 ]}
                             />
                         ))
@@ -583,7 +584,7 @@ const styles = StyleSheet.create({
         paddingLeft: 15,
         // justifyContent: 'flex-start',
         // marginVertical : 5,
-        marginBottom : 125,
+        // marginBottom : 300,
         backgroundColor: '#fff'
     },
     slider: {

@@ -78,13 +78,22 @@ class FlatItemrenderer extends PureComponent{
 
                 <View style={styles.info}>
 
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Mã:" + ' '}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
-                                {model.code+""}
-                            </Text>
+                        <View style={{flexDirection:'row', justifyContent:'space-between', paddingRight:10}}>
+                            <View style={{flexDirection:'row'}}>
+                                <Text>
+                                    {"Mã:" + ' '}
+                                </Text>
+                                <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
+                                    {model.code+""}
+                                </Text>
+                            </View>
+
+                            <View style={{flexDirection:'row', backgroundColor:Style.DEFAUT_RED_COLOR, borderRadius:2, borderColor:'#fff'}}>
+                                    <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5, color:'#fff'}}>
+                                        {FlatHelper.calPassPifStr(model)}
+                                    </Text>
+                            </View>
+
                         </View>
 
 
@@ -108,7 +117,7 @@ class FlatItemrenderer extends PureComponent{
                         </View>
                         <View style={{flexDirection:'row'}}>
                             <Text>
-                                {"Khách hàng:" + ' '}
+                                {"Chủ sở hữu:" + ' '}
                             </Text>
                             <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
                                 { model.customer? model.customer.name+"" : ""}
@@ -124,16 +133,6 @@ class FlatItemrenderer extends PureComponent{
                                 { model.deliver_date ? Def.getDateString(new Date(model.deliver_date *1000), "dd-MM-yyyy hh:mm") : ""}
                             </Text>
                         </View>
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Hạng mục: "}
-                            </Text>
-
-                            <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                {FlatHelper.calPassPifStr(model)}
-                            </Text>
-                        </View>
-
                 </View>
 
 
