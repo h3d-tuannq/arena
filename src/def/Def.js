@@ -109,6 +109,9 @@ export default class Def {
 
     static customerTypes = {0: 'Chủ nhà', 1: 'Kiến trúc sư'};
 
+    static flatCurrentPage = 0;
+
+
     static getDateString(date, format) {
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             getPaddedComp = function (comp) {
@@ -438,6 +441,16 @@ export default class Def {
 
 
     }
+
+    static appendToFlatData(newData){
+        if(Def.flat_data){
+            Def.flat_data = Def.flat_data.concat(newData);
+        }else {
+            Def.flat_data = newData;
+        }
+        return Def.flat_data;
+    }
+
 
     static buildingData = [];
     static customerData = [];

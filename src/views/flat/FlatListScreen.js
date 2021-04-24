@@ -55,7 +55,7 @@ class FlatListScreen extends React.Component {
         this.showModal = this.showModal.bind(this);
         this.getBuildingSuccess = this.getBuildingSuccess.bind(this);
         this.getCustomerSuccess = this.getCustomerSuccess.bind(this);
-        this.getFilterDataFalse = this.getFilterDataFalse.bind(this)
+        this.getFilterDataFalse = this.getFilterDataFalse.bind(this);
         this.closeFunction = this.closeFunction.bind(this);
         this.filterDataByCondition = this.filterDataByCondition.bind(this);
         this.searchButtonClick = this.searchButtonClick.bind(this);
@@ -108,6 +108,13 @@ class FlatListScreen extends React.Component {
             this.filterDataByCondition();
         }
     }
+
+    loadNextPage = (page) => {
+
+    }
+
+
+
 
 
     hideDateTimePicker = () => {
