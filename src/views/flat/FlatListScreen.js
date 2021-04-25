@@ -65,6 +65,7 @@ class FlatListScreen extends React.Component {
         this.displayImageLoaded = this.displayImageLoaded.bind(this);
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
+
         let title = "Căn hộ bàn giao";
         this.state = {
             data: Def.flat_data,
@@ -83,6 +84,7 @@ class FlatListScreen extends React.Component {
             selectedDate: new Date(),
             filterDate: null,
             displaySelectDate: false,
+            pageIndex:0,
 
         };
 
@@ -109,8 +111,8 @@ class FlatListScreen extends React.Component {
         }
     }
 
-    loadNextPage = (page) => {
-
+    loadNextPage = (pageIndex) => {
+        FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
     }
 
 
@@ -168,7 +170,7 @@ class FlatListScreen extends React.Component {
     }
 
     onRefresh = () => {
-        this.setState({isRefresh:true});
+        this.setState({isRefresh:true, pageIndex:0});
         this.resetCriteria();
         if(Def.user_info){
             FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
@@ -182,11 +184,15 @@ class FlatListScreen extends React.Component {
 
 
     onGetFlatSuccess(data){
-        Def.flat_data = data["data"];
+        Def.flat_data = Def.appendToFlatData(data["data"]);
         let title = "Danh sách thiết kế";
         let design_list = Def.flat_data;
         AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
-        this.setState({data:design_list, isRefresh:false});
+        let newPageIndex = this.state.pageIndex + 1;
+        Def.flatCurrentPage = newPageIndex;
+        AsyncStorage.setItem('flat_current_page', newPageIndex);
+        console.log('New Page Index : ' + newPageIndex + " Flat Data Length : " + Def.flat_data.length) ;
+        this.setState({data:design_list, isRefresh:false, pageIndex:newPageIndex});
     }
 
 
@@ -339,7 +345,7 @@ class FlatListScreen extends React.Component {
                             if(value){
                                 Def.flat_data = JSON.parse(value);
                                 console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
-                                this.setState({data:Def.flat_data});
+                                this.setState({data:Def.flat_data, pageIndex : Math.ceil(Def.flat_data.length/Def.pageSize) -1});
                             } else {
                                 FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
                             }

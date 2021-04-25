@@ -111,6 +111,8 @@ export default class Def {
 
     static flatCurrentPage = 0;
 
+    static pageSize = 20;
+
 
     static getDateString(date, format) {
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],

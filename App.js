@@ -240,6 +240,13 @@ class App extends React.Component {
                     }
                 });
 
+
+                AsyncStorage.getItem('flat_current_page').then((value) => {
+                    if(value){
+                        Def.flatCurrentPage = value;
+                    }
+                });
+
             } else {
                 AsyncStorage.set('flat_data', null);
             }

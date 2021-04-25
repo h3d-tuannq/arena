@@ -3,8 +3,8 @@ import {Alert, Platform} from 'react-native'
 import Net from  './Net'
 
 export default class FlatController {
-    static getFlat(callback,errCallback ) {
-       let param = {'token' : Def.user_info['access_token']};
+    static getFlat(callback,errCallback , get_all = false, pageSize = Def.pageSize, pageIndex) {
+       let param = {'token' : Def.user_info['access_token'] , 'get_all' : false, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat" ,Def.POST_METHOD, param);
     }
 
