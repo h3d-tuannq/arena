@@ -1,22 +1,20 @@
 import React from 'react';
 import {Text, View, Button, TouchableOpacity, RefreshControl} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
-import FlatListScreen from './views/flat/FlatListScreen';
-import FlatDetailScreen from './views/flat/FlatDetailScreen';
+import ProductListScreen from './views/product/ProductListScreen';
 import ProductDetailScreen from './views/flat/ProductDetailScreen'
 import MenuIcon from '../assets/icon/menu.svg';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BackIconSvg from '../assets/icon/icon-back.svg'
 import Style from './def/Style'
 import Def from './def/Def'
-import FlatHelper from "./def/FlatHelper";
 
 
 
 
 const RootStack = createStackNavigator();
 
-class FlatStack extends React.Component {
+class ProductStack extends React.Component {
     constructor(props){
         super(props);
     }
@@ -28,8 +26,8 @@ class FlatStack extends React.Component {
     render() {
         return (
             <RootStack.Navigator>
-                <RootStack.Screen name="flat-screen" component={FlatListScreen} options={{
-                    title: "Danh sách căn hộ",
+                <RootStack.Screen name="product-list-screen" component={ProductListScreen} options={{
+                    title: "Sản phẩm mẫu",
                     headerLeft: () => (
                         <TouchableOpacity
                             style={
@@ -47,32 +45,12 @@ class FlatStack extends React.Component {
                                 height={Style.DRAWER_MENU_ICON_SIZE}
                             />
                         </TouchableOpacity>
-
                     ),
                     headerStyle: {
                         backgroundColor: Style.DEFAUT_BLUE_COLOR,
                         height: Style.HEADER_HEIGHT,
                     },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: {
-                        // alignSelf: 'center'
-                    },
-                    headerBackImage: ()=> {
-                        return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
-                    }
-                }} />
-                <RootStack.Screen name="flat-detail" component={FlatDetailScreen} options={({route}) => {
-                    return ({
-                    title: 'Chi tiết căn hộ',
-                    headerStyle: {
-                        backgroundColor: Style.DEFAUT_BLUE_COLOR,
-                        height: Style.HEADER_HEIGHT,
-                    },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: {
-
-                    },
-                    headerRight: Def.user_info && FlatHelper.canSendRequestRepair(route.params.item,Def.user_info) && false ?  () => (
+                    headerRight: true ?  () => (
 
                         <TouchableOpacity
                             style=  {
@@ -85,7 +63,44 @@ class FlatStack extends React.Component {
                                 }
                             }
                             onPress={() => this.goProductList}>
-                            <Icon name="calendar" size={30} color="#fff" />
+                            <Icon name="download" size={20} color="#fff" />
+                        </TouchableOpacity>
+
+
+                    ) : null,
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                        // alignSelf: 'center'
+                    },
+                    headerBackImage: ()=> {
+                        return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
+                    }
+                }} />
+                <RootStack.Screen name="product-detail" component={ProductDetailScreen} options={({route}) => {
+                    return ({
+                    title: 'Chi tiết sản phẩm',
+                    headerStyle: {
+                        backgroundColor: Style.DEFAUT_BLUE_COLOR,
+                        height: Style.HEADER_HEIGHT,
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+
+                    },
+                    headerRight: Def.user_info ?  () => (
+
+                        <TouchableOpacity
+                            style=  {
+                                {
+                                    width: Style.DRAWER_MENU_SIZE,
+                                    height: Style.DRAWER_MENU_SIZE,
+                                    justifyContent: 'center',
+                                    paddingRight:5 ,
+                                    alignItems : 'center'
+                                }
+                            }
+                            onPress={() => this.goProductList}>
+                            <Icon name="download" size={25} color="#fff" />
                             {/*<Text style={{color:'#fff'}}>*/}
                                 {/*{route.params.item.id}*/}
                             {/*</Text>*/}
@@ -100,26 +115,9 @@ class FlatStack extends React.Component {
                     }
                 })}
                 } />
-
-                <RootStack.Screen name="product-detail" component={ProductDetailScreen} options={{
-                    title: 'Chi tiết sản phẩm',
-                    headerStyle: {
-                        backgroundColor: Style.DEFAUT_BLUE_COLOR,
-                        height: Style.HEADER_HEIGHT,
-                    },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: {
-
-                    },
-                    headerBackImage: ()=> {
-                        return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
-                    }
-                }} />
-
-
             </RootStack.Navigator>
         )
     }
 }
 
-export default FlatStack;
+export default ProductStack;

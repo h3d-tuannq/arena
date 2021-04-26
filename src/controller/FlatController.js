@@ -14,6 +14,12 @@ export default class FlatController {
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/design/design" ,Def.POST_METHOD, param);
     }
 
+    static getProduct(callback,errCallback , get_all = true, pageSize = Def.pageSize, pageIndex) {
+        console.log('Get Product');
+        let param = {'token' : Def.user_info['access_token'] , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/product/product" ,Def.POST_METHOD, param);
+    }
+
     static getbuilding(callback,errCallback , params = null) {
 
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-bulding" ,Def.POST_METHOD, params);

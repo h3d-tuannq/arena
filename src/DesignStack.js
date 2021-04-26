@@ -22,7 +22,7 @@ class DesignStack extends React.Component {
     render() {
         return (
             <RootStack.Navigator>
-                <RootStack.Screen name="flat-screen" component={DesignListScreen} options={{
+                <RootStack.Screen name="design-screen" component={DesignListScreen} options={{
                     title: "Danh sách căn mẫu",
                     headerLeft: () => (
                         <TouchableOpacity
@@ -47,6 +47,24 @@ class DesignStack extends React.Component {
                         backgroundColor: Style.DEFAUT_BLUE_COLOR,
                         height: Style.HEADER_HEIGHT,
                     },
+                    headerRight: true ?  () => (
+
+                        <TouchableOpacity
+                            style=  {
+                                {
+                                    width: Style.DRAWER_MENU_SIZE,
+                                    height: Style.DRAWER_MENU_SIZE,
+                                    justifyContent: 'center',
+                                    paddingRight:5 ,
+                                    alignItems : 'center'
+                                }
+                            }
+                            onPress={() => this.goProductList}>
+                            <Icon name="download" size={20} color="#fff" />
+                        </TouchableOpacity>
+
+
+                    ) : null,
                     headerTintColor: '#fff',
                     headerTitleStyle: {
                         // alignSelf: 'center'
@@ -79,7 +97,7 @@ class DesignStack extends React.Component {
                                 }
                             }
                             onPress={() => this.goProductList}>
-                            <Icon name="download" size={30} color="#fff" />
+                            <Icon name="calendar" size={30} color="#fff" />
                         </TouchableOpacity>
 
 

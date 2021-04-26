@@ -27,7 +27,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import FlatHelper from '../../def/FlatHelper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MailProductItemrenderer from '../../com/item-render/MailProductItemrenderer';
-import DesignItemrenderer from '../../com/item-render/DesignItemrenderer';
+import ProductItemrenderer from '../../com/item-render/ProductItemrenderer';
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -38,15 +38,15 @@ const CHOSE_DELIVER_DATE = 3;
 const ITEM_HEIGHT = 38;
 
 
-class DesignListScreen extends React.Component {
+class ProductListScreen extends React.Component {
 
     criteria = {};
     imageView = null;
 
     constructor(props){
         super(props);
-        this.onGetDesignSuccess     = this.onGetDesignSuccess.bind(this);
-        this.onGetDesignFalse     = this.onGetDesignFalse.bind(this);
+        this.onGetProductSuccess     = this.onGetProductSuccess.bind(this);
+        this.onGetProductFalse     = this.onGetProductFalse.bind(this);
         this.refresh     = this.refresh.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
         this.choseBuildingClick = this.choseBuildingClick.bind(this);
@@ -63,14 +63,12 @@ class DesignListScreen extends React.Component {
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
 
-        let title = "Căn mẫu";
+        let title = "Sản phẩm mẫu";
         this.state = {
-            data: Def.design_data,
+            data: Def.product_data,
             title: title,
             stateCount: 0.0,
             isRefresh : false,
-            building: null,
-            customer: null,
             name:'',
             displayModal: false,
             filterAttr:"name",
@@ -85,31 +83,12 @@ class DesignListScreen extends React.Component {
 
         };
 
-        this.handleDatePicked = this.handleDatePicked.bind(this);
-        this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
-        this.displayFilterDate = this.displayFilterDate.bind(this);
-        this.cancelDateFilter = this.cancelDateFilter.bind(this);
         this.itemClick = this.itemClick.bind(this);
 
     }
 
-    handleDatePicked = date => {
-        this.hideDateTimePicker();
-        this.setState({ selectedDate : date, filterDate:date, type:CHOSE_DELIVER_DATE });
-        this.criteria['deliverDate'] = date;
-        this.filterDataByCondition();
-    };
-
-    cancelDateFilter = () => {
-        this.setState({filterDate : null});
-        if(this.criteria['deliverDate']){
-            this.criteria['deliverDate'] = null;
-            this.filterDataByCondition();
-        }
-    }
-
     loadNextPage = (pageIndex) => {
-        FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
+        FlatController.getFlat(this.onGetFlatSuccess, this.onGetProductFalse, false, Def.pageSize, this.state.pageIndex + 1);
     }
 
     itemClick(item){
@@ -130,9 +109,6 @@ class DesignListScreen extends React.Component {
 
 
 
-    hideDateTimePicker = () => {
-        this.setState({ displaySelectDate : false });
-    };
 
     displayFilterDate = () => {
         this.setState({ displaySelectDate : true });
@@ -151,10 +127,10 @@ class DesignListScreen extends React.Component {
 
     filterDataByCondition = () => {
         this.criteria['name'] = this.state.name;
-       console.log('Run Filter Criteria : ' + JSON.stringify(this.criteria));
-       let dataFilter =  Def.flat_data.filter(this.filterFunc);
-       console.log('Filter-Data : ' + dataFilter.length);
-       this.setState({data:dataFilter});
+        console.log('Run Filter Criteria : ' + JSON.stringify(this.criteria));
+        let dataFilter =  Def.flat_data.filter(this.filterFunc);
+        console.log('Filter-Data : ' + dataFilter.length);
+        this.setState({data:dataFilter});
     }
 
     filterFunc = (item) => {
@@ -184,7 +160,7 @@ class DesignListScreen extends React.Component {
         this.setState({isRefresh:true, pageIndex:0});
         this.resetCriteria();
         if(Def.user_info){
-            FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+            FlatController.getProduct(this.onGetProductSuccess, this.onGetProductFalse);
         }
     };
 
@@ -194,15 +170,15 @@ class DesignListScreen extends React.Component {
     }
 
 
-    onGetDesignSuccess(data){
-        Def.design_data = data["data"];
-        let title = "Danh sách thiết kế";
-        AsyncStorage.setItem('design_data', JSON.stringify(Def.design_data));
-        this.setState({data:Def.design_data, isRefresh:false});
+    onGetProductSuccess(data){
+        Def.product_data = data["data"];
+        let title = "Sản phẩm mẫu";
+        AsyncStorage.setItem('product_data', JSON.stringify(Def.product_data));
+        this.setState({data:Def.product_data, isRefresh:false});
     }
 
 
-    onGetDesignFalse(data){
+    onGetProductFalse(data){
         console.log("false data : " + data);
         this.setState({isRefresh:false});
     }
@@ -319,9 +295,9 @@ class DesignListScreen extends React.Component {
             }
 
 
-          this.state.type == CHOSE_CUSTOMER?  state['customer'] = data : state['status'] = data;
+            this.state.type == CHOSE_CUSTOMER?  state['customer'] = data : state['status'] = data;
             this.state.type == CHOSE_CUSTOMER ?  this.criteria['customer'] = data : this.criteria['status'] = data;
-          this.filterDataByCondition();
+            this.filterDataByCondition();
         }
 
 
@@ -330,9 +306,9 @@ class DesignListScreen extends React.Component {
 
 
     componentDidMount() {
-        if(!Def.design_data || Def.design_data.length == 0){
-            if (Def.design_data.length > 0 && Def.design_data) {
-                this.setState({data:Def.design_data});
+        if(!Def.product_data || Def.product_data.length == 0){
+            if (Def.product_data.length > 0 && Def.product_data) {
+                this.setState({data:Def.product_data});
             } else {
                 AsyncStorage.getItem('user_info').then((value) => {
                     if(value){
@@ -341,18 +317,18 @@ class DesignListScreen extends React.Component {
                         Def.email = Def.user_info['email'];
                         console.log('Iset User Data');
 
-                        AsyncStorage.getItem('design_data').then((value) => {
+                        AsyncStorage.getItem('product_data').then((value) => {
                             if(value){
-                                Def.design_data = JSON.parse(value);
-                                this.setState({data:Def.design_data});
+                                Def.product_data = JSON.parse(value);
+                                this.setState({data:Def.product_data});
                             } else {
-                                FlatController.getDesign(this.onGetDesignSuccess, this.onGetDesignFalse);
+                                FlatController.getProduct(this.onGetProductSuccess, this.onGetProductFalse);
                             }
 
                         });
 
                     } else {
-                        AsyncStorage.set('design_data', null);
+                        AsyncStorage.set('product_data', null);
                     }
                 });
 
@@ -371,7 +347,7 @@ class DesignListScreen extends React.Component {
             <View>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
                     <View style={{marginLeft:15, paddingBottom:5}}>
-                        <Text style={styles.titleStyle}>{ (this.state.data ? this.state.data.length : 0 )+ " Căn hộ"}</Text>
+                        <Text style={styles.titleStyle}>{ (this.state.data ? this.state.data.length : 0 )+ " Sản phẩm"}</Text>
                     </View>
                 </View>
             </View>
@@ -381,8 +357,8 @@ class DesignListScreen extends React.Component {
 
             return (
                 <View style={{}}>
-                    <DesignItemrenderer
-                        item ={item} click={this.itemClick}
+                    <ProductItemrenderer
+                        item ={item} click={this.itemClick} type={'product-template'}
                         styleImage={{width: (width - 30) / 2, height: (width - 30) / 2}}
                     />
                 </View>
@@ -411,34 +387,31 @@ class DesignListScreen extends React.Component {
 
                 </View>
                 :
-
-
-            <View style={{flex:1, paddingTop:5, paddingHorizontal:10}}>
-                 <ProgramVerList
-
-                    data={this.state.data}
-                    navigation={this.props.navigation}
-                    header={ListHeader}
-                    styleList={{paddingHorizontal:10}}
-                    refreshControl={
-                        <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
-                    }
-                    renderFunction={renderItem}
-                    type={'design'}
-                    numColumns={1}
-                    screen={'design-detail'}
-                    itemSeparatorComponent={
-                        (({ highlighted }) => (
-                            <View
-                                style={[
-                                    {backgroundColor:Style.GREY_TEXT_COLOR, height:1, width:width -25, marginHorizontal: 10},
-                                    highlighted && { marginHorizontal:10 }
-                                ]}
-                            />
-                        ))
-                    }
+                <View style={{flex:1, paddingTop:5, paddingHorizontal: 10}}>
+                    <ProgramVerList
+                        data={this.state.data}
+                        navigation={this.props.navigation}
+                        header={ListHeader}
+                        styleList={{paddingHorizontal : 10}}
+                        refreshControl={
+                            <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
+                        }
+                        renderFunction={renderItem}
+                        type={'product-template'}
+                        numColumns={2}
+                        screen={'product-detail'}
+                        itemSeparatorComponent={
+                            (({ highlighted }) => (
+                                <View
+                                    style={[
+                                        {backgroundColor:Style.GREY_TEXT_COLOR, height:1, width:width -25, marginHorizontal: 10},
+                                        highlighted && { marginHorizontal:10 }
+                                    ]}
+                                />
+                            ))
+                        }
                     />
-            </View>
+                </View>
 
         )
     }
@@ -484,4 +457,4 @@ const styles = StyleSheet.create({
     textInput : {height: 40,  borderColor: "#9e9e9e", borderWidth : 0, borderBottomWidth:0 ,color:'black', fontSize : Style.MIDLE_SIZE, borderRadius: 5, paddingHorizontal: 5  },
 });
 
-export default DesignListScreen;
+export default ProductListScreen;

@@ -23,6 +23,12 @@ import Def from './src/def/Def'
 
 import PolicyIcon from './assets/icon/icon-policy.svg';
 import GuideIcon from './assets/icon/icon-how-to-use.svg'
+import GalleryIcon from './assets/icons/list.svg'
+import GallerySelectedIcon from './assets/icons/List b.svg';
+
+import TileSelectedIcon from './assets/icons/Tile b.svg';
+import TileIcon from './assets/icons/Tile.svg';
+
 import RuleIcon from './assets/icon/icon-rule.svg';
 import UserController from './src/controller/UserController'
 
@@ -184,6 +190,7 @@ function HomeScreen({ navigation }) {
 }
 
 const RootStack = createStackNavigator();
+const Stack = createStackNavigator();
 
 function AppStack() {
     return (
@@ -197,10 +204,10 @@ function AppStack() {
 
 function OfflineLibStack() {
     return (
-        <RootStack.Navigator headerMode="none">
-            <RootStack.Screen name="Design" component={DesignStack} />
-            <RootStack.Screen name="Product" component={ProductStack} />
-        </RootStack.Navigator>
+        <Stack.Navigator headerMode="none">
+            <Stack.Screen name="Design" component={OfflineTab} />
+            <RootStack.Screen name="Login" component={LoginStack} />
+        </Stack.Navigator>
     );
 
 }
@@ -244,6 +251,72 @@ function AppDrawer() {
 
 
         </Drawer.Navigator>
+    );
+}
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+
+const Tab = createBottomTabNavigator();
+
+function OfflineTab() {
+    return (
+        <Tab.Navigator
+            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
+
+            // tabBar={(props) => <MyTabBar {...props} item={null} />}
+            initialRouteName={'Product'}
+            tabBarOptions={{
+                activeTintColor: Style.DEFAUT_RED_COLOR,
+                inactiveTintColor: '#b3b3b3',
+                labelStyle: {
+                    fontSize: Style.NORMAL_SIZE,
+                },
+                style: {height: 50},
+                tabStyle: {
+                    paddingVertical: 5,
+                    paddingTop :8,
+                },
+                // item:program
+            }}>
+
+            <Tab.Screen
+                name="Design"
+                component={DesignStack}
+                options={(route) => {
+                    return false
+                        ? {tabBarVisible: false}
+                        : {
+                            tabBarLabel: 'Thiết kế',
+                            tabBarIcon: ({focused, color, size}) => {
+                                if (focused) {
+                                    return <GallerySelectedIcon style={styles.tabBarIconStyle} />;
+                                    // return <MyProfileIconSelect style={styles.tabBarIconStyle} />;
+                                }
+                                return <GalleryIcon style={styles.tabBarIconStyle} />;
+                            },
+                        };
+                }}
+            />
+
+            <Tab.Screen
+                name="Product"
+                component={ProductStack}
+                options={(route) => {
+                    return false
+                        ? {tabBarVisible: false}
+                        : {
+                            tabBarLabel: 'Sản phẩm',
+                            tabBarIcon: ({focused, color, size}) => {
+                                if (focused) {
+                                    return <TileSelectedIcon style={styles.tabBarIconStyle} />;
+                                    return <Icon name="th" size={25} color={Style.DEFAUT_RED_COLOR} />
+                                    // return <MyProfileIconSelect style={styles.tabBarIconStyle} />;
+                                }
+                                return <TileIcon style={styles.tabBarIconStyle} />;
+                            },
+                        };
+                }}
+            />
+        </Tab.Navigator>
     );
 }
 

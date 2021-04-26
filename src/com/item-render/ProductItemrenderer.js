@@ -28,6 +28,7 @@ class ProductItemrenderer extends PureComponent{
     render(){
         const model = this.props.item;
         const click = this.props.click;
+        const product = this.props.type == 'product-template' ? model : model.productInstance.product;
         return (
             <View style={{justifyContent : 'center', alignItems:'center' , marginVertical : 3 , marginLeft:1}}>
 
@@ -36,16 +37,17 @@ class ProductItemrenderer extends PureComponent{
                     click(model);
                 }
             } >
-                {
-                    <TouchableOpacity style={[styles.favoriteIcon, {width:10, height:10, backgroundColor : Def.ProductStatusColor[model.status], alignItems : 'center', justifyContent:'center', borderRadius: 5}]}
 
-                    >
-                    </TouchableOpacity>
+                {
+                    this.props.type == "product" ?
+                    <TouchableOpacity style={[styles.favoriteIcon, {width:10, height:10, backgroundColor : Def.ProductStatusColor[model.status], alignItems : 'center', justifyContent:'center', borderRadius: 5}]}>
+                    </TouchableOpacity> : null
+
                 }
                 {
-                    model.productInstance && model.productInstance && model.productInstance.product.image_path ?
+                    product && product.image_path ?
 
-                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(model.productInstance.product.image_path)}}  />
+                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(product.image_path)}}  />
                         :
                         <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
 
@@ -56,7 +58,7 @@ class ProductItemrenderer extends PureComponent{
                 <View style = {{width:this.props.styleImage.width, justifyContent:'center', alignItems: (this.props.type == 'product' ? 'flex-start' :'center')}}>
 
                     <Text style={[{position: 'absolute',zIndex:3 , paddingHorizontal : 5 , left : 5 , paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor: this.props.type == 'product' ? Style.DEFAUT_BLUE_COLOR :Style.DEFAUT_RED_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                          {Def.formatText(this.props.type == 'product' ? model.productInstance.code :model.productInstance.code, 15)}
+                          {Def.formatText(this.props.type == 'product' ? model.productInstance.code :product.model, 15)}
                     </Text>
                 </View>
             </View>
