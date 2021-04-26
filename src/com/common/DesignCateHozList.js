@@ -7,7 +7,7 @@ import MusicWishlistIcon from '../../../assets/icon/icon-catalog-music.svg'
 
 import DefaultProgramImage from '../../../assets/icon/logo-vov.svg'
 import CollectionItemrenderer from '../item-render/CollectionItemrenderer'
-import DesignItemrenderer from '../item-render/DesignItemrenderer'
+import DesignItemrendererOld from '../item-render/DesignItemrendererOld'
 import CategoryItemrenderer from '../item-render/CategoryItemrenderer'
 
 import Style from "../../../src/def/Style";
@@ -75,7 +75,7 @@ class DesignCateHozList extends React.Component {
                            type={this.props.type}
                        />
                        : type == 'design' ?
-                    <DesignItemrenderer
+                    <DesignItemrendererOld
                        click={this.itemClick}
                        refresh={this.refresh}
                        item={item}

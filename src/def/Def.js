@@ -71,7 +71,7 @@ export default class Def {
 
     static news_data = null;
     static collection_data = null;
-    static design_data = null;
+    static design_data = [];
     static popular_design = null;
     static config_collection_menu = null;
     static design_cate = null;

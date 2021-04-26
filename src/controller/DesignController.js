@@ -4,14 +4,8 @@ import Net from  './Net'
 
 export default class FlatController {
     static getFlat(callback,errCallback , get_all = false, pageSize = Def.pageSize, pageIndex) {
-       let param = {'token' : Def.user_info['access_token'] , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
+       let param = {'token' : Def.user_info['access_token'] , 'get_all' : false, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat" ,Def.POST_METHOD, param);
-    }
-
-    static getDesign(callback,errCallback , get_all = false, pageSize = Def.pageSize, pageIndex) {
-        console.log('Get Design');
-        let param = {'token' : Def.user_info['access_token'] , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
-        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/design/design" ,Def.POST_METHOD, param);
     }
 
     static getbuilding(callback,errCallback , params = null) {

@@ -9,6 +9,7 @@
 import React from 'react';
 import {Dimensions, StatusBar, PixelRatio, View , Button , TouchableOpacity, Text } from  'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { createDrawerNavigator,
     DrawerItemList,
     DrawerContentScrollView,
@@ -30,6 +31,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 import BackIcon from './assets/icon/icon-back.svg';
 
 import FlatStack from './src/FlatStack';
+import ProductStack from './src/ProductStack';
+import DesignStack from './src/DesignStack';
+
 
 const {width, height} = Dimensions.get('window');
 
@@ -191,6 +195,17 @@ function AppStack() {
 
 }
 
+function OfflineLibStack() {
+    return (
+        <RootStack.Navigator headerMode="none">
+            <RootStack.Screen name="Design" component={DesignStack} />
+            <RootStack.Screen name="Product" component={ProductStack} />
+        </RootStack.Navigator>
+    );
+
+}
+
+
 
 function AppDrawer() {
     const iconSize = true <2 ? 18 : 20;
@@ -207,6 +222,16 @@ function AppDrawer() {
             drawerContent={(props) => <CustomDrawerContent {...props} />}
         >
             <Drawer.Screen
+                name="Offline-Lib"
+                component={OfflineLibStack}
+                options={{
+                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
+                        return <Icon name="folder-open" size={iconSize} />;
+                    },
+                }}
+            />
+
+            <Drawer.Screen
                 name="Flat"
                 component={AppStack}
                 options={{
@@ -215,6 +240,9 @@ function AppDrawer() {
                     },
                 }}
             />
+
+
+
         </Drawer.Navigator>
     );
 }
