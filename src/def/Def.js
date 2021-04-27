@@ -1,3 +1,5 @@
+import {OfflineHelper} from "./OfflineHelper";
+import {Platform} from "react-native";
 
 export default class Def {
     static URL_BASE = "https://eurotiledev.house3d.net";
@@ -246,6 +248,32 @@ export default class Def {
         rs = rs.join('.') + '_200x200.' + lastItem;
         return rs;
     }
+    /*
+       ProductType = 0
+       DesignType = 1
+     */
+    static ProductType = 0;
+    static DesignType = 1;
+    static OFFLINE_PRIORITY = 0;
+    static ONLINE_PRIORITY = 1;
+
+
+    static getObjImage(obj, priority = Def.OFFLINE_PRIORITY ,  type = Def.ProductType) {
+        let img_path = Def.LIFE_STYLE_BASE_ASSET + obj.image_path;
+        let rs = img_path.split(".");
+        let lastItem = rs.pop();
+        rs = rs.join('.') + '_200x200.' + lastItem;
+        if(priority == Def.OFFLINE_PRIORITY) {
+            let offlineData = type == Def.ProductType ? OfflineHelper.offlineProductData : OfflineHelper.offlineDesignData;
+            if(offlineData[obj.id] && offlineData[obj.id].offline_img) {
+                rs = Platform.OS === 'android' ? 'file://' +offlineData[obj.id].offline_img : '' + offlineData[obj.id].offline_img;
+            }
+        }
+        return rs;
+    }
+
+
+
 
     static getTypeAccount() {
         if (Def.user_info && Def.user_info['partnerInfo']) {

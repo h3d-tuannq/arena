@@ -85,7 +85,7 @@ class FlatStack extends React.Component {
                                 }
                             }
                             onPress={() => this.goProductList}>
-                            <Icon name="calendar" size={30} color="#fff" />
+                            <Icon name="download" size={25} color="#fff" />
                             {/*<Text style={{color:'#fff'}}>*/}
                                 {/*{route.params.item.id}*/}
                             {/*</Text>*/}

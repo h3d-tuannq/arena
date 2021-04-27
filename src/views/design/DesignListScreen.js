@@ -28,6 +28,7 @@ import FlatHelper from '../../def/FlatHelper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MailProductItemrenderer from '../../com/item-render/MailProductItemrenderer';
 import DesignItemrenderer from '../../com/item-render/DesignItemrenderer';
+import {OfflineHelper} from "../../def/OfflineHelper";
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -63,6 +64,14 @@ class DesignListScreen extends React.Component {
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
 
+
+        this.checkPermission = this.checkPermission.bind(this);
+        this.downloadDesignList = this.downloadDesignList.bind(this);
+        this.downloadDesignFalse = this.downloadDesignFalse.bind(this);
+
+        OfflineHelper.downloadDesignList = this.checkPermission;
+
+
         let title = "Căn mẫu";
         this.state = {
             data: Def.design_data,
@@ -82,6 +91,9 @@ class DesignListScreen extends React.Component {
             filterDate: null,
             displaySelectDate: false,
             pageIndex:0,
+            downloaded: 0,
+            startDownload : false,
+            downloadFalse : 0,
 
         };
 
@@ -91,6 +103,63 @@ class DesignListScreen extends React.Component {
         this.cancelDateFilter = this.cancelDateFilter.bind(this);
         this.itemClick = this.itemClick.bind(this);
 
+    }
+
+    checkPermission = async () => {
+
+        // Function to check the platform
+        // If iOS then start downloading
+        // If Android then ask for permission
+
+        if (Platform.OS === 'ios') {
+            this.downloadDesignList();
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'Storage Permission Required',
+                        message:
+                            'App needs access to your storage to download Photos',
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    // Once user grant the permission start downloading
+                    console.log('Storage Permission Granted.');
+                    this.downloadDesignList();
+
+                } else {
+                    // If permission denied then show alert
+                    alert('Storage Permission Not Granted');
+                }
+            } catch (err) {
+                // To handle permission related exception
+                console.warn(err);
+            }
+        }
+    };
+
+    downloadDesignList = () => {
+        this.setState({startDownload:true});
+        let i = 0;
+        let products = Def.design_data;
+        OfflineHelper.offlineDesignData = OfflineHelper.makeArrayDataWithIdKey(Def.design_data);
+        OfflineHelper.offlineDesignData.forEach((value, index) => {
+            if(value){
+                OfflineHelper.downloadDesignImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
+            }
+        });
+    }
+
+    downloadDesignSuccess = (obj,res) => {
+        obj.offline_img = res.path();
+        this.downloaded = this.downloaded + 1;
+        this.setState({downloaded: this.downloaded })
+    }
+
+    downloadDesignFalse = (obj,res) => {
+        this.downloadFalse = this.downloadFalse + 1;
+        this.setState({downloadFalse: this.downloadFalse })
     }
 
     handleDatePicked = date => {
@@ -414,6 +483,32 @@ class DesignListScreen extends React.Component {
 
 
             <View style={{flex:1, paddingTop:5, paddingHorizontal:10}}>
+                {
+                    this.state.startDownload ?
+                        <View>
+                            <Text>
+                                Tải xuống
+                            </Text>
+                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
+                                <Text>
+                                    Thành công
+                                </Text>
+                                <Text>
+                                    {this.state.downloaded + '/' + Def.design_data.length }
+                                </Text>
+                            </View>
+                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
+                                <Text>
+                                    Thất bại
+                                </Text>
+                                <Text>
+                                    {this.state.downloadFalse + '/' + Def.design_data.length }
+                                </Text>
+                            </View>
+                        </View>
+
+                        : null
+                }
                  <ProgramVerList
 
                     data={this.state.data}

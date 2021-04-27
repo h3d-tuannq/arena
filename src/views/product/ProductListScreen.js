@@ -44,6 +44,7 @@ class ProductListScreen extends React.Component {
     criteria = {};
     imageView = null;
     downloaded = 0;
+    downloadFalse = 0;
 
     constructor(props){
         super(props);
@@ -64,8 +65,11 @@ class ProductListScreen extends React.Component {
         this.resetCriteria = this.resetCriteria.bind(this);
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
+        this.checkPermission = this.checkPermission.bind(this);
         this.downloadProductList = this.downloadProductList.bind(this);
-        OfflineHelper.downloadProductList = this.downloadProductList;
+        this.downloadProductFalse = this.downloadProductFalse.bind(this);
+
+        OfflineHelper.downloadProductList = this.checkPermission;
 
         let title = "Sản phẩm mẫu";
         this.state = {
@@ -87,6 +91,7 @@ class ProductListScreen extends React.Component {
             total:Def.product_data.length,
             downloaded: 0,
             startDownload : false,
+            downloadFalse : 0,
 
         };
 
@@ -103,22 +108,63 @@ class ProductListScreen extends React.Component {
     goToSendRequestRepairScreen = (flat) => {
         console.log('');
     }
+
+
+    checkPermission = async () => {
+
+        // Function to check the platform
+        // If iOS then start downloading
+        // If Android then ask for permission
+
+        if (Platform.OS === 'ios') {
+            this.downloadProductList();
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'Storage Permission Required',
+                        message:
+                            'App needs access to your storage to download Photos',
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    // Once user grant the permission start downloading
+                    console.log('Storage Permission Granted.');
+                    this.downloadProductList();
+
+                } else {
+                    // If permission denied then show alert
+                    alert('Storage Permission Not Granted');
+                }
+            } catch (err) {
+                // To handle permission related exception
+                console.warn(err);
+            }
+        }
+    };
+
     downloadProductList = () => {
-        console.log('call download product list in product list');
         this.setState({startDownload:true});
         let i = 0;
         let products = Def.product_data;
-        OfflineHelper.offlineProductData = Def.product_data;
-        for(i = 0; i< OfflineHelper.offlineProductData.length ; i++){
-            OfflineHelper.downloadProductImage(OfflineHelper.offlineProductData[i], this.downloadProductSuccess);
-        }
+        OfflineHelper.offlineProductData =  OfflineHelper.makeArrayDataWithIdKey(Def.product_data);
+        OfflineHelper.offlineProductData.forEach((value, index) => {
+           if(value){
+               OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
+           }
+        });
     }
 
     downloadProductSuccess = (obj,res) => {
         obj.offline_img = res.path();
-        console.log('Download Success : ' + res.path());
         this.downloaded = this.downloaded + 1;
-        this.setState({downloaded: downloaded })
+        this.setState({downloaded: this.downloaded })
+    }
+
+    downloadProductFalse = (obj,res) => {
+        this.downloadFalse = this.downloadFalse + 1;
+        this.setState({downloadFalse: this.downloadFalse })
     }
 
 
@@ -426,14 +472,28 @@ class ProductListScreen extends React.Component {
                 <View style={{flex:1, paddingTop:5, paddingHorizontal: 10}}>
                     {
                         this.state.startDownload ?
-                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
+                            <View>
                                 <Text>
-                                    Download
+                                    Tải xuống
                                 </Text>
-                                <Text>
-                                    {this.state.downloaded + '/' + Def.product_data.length }
-                                </Text>
+                                <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
+                                    <Text>
+                                        Thành công
+                                    </Text>
+                                    <Text>
+                                        {this.state.downloaded + '/' + Def.product_data.length }
+                                    </Text>
+                                </View>
+                                <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
+                                    <Text>
+                                        Thất bại
+                                    </Text>
+                                    <Text>
+                                        {this.state.downloadFalse + '/' + Def.product_data.length }
+                                    </Text>
+                                </View>
                             </View>
+
                              : null
                     }
                     <ProgramVerList

@@ -9,15 +9,26 @@ import BackIconSvg from '../assets/icon/icon-back.svg'
 import Style from './def/Style'
 import Def from './def/Def'
 import FlatHelper from "./def/FlatHelper";
+import {OfflineHelper} from "./def/OfflineHelper";
 const RootStack = createStackNavigator();
 class DesignStack extends React.Component {
+    downloaded = 0;
+    downloadFalse = 0;
+
     constructor(props){
         super(props);
+        this.downloadDesignList = this.downloadDesignList.bind(this);
     }
 
     goToSendRequestRepairScreen = (flat) => {
         console.log('');
-    }
+    };
+
+    downloadDesignList = () => {
+        if(OfflineHelper.downloadDesignList){
+            OfflineHelper.downloadDesignList();
+        }
+    };
 
     render() {
         return (
@@ -59,7 +70,7 @@ class DesignStack extends React.Component {
                                     alignItems : 'center'
                                 }
                             }
-                            onPress={() => this.goProductList}>
+                            onPress={this.downloadDesignList}>
                             <Icon name="download" size={20} color="#fff" />
                         </TouchableOpacity>
 
@@ -84,7 +95,7 @@ class DesignStack extends React.Component {
                     headerTitleStyle: {
 
                     },
-                    headerRight: Def.user_info ?  () => (
+                    headerRight: Def.user_info && false?  () => (
 
                         <TouchableOpacity
                             style=  {
@@ -96,7 +107,7 @@ class DesignStack extends React.Component {
                                     alignItems : 'center'
                                 }
                             }
-                            onPress={() => this.goProductList}>
+                            onPress={this.downloadDesignList}>
                             <Icon name="calendar" size={30} color="#fff" />
                         </TouchableOpacity>
 

@@ -2,12 +2,16 @@ import Def from "./Def";
 import RNFetchBlob from "rn-fetch-blob";
 import FlatHelper from "./FlatHelper";
 
+const PRODUCT_TYPE = 0;
+const DESIGN_TYPE = 1;
+
 export class OfflineHelper {
     static getDownloadProduct(product){
 
     }
 
     static offlineProductData = [];
+    static offlineDesignData = [];
 
     static getExtention(filename)  {
         // To get the file extension
@@ -16,19 +20,19 @@ export class OfflineHelper {
     };
 
     static downloadProductList;
+    static downloadDesignList;
 
 
 
 
-    static downloadDesignImage = (design = null, callback) => {
-        return FlatHelper.downloadImage(design.image_path, callback, 1);
+    static downloadDesignImage = (design = null, callback, falseCallback = null) => {
+        return OfflineHelper.downloadImage(design, callback, falseCallback , DESIGN_TYPE);
     }
 
-    static downloadProductImage = (product = null, callback) => {
-        console.log('Start download');
-        return FlatHelper.downloadImage(product, callback);
+    static downloadProductImage = (product = null, callback = null, falseCallback = null) => {
+        return OfflineHelper.downloadImage(product, callback, falseCallback, PRODUCT_TYPE);
     }
-    static downloadImage = (obj, callback, type = 0) => {
+    static downloadImage = (obj, callback = null, falseCallback = null, type = PRODUCT_TYPE) => {
         // Main function to download the image
         let sourcePath = obj.image_path;
 
@@ -43,7 +47,7 @@ export class OfflineHelper {
         // Image URL which we want to download
         let image_URL = Def.getThumnailImg(obj.image_path);
         // Getting the extention of the file
-        let ext = FlatHelper.getExtention(image_URL);
+        let ext = OfflineHelper.getExtention(image_URL);
         ext = '.' + ext[0];
         // Get config and fs from RNFetchBlob
         // config: To pass the downloading related options
@@ -51,18 +55,18 @@ export class OfflineHelper {
         const { config, fs } = RNFetchBlob;
 
         let dir = fs.dirs.DownloadDir + '/arena/';
-        let path = Def.remoteVersion(dir +  (obj ? ( type ==  0 ? 'product_' : 'design_' ) +   obj.id : date.getTime()) + ext);
+        let path = Def.remoteVersion(dir +  (obj ? ( type ==  PRODUCT_TYPE ? 'product_' : 'design_' ) +   obj.id : date.getTime()) + ext);
         fs.isDir(dir).then((isDir) => {
             if(!isDir){
                 RNFetchBlob.fs.mkdir(dir).then(() => {
                     console.log("App directory created..");
-                    FlatHelper.downloadFile(obj, path, ext, callback);
+                    OfflineHelper.downloadFile(obj, path, ext, callback, falseCallback);
                 })
                     .catch((err) => {
                         console.log("Err : " + JSON.stringify(err));
                     });
             } else {
-                FlatHelper.downloadFile(obj, path, ext, callback);
+                OfflineHelper.downloadFile(obj, path, ext, callback, falseCallback);
             }
         });
 
@@ -98,9 +102,8 @@ export class OfflineHelper {
         // ;
     };
 
-    static downloadFile(obj, path, ext, callback) {
-        console.log('Start download image');
-        let url = obj.image_path;
+    static downloadFile(obj, path, ext, callback = null, falseCallback = null) {
+        let url = Def.getThumnailImg(obj.image_path);
         let date = new Date();
         const { config, fs } = RNFetchBlob;
         console.log('Url : ' + url);
@@ -111,6 +114,9 @@ export class OfflineHelper {
             fileCache: true,
             // addAndroidDownloads: {
             //     // Related to the Android only
+
+
+
             //     useDownloadManager: true,
             //     notification: true,
             //     path:
@@ -124,17 +130,31 @@ export class OfflineHelper {
         config(options)
             .fetch('GET', url)
             .then(res => {
+                console.log('in then')
                 // Showing alert after successful downloading
-                // console.log('res -> ', JSON.stringify(res));
-                if(res && callback){
-                    console.log("Call back set Image");
-                    callback(res);
-                }
-                // alert('Image Downloaded Successfully.'  + res.path());
+                //  console.log('res -> ', JSON.stringify(res));
+                 if(res && callback){
+                     callback(obj, res);
+                 }
+                  // alert('Image Downloaded Successfully.'  + res.path());
             })
             .catch(err => {
+                console.log('in err')
                 console.log("Err download image : " + JSON.stringify(err));
+                if(falseCallback) {
+                    falseCallback(obj);
+                }
             })
         ;
     }
+
+    static makeArrayDataWithIdKey = (arr) => {
+        let rs = [];
+        arr.forEach(item => {
+            rs[item['id']] = item;
+        });
+        return rs;
+
+    }
+
 }
