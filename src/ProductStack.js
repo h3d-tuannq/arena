@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import BackIconSvg from '../assets/icon/icon-back.svg'
 import Style from './def/Style'
 import Def from './def/Def'
+import {OfflineHelper} from './def/OfflineHelper';
 
 
 
@@ -17,10 +18,28 @@ const RootStack = createStackNavigator();
 class ProductStack extends React.Component {
     constructor(props){
         super(props);
+        this.state = {
+          total:Def.design_data.length,
+          downloaded: 0,
+        };
+        this.downloadProductSuccess = this.downloadProductSuccess.bind(this);
+        this.downloadProduct = this.downloadProduct.bind(this);
     }
 
     goToSendRequestRepairScreen = (flat) => {
         console.log('');
+    }
+    downloadProduct = () => {
+        if(OfflineHelper.downloadProductList) {
+            console.log('Download Product List');
+            OfflineHelper.downloadProductList();
+        } else {
+            console.log('Not exist dowload function');
+        }
+    }
+
+    downloadProductSuccess = (data) => {
+
     }
 
     render() {
@@ -62,7 +81,7 @@ class ProductStack extends React.Component {
                                     alignItems : 'center'
                                 }
                             }
-                            onPress={() => this.goProductList}>
+                            onPress={this.downloadProduct}>
                             <Icon name="download" size={20} color="#fff" />
                         </TouchableOpacity>
 

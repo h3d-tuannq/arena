@@ -28,6 +28,7 @@ import FlatHelper from '../../def/FlatHelper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MailProductItemrenderer from '../../com/item-render/MailProductItemrenderer';
 import ProductItemrenderer from '../../com/item-render/ProductItemrenderer';
+import {OfflineHelper} from '../../def/OfflineHelper';
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -42,6 +43,7 @@ class ProductListScreen extends React.Component {
 
     criteria = {};
     imageView = null;
+    downloaded = 0;
 
     constructor(props){
         super(props);
@@ -62,6 +64,8 @@ class ProductListScreen extends React.Component {
         this.resetCriteria = this.resetCriteria.bind(this);
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
+        this.downloadProductList = this.downloadProductList.bind(this);
+        OfflineHelper.downloadProductList = this.downloadProductList;
 
         let title = "Sản phẩm mẫu";
         this.state = {
@@ -80,12 +84,44 @@ class ProductListScreen extends React.Component {
             filterDate: null,
             displaySelectDate: false,
             pageIndex:0,
+            total:Def.product_data.length,
+            downloaded: 0,
+            startDownload : false,
 
         };
 
         this.itemClick = this.itemClick.bind(this);
 
+        this.downloadProductSuccess = this.downloadProductSuccess.bind(this);
+        this.downloadProduct = this.downloadProduct.bind(this);
     }
+
+    downloadProduct = () => {
+        console.log('call download product list in product list');
+    }
+
+    goToSendRequestRepairScreen = (flat) => {
+        console.log('');
+    }
+    downloadProductList = () => {
+        console.log('call download product list in product list');
+        this.setState({startDownload:true});
+        let i = 0;
+        let products = Def.product_data;
+        OfflineHelper.offlineProductData = Def.product_data;
+        for(i = 0; i< OfflineHelper.offlineProductData.length ; i++){
+            OfflineHelper.downloadProductImage(OfflineHelper.offlineProductData[i], this.downloadProductSuccess);
+        }
+    }
+
+    downloadProductSuccess = (obj,res) => {
+        obj.offline_img = res.path();
+        console.log('Download Success : ' + res.path());
+        this.downloaded = this.downloaded + 1;
+        this.setState({downloaded: downloaded })
+    }
+
+
 
     loadNextPage = (pageIndex) => {
         FlatController.getFlat(this.onGetFlatSuccess, this.onGetProductFalse, false, Def.pageSize, this.state.pageIndex + 1);
@@ -388,6 +424,18 @@ class ProductListScreen extends React.Component {
                 </View>
                 :
                 <View style={{flex:1, paddingTop:5, paddingHorizontal: 10}}>
+                    {
+                        this.state.startDownload ?
+                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
+                                <Text>
+                                    Download
+                                </Text>
+                                <Text>
+                                    {this.state.downloaded + '/' + Def.product_data.length }
+                                </Text>
+                            </View>
+                             : null
+                    }
                     <ProgramVerList
                         data={this.state.data}
                         navigation={this.props.navigation}
