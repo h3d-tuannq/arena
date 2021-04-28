@@ -58,6 +58,9 @@ const update_deadline_form = 4;
 
 class FlatDetailScreen extends React.Component {
 
+    downloaded = 0;
+    downloadFalse = 0;
+
     constructor(props){
         super(props);
         this.formatText    = this.formatText.bind(this);
@@ -92,6 +95,8 @@ class FlatDetailScreen extends React.Component {
             displayFullFlatImg : false,
             downloaded : false,
             startDownload : false,
+            imageRepairItem : 0,
+
 
         };
         this.updateFlatStatus = this.updateFlatStatus.bind(this);
@@ -110,11 +115,13 @@ class FlatDetailScreen extends React.Component {
         this.downloadFlat = this.downloadFlat.bind(this);
         this.downloadRepairInFlat = this.downloadRepairInFlat.bind(this);
         this.downloadRepairFalse = this.downloadRepairFalse.bind(this);
-
-
+        this.finishDownload = this.finishDownload.bind(this);
+        this.processDownloadRepairInFlat = this.processDownloadRepairInFlat.bind(this);
+        this.getRepairByFlatFalse = this.getRepairByFlatFalse.bind(this);
+        this.getRepairByFlatSuccess = this.getRepairByFlatSuccess.bind(this);
+        OfflineHelper.downloadRepariItemInflat = this.downloadFlat.bind(this);
     }
-
-    downloadFlat = (flatId) => {
+    downloadFlat = async () => {
         if (Platform.OS === 'ios') {
             this.downloadRepairInFlat();
         } else {
@@ -144,20 +151,73 @@ class FlatDetailScreen extends React.Component {
     }
 
     downloadRepairInFlat = () => {
-        this.setState({startDownload:true});
-        let i = 0;
-        OfflineHelper.offlineDesignData = OfflineHelper.makeArrayDataWithIdKey(Def.design_data);
-        OfflineHelper.offlineDesignData.forEach((value, index) => {
-            if(value){
-                OfflineHelper.downloadDesignImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
-            }
-        });
+        FlatController.getRequestRepairByFlat();
+    };
+
+    getRepairByFlatSuccess = (data) => {
+        if( data['result']  && data['request_repairs']){
+            Def.requestRepairtFlat[this.state.item.id] = data['request_repairs'];
+            let requestRepair = data['request_repairs'];
+            console.log('Cập nhật dữ liệu Flat');
+            requestRepair.forEach((pifRepair,id) => {
+                Def.requestRepairtTree[id] = pifRepair;
+            });
+            this.processDownloadRepairInFlat();
+        }
+    };
+
+    getRepairByFlatFalse = (data) => {
+        console.log('Err : ' + JSON.stringify(data));
+    };
+
+    processDownloadRepairInFlat = () => {
+        if(Def.requestRepairtFlat[this.state.item.id]) {
+            console.log('Start download in flat + ' + this.state.item.id);
+            this.setState({startDownload: true});
+            let offlineItem = this.state.item;
+            OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
+            let flatRepairItems = [];
+            let productInstances = this.state.item.productInstanceFlat;
+            let repairItems;
+            productInstances.forEach(pif => {
+                if(Def.requestRepairtFlat[this.state.item.id][pif.id]) {
+                    requestRepairs = Def.requestRepairtFlat[this.state.item.id][pif.id];
+                    repairItems = OfflineHelper.makeArrayDataWithIdKey(requestRepairs);
+                    console.log('Request Repair : ' + repairItems.length);
+                    flatRepairItems.concat(repairItems);
+                }
+
+            });
+            console.log('Request repair item : ' + flatRepairItems.length);
+            let imageRepairItems = flatRepairItems.filter((item) => {
+                return item['image_path'] != null && item['image_path'].length > 0
+            });
+            this.setState({imageRepairItem: imageRepairItems.length});
+            console.log('Total download : ' + imageRepairItems.length);
+            imageRepairItems.forEach((value, index) => {
+                if (value) {
+                    OfflineHelper.downloadRepairItemImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
+                }
+            });
+        }
     }
 
     downloadRepairInFlatSuccess = (obj,res) => {
         obj.offline_img = res.path();
+        OfflineHelper.updateOfflineRepairItem(obj);
         this.downloaded = this.downloaded + 1;
+        if(this.downloaded + this.downloadFalse == this.state.imageRepairItem) {
+            this.finishDownload();
+        }
         this.setState({downloaded: this.downloaded })
+    }
+
+    finishDownload() {
+        console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.state.downloaded);
+        offlineItem = OfflineHelper.offlineFlatData[this.state.item.id];
+        offlineItem['downloaded'] = this.state.downloaded;
+        offlineItem['image_dowload'] = this.state.imageRepairItem;
+        OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
     }
 
     downloadRepairFalse = (obj,res) => {

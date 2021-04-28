@@ -80,6 +80,8 @@ export default class Def {
     static product_data = [];
     static cart_data = [];
 
+    static requestRepairtFlat ;
+
     static flat_data = [];
     static refresh_flat_data = false;
     static refeshFlatList = [];

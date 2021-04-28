@@ -45,6 +45,11 @@ export default class FlatController {
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-request-repair-by-pif" ,Def.POST_METHOD, param);
     }
 
+    static getRequestRepairByFlat(callback, errCallback , flat_id){
+        let param = {'flat_id' : flat_id, 'token' : Def.user_info['access_token']};
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-repair-item-by-flat" ,Def.POST_METHOD, param);
+    }
+
     static changeStatusProduct(callback, errCallback, product_instance_id, role, token , type, note, image, status ){
        let param = {'product_instance_id' : product_instance_id, 'token' : token, 'role': role, 'type' : type, 'note': note, 'image':image, 'status' :status};
        console.log("Change-status-product : " + type);

@@ -229,6 +229,16 @@ function AppDrawer() {
             drawerContent={(props) => <CustomDrawerContent {...props} />}
         >
             <Drawer.Screen
+                name="Flat"
+                component={AppStack}
+                options={{
+                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
+                        return <GuideIcon width={iconSize} height={iconSize} />;
+                    },
+                }}
+            />
+
+            <Drawer.Screen
                 name="Offline-Lib"
                 component={OfflineLibStack}
                 options={{
@@ -238,15 +248,7 @@ function AppDrawer() {
                 }}
             />
 
-            <Drawer.Screen
-                name="Flat"
-                component={AppStack}
-                options={{
-                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
-                        return <GuideIcon width={iconSize} height={iconSize} />;
-                    },
-                }}
-            />
+
 
 
 

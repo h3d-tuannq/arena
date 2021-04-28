@@ -4,6 +4,7 @@ import FlatHelper from "./FlatHelper";
 
 const PRODUCT_TYPE = 0;
 const DESIGN_TYPE = 1;
+const REPAIR_TYPE = 2;
 
 export class OfflineHelper {
     static getDownloadProduct(product){
@@ -12,6 +13,18 @@ export class OfflineHelper {
 
     static offlineProductData = [];
     static offlineDesignData = [];
+    static offlineRepairData = [];
+    static offlineFlatData = [];
+
+
+
+
+    static updateOfflineRepairItem (repairItem) {
+        if(OfflineHelper.offlineRepairData){
+            OfflineHelper.offlineRepairData[repairItem.id] = repairItem;
+        }
+    }
+
 
     static getExtention(filename)  {
         // To get the file extension
@@ -21,8 +34,12 @@ export class OfflineHelper {
 
     static downloadProductList;
     static downloadDesignList;
+    static downloadRepariItemInflat;
 
-
+    static downloadRepairItemImage = (repairItem = null, callback, falseCallback = null) => {
+        console.log('Download Repair item + ' + repairItem.id);
+        return OfflineHelper.downloadImage(repairItem, callback, falseCallback , REPAIR_TYPE);
+    }
 
 
     static downloadDesignImage = (design = null, callback, falseCallback = null) => {
@@ -54,8 +71,19 @@ export class OfflineHelper {
         // fs: Directory path where we want our image to download
         const { config, fs } = RNFetchBlob;
 
+        let typeName = 'product_';
+        switch (type) {
+            case DESIGN_TYPE :
+                typeName = 'design_';
+                break;
+            case REPAIR_TYPE :
+                typeName = 'repair_item_';
+                break;
+        }
+
+
         let dir = fs.dirs.DownloadDir + '/arena/';
-        let path = Def.remoteVersion(dir +  (obj ? ( type ==  PRODUCT_TYPE ? 'product_' : 'design_' ) +   obj.id : date.getTime()) + ext);
+        let path = Def.remoteVersion(dir +  (obj ?  typeName +   obj.id : date.getTime()) + ext);
         fs.isDir(dir).then((isDir) => {
             if(!isDir){
                 RNFetchBlob.fs.mkdir(dir).then(() => {
@@ -150,9 +178,12 @@ export class OfflineHelper {
 
     static makeArrayDataWithIdKey = (arr) => {
         let rs = [];
-        arr.forEach(item => {
-            rs[item['id']] = item;
-        });
+        if(arr){
+            arr.forEach(item => {
+                rs[item['id']] = item;
+            });
+        }
+
         return rs;
 
     }

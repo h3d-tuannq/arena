@@ -10,6 +10,7 @@ import BackIconSvg from '../assets/icon/icon-back.svg'
 import Style from './def/Style'
 import Def from './def/Def'
 import FlatHelper from "./def/FlatHelper";
+import {OfflineHelper} from "./def/OfflineHelper";
 
 
 
@@ -19,10 +20,17 @@ const RootStack = createStackNavigator();
 class FlatStack extends React.Component {
     constructor(props){
         super(props);
+
     }
 
     goToSendRequestRepairScreen = (flat) => {
         console.log('');
+    }
+
+    downloadFlat = (flatId) => {
+        if(OfflineHelper.downloadRepariItemInflat){
+            OfflineHelper.downloadRepariItemInflat();
+        }
     }
 
     render() {
@@ -72,7 +80,7 @@ class FlatStack extends React.Component {
                     headerTitleStyle: {
 
                     },
-                    headerRight: Def.user_info && FlatHelper.canSendRequestRepair(route.params.item,Def.user_info) && false ?  () => (
+                    headerRight: Def.user_info ?  () => (
 
                         <TouchableOpacity
                             style=  {
@@ -84,8 +92,8 @@ class FlatStack extends React.Component {
                                     alignItems : 'center'
                                 }
                             }
-                            onPress={() => this.goProductList}>
-                            <Icon name="download" size={25} color="#fff" />
+                            onPress={() => this.downloadFlat(route.params.item.id)}>
+                            <Icon name="download" size={20} color="#fff" />
                             {/*<Text style={{color:'#fff'}}>*/}
                                 {/*{route.params.item.id}*/}
                             {/*</Text>*/}
