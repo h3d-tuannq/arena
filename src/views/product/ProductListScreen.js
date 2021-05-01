@@ -148,12 +148,18 @@ class ProductListScreen extends React.Component {
         this.setState({startDownload:true});
         let i = 0;
         let products = Def.product_data;
-        OfflineHelper.offlineProductData =  OfflineHelper.makeArrayDataWithIdKey(Def.product_data);
-        OfflineHelper.offlineProductData.forEach((value, index) => {
-           if(value){
-               OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
-           }
-        });
+        OfflineHelper.offlineProductData =  OfflineHelper.makeObjectDataWithIdKey(Def.product_data);
+
+        for (const key in  OfflineHelper.offlineProductData){
+            if(OfflineHelper.offlineProductData[key]){
+                OfflineHelper.downloadProductImage(OfflineHelper.offlineProductData[key], this.downloadProductSuccess, this.downloadProductFalse);
+            }
+        }
+        // OfflineHelper.offlineProductData.forEach((value, index) => {
+        //    if(value){
+        //        OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
+        //    }
+        // });
     }
 
     downloadProductSuccess = (obj,res) => {

@@ -176,13 +176,37 @@ export class OfflineHelper {
         ;
     }
 
-    static makeArrayDataWithIdKey = (arr) => {
+    static makeObjectDataWithIdKey = (arr) => {
         let rs = [];
         if(arr){
             arr.forEach(item => {
                 rs[item['id']] = item;
             });
         }
+        console.log('RS : ' + JSON.stringify(rs));
+        return rs;
+    }
+
+    static makeObjectDataWithKeyObj = (arr) => {
+        let rs = {};
+        let totalItem  =0;
+        if(arr){
+            arr.forEach(item => {
+                if(item != null && item != []){
+                    let i = 0;
+                    let key = 0;
+                    for(key in item){
+                        if(key == null || key == "") {
+                        }else {
+                            rs[key] = item[key];
+                            totalItem++;
+                        }
+                    }
+                }
+            })
+        }
+
+        console.log('rs : ' + JSON.stringify(rs));
 
         return rs;
 

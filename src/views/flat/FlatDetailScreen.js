@@ -151,16 +151,22 @@ class FlatDetailScreen extends React.Component {
     }
 
     downloadRepairInFlat = () => {
-        FlatController.getRequestRepairByFlat();
+        if(Def.user_info){
+            FlatController.getRequestRepairByFlat(this.getRepairByFlatSuccess, this.getRepairByFlatFalse, this.state.item.id);
+        }
+
     };
 
     getRepairByFlatSuccess = (data) => {
         if( data['result']  && data['request_repairs']){
-            Def.requestRepairtFlat[this.state.item.id] = data['request_repairs'];
+            Def.requestRepairtFlat[this.state.item.id] = OfflineHelper.makeObjectDataWithKeyObj (data['request_repairs']);
             let requestRepair = data['request_repairs'];
-            console.log('Cập nhật dữ liệu Flat');
-            requestRepair.forEach((pifRepair,id) => {
-                Def.requestRepairtTree[id] = pifRepair;
+             requestRepair.forEach((pifRepair) => {
+                if(pifRepair){
+                    for (const key in pifRepair) {
+                        Def.requestRepairsTree[key] = pifRepair[key];
+                    }
+                }
             });
             this.processDownloadRepairInFlat();
         }
@@ -182,10 +188,14 @@ class FlatDetailScreen extends React.Component {
             productInstances.forEach(pif => {
                 if(Def.requestRepairtFlat[this.state.item.id][pif.id]) {
                     requestRepairs = Def.requestRepairtFlat[this.state.item.id][pif.id];
-                    repairItems = OfflineHelper.makeArrayDataWithIdKey(requestRepairs);
-                    console.log('Request Repair : ' + repairItems.length);
-                    flatRepairItems.concat(repairItems);
+                    repairItems = OfflineHelper.makeObjectDataWithIdKey(requestRepairs);
+                    if(repairItems.length > 0){
+                        // console.log('Request Repair : ' + pif.id + '---' + repairItems.length);
+                        // console.log('Request Repair content : '+ JSON.stringify(repairItems))
+                    }
+                    flatRepairItems =  flatRepairItems.concat(repairItems);
                 }
+
 
             });
             console.log('Request repair item : ' + flatRepairItems.length);
@@ -196,7 +206,7 @@ class FlatDetailScreen extends React.Component {
             console.log('Total download : ' + imageRepairItems.length);
             imageRepairItems.forEach((value, index) => {
                 if (value) {
-                    OfflineHelper.downloadRepairItemImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
+                     OfflineHelper.downloadRepairItemImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
                 }
             });
         }

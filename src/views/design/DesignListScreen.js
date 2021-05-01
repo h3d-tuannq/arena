@@ -143,12 +143,13 @@ class DesignListScreen extends React.Component {
         this.setState({startDownload:true});
         let i = 0;
         let products = Def.design_data;
-        OfflineHelper.offlineDesignData = OfflineHelper.makeArrayDataWithIdKey(Def.design_data);
-        OfflineHelper.offlineDesignData.forEach((value, index) => {
-            if(value){
-                OfflineHelper.downloadDesignImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
+        OfflineHelper.offlineDesignData = OfflineHelper.makeObjectDataWithIdKey(Def.design_data);
+
+        for (const key in  OfflineHelper.offlineDesignData){
+            if(OfflineHelper.offlineDesignData[key]){
+                OfflineHelper.downloadProductImage(OfflineHelper.offlineDesignData[key], this.downloadDesignSuccess, this.downloadDesignFalse);
             }
-        });
+        }
     }
 
     downloadDesignSuccess = (obj,res) => {
