@@ -465,7 +465,6 @@ export default class Def {
 
         console.log('Index : ' + index);
         if (index > -1){
-            console.log('Flat : ' + JSON.stringify(Def.flat_data[index]));
         }
 
 

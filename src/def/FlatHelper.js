@@ -148,7 +148,7 @@ export default class FlatHelper {
 
     static  readyToDeliver(flat, user){
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
-        return  (isQa && !flat.highlight_re_schedule  && !flat.deliverDate && flat.status > FlatHelper.FINANCE_DONE_STATUS && FlatHelper.checkCompletedProduct(flat));
+        return  (isQa && !flat.highlight_re_schedule  && !flat.deliver_date && flat.status > FlatHelper.DELIVERING_STATUS && FlatHelper.checkCompletedProduct(flat));
     }
 
     static canRollbackFinalDone(flat, user){
@@ -161,7 +161,9 @@ export default class FlatHelper {
     static canPerformDelivering(flat, user){
         let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER);
         let status = flat.status == FlatHelper.CAN_DELIVER_STATUS;
-        return isHandover && status;
+
+        console.log('Deliver Date : ' + flat.deliver_date )
+        return isHandover && status && flat.deliver_date;
     }
 
     static canSigning(flat, user){
@@ -189,6 +191,13 @@ export default class FlatHelper {
         let isDecline = flat.is_decline;
         return !isDecline && isHandover && status;
     }
+
+    static canAbsenteeHanover(flat, user){
+        let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) &&  (flat.handover_id = user.id);
+        let status = flat.status == FlatHelper.DELIVERING_STATUS;
+        return  isHandover && status;
+    }
+
 
     static canSendRequestRepair(flat, user){
         let calPif = FlatHelper.calPassPif(flat);

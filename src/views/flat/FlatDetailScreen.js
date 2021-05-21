@@ -270,7 +270,7 @@ class FlatDetailScreen extends React.Component {
         console.log("false data : " + data);
     }
 
-    changeFlatStatus = (type, status = null) => {
+    changeFlatStatus = (type, status = null, absentee_hanover = null) => {
         if(type == decline_deliver_form) {
             this.setState({displayDeclineForm : true, type:type});
         }
@@ -279,7 +279,7 @@ class FlatDetailScreen extends React.Component {
         }
         if (type == update_status_form) {
             if(Def.user_info){
-                FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, status, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE);
+                FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, status, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE, null, null, absentee_hanover);
             }
         }
     }
@@ -664,6 +664,16 @@ class FlatDetailScreen extends React.Component {
                                                           onPress={() => this.changeFlatStatus(signature_form)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Ký nhận
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {
+                                    FlatHelper.canAbsenteeHanover(this.state.item, Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.PROFILE_COMPLETED_STATUS, 1)}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Bàn giao vắng mặt
                                             </Text>
                                         </TouchableOpacity> : null
                                 }
