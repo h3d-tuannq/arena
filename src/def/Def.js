@@ -474,9 +474,14 @@ export default class Def {
 
     }
 
+    static onlyUnique(value, index, self){
+        return self.findIndex(item => {return item.code == value.code}) === index;
+    }
+
     static appendToFlatData(newData){
         if(Def.flat_data){
             Def.flat_data = Def.flat_data.concat(newData);
+            Def.flat_data = Def.flat_data.filter(Def.onlyUnique);
         }else {
             Def.flat_data = newData;
         }
@@ -486,4 +491,12 @@ export default class Def {
 
     static buildingData = [];
     static customerData = [];
+
+    static checkTakePhotoImg = (uri) => {
+        var n = uri.search("com.arena");
+        return n != -1;
+    }
+
+
+
 }

@@ -252,6 +252,8 @@ function AppDrawer() {
 
 
 
+
+
         </Drawer.Navigator>
     );
 }

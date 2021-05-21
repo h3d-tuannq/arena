@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View, Button, TouchableOpacity, RefreshControl} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import ProductListScreen from './views/product/ProductListScreen';
-import ProductDetailScreen from './views/flat/ProductDetailScreen'
+import ProductDetailScreen from './views/product/ProductDetailScreen'
 import MenuIcon from '../assets/icon/menu.svg';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BackIconSvg from '../assets/icon/icon-back.svg'

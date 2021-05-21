@@ -172,23 +172,6 @@ class ProductDetailScreen extends React.Component {
     render() {
         const {navigation} = this.props;
         const item = this.state.item;
-        const productInstance = item ? item.productInstance : null;
-        const product = productInstance ? productInstance.product : null;
-
-        console.log('item : '  + JSON.stringify(item));
-
-        const renderItem = ({item}) => {
-            return (
-                <View style={{}}>
-                            <RequestRepairRenderer
-                                item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
-                                styleImage={{width: PROGRAM_IMAGE_WIDTH / 3, height: PROGRAM_IMAGE_WIDTH / 3}}
-                                type={this.props.type}
-                            />
-
-                </View>
-            )
-        }
 
         // console.log("Slide Product data : " + JSON.stringify(this.state.slide_data) );
         return (
@@ -196,43 +179,23 @@ class ProductDetailScreen extends React.Component {
                 <View style={{width : width,height:PROGRAM_IMAGE_HEIGHT + 10 , backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <View style={styles.imageContainer}>
                         <TouchableOpacity onPress={this.displayFullProduct}>
-                        {product &&  product.image_path ?
+                        {item &&  item.image_path ?
 
-                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(product.image_path)}}  />
+                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
 
                             :
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
-
                         }
                         </TouchableOpacity>
                     </View>
                     <View style={styles.info}>
-                        {/*<View style={{flexDirection:'row'}}>*/}
-                            {/*<Text>*/}
-                                {/*{"Mã sản phẩm:" + ' '}*/}
-                            {/*</Text>*/}
-                            {/*<Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>*/}
-                                {/*{(productInstance && productInstance.code ? "" : "")}*/}
-                            {/*</Text>*/}
-                        {/*</View>*/}
 
                         <View style={{flexDirection:'row'}}>
-                            {/*<Text>*/}
-                                {/*{"Tên sản phẩm:" + ' '}*/}
-                            {/*</Text>*/}
                             <Text style={[{fontSize:Style.TITLE_SIZE , paddingRight:5}, Style.text_styles.titleTextNotBold]}>
-                                {(product && product.name ? product.name : "")}
+                                {(item && item.name ? item.name : "")}
                             </Text>
                         </View>
 
-                        <View style={{flexDirection:'row'}}>
-                            <Text>
-                                {"Căn hộ: "}
-                            </Text>
-                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {Def.getFlatFromFlatData(item.flat_id) ? Def.getFlatFromFlatData(item.flat_id).code : ""}
-                            </Text>
-                        </View>
 
                         <View style={{flexDirection:'row'}}>
                             <Text>
@@ -246,129 +209,12 @@ class ProductDetailScreen extends React.Component {
                 </View>
 
                 <View style={{flexDirection:'column'}}>
-                    {/*<Text style={{paddingHorizontal : 10}}>*/}
-                        {/*{"Mô tả:" + ' '}*/}
-                    {/*</Text>*/}
                     <ScrollView style={{maxHeight:120, width:width, paddingHorizontal:10, minHeight:60}}>
                         <Text>
-                            {product ? product.description : "Sản phẩm chưa có mô tả"}
+                            {item ? item.description : "Sản phẩm chưa có mô tả"}
                         </Text>
                     </ScrollView>
                 </View>
-
-                <View style={{marginTop:10, flex:1, marginBottom:25}}>
-                    <Text style={[{ paddingHorizontal : 10}, Style.text_styles.titleText]}>
-                        {"Lịch sử chỉnh sửa:" + ' '}
-                    </Text>
-                    <ProgramVerList
-                        // styleList={{maxHeight : height /2 - 100}}
-                        data={this.state.requestRepairs}
-                        navigation={this.props.navigation}
-                        type={'request-repair'}
-                        numColumns={1}
-                        renderFunction={renderItem}
-                        stack={'Flat'}
-                        screen={'request-repair-detail'}
-                        addToCart={this.addToCart}
-                    />
-                </View >
-
-                <View style={{flexDirection:'row', paddingBottom : 5}}>
-                    {FlatHelper.canRequestRepair(this.state.item, Def.user_info) ?
-                        <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.openRequestForm(FlatHelper.REQUEST_TYPE)}>
-                            <Text style={Style.text_styles.whiteTitleText}>
-                                Yêu cầu sửa
-                            </Text>
-                        </TouchableOpacity> : null
-                    }
-                    {
-                    FlatHelper.canFixRepair(this.state.item, Def.user_info) ?
-                    <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.openFixedForm(1)}>
-                        <Text style={Style.text_styles.whiteTitleText}>
-                            Hoàn thành
-                        </Text>
-                    </TouchableOpacity> : null
-                    }
-
-                    {
-                        FlatHelper.canApproveRepairedProduct(this.state.item, Def.user_info) ?
-                            <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.approveRepair(1)}>
-                                <Text style={Style.text_styles.whiteTitleText}>
-                                    Đạt yêu cầu
-                                </Text>
-                            </TouchableOpacity> : null
-                    }
-                    {
-                        FlatHelper.canApproveRepairedProduct(this.state.item, Def.user_info) ?
-                            <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.approveRepair(0)}>
-                                <Text style={Style.text_styles.whiteTitleText}>
-                                    Không đạt
-                                </Text>
-                            </TouchableOpacity> : null
-                    }
-
-                    {
-                        FlatHelper.canComment(this.state.item, Def.user_info) ?
-                            <TouchableOpacity style={Style.button_styles.bookingBtn} onPress={() => this.openCommentForm(FlatHelper.COMMENT_TYPE)}>
-                                <Text style={Style.text_styles.whiteTitleText}>
-                                    Bình luận
-                                </Text>
-                            </TouchableOpacity> : null
-                    }
-
-                </View>
-                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestModal} >
-                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
-                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.6*height,  alignItems: "center",
-                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
-                            // props.closeFun(props.selectedDate)
-                            console.log('prevent click');
-                            e.preventDefault()
-                        }}>
-                            <View>
-                                <RequestRepairDetailModal item={this.state.requestDetail} />
-                            </View>
-
-                        </TouchableWithoutFeedback>
-
-                    </TouchableOpacity>
-                </Modal>
-
-                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestForm} >
-                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
-                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.6*height,  alignItems: "center",
-                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
-                            // props.closeFun(props.selectedDate)
-                            console.log('prevent click');
-                            e.preventDefault()
-                        }}>
-                            <View style={{zIndex : 5 , height :0.5*height}}>
-                                <RequestRepairModalForm appendRepairItem={this.appendRepairItem} product={this.state.item} type={this.state.requestType} />
-                            </View>
-
-                        </TouchableWithoutFeedback>
-
-                    </TouchableOpacity>
-                </Modal>
-
-                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayFullProductImg} >
-                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
-                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width, height : height,  alignItems: "center",
-                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
-                            console.log('prevent click');
-                            e.preventDefault()
-                        }}>
-                            <View>
-                                <FullImageModal item={product} />
-                            </View>
-
-                        </TouchableWithoutFeedback>
-
-                    </TouchableOpacity>
-                </Modal>
-
-
-
             </View>
         )
     }

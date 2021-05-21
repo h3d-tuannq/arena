@@ -105,7 +105,17 @@ class RequestRepairModalForm extends React.Component {
                     let maxsize = response.width > response.height ? response.width : response.height;
                     if (maxsize > Def.DEFAULT_MAX_SIZE) {
                         let compressType = response.type == "image/jpeg" ? "JPEG" : "PNG";
-                        ImageResizer.createResizedImage(response.uri, Def.DEFAULT_MAX_SIZE, Def.DEFAULT_MAX_SIZE, compressType, 50, 0, undefined, false)
+                        let rotation = 360;
+                        if ( response.originalRotation === 90 ) {
+                            if(Def.checkTakePhotoImg(response.uri)){
+                                rotation = 90;
+                            }
+
+                        } else if ( response.originalRotation === 270 ) {
+                            rotation = -90
+                        }
+
+                        ImageResizer.createResizedImage(response.uri, Def.DEFAULT_MAX_SIZE, Def.DEFAULT_MAX_SIZE, compressType, 50, rotation, undefined, false)
                             .then(resizedImage => {
                                 console.log("Attr : " + attr);
                                 resizedImage['type'] = response.type;
@@ -170,7 +180,8 @@ class RequestRepairModalForm extends React.Component {
                             }
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.requestBtn}
+                            style={[styles.requestBtn, {backgroundColor: this.state.image || this.state.note ? Style.DEFAUT_RED_COLOR : Style.GREY_BACKGROUND_COLOR }]}
+                            disabled={!(this.state.image || this.state.note)}
                             onPress={this.requestBtnClick}
                         >
                             <Text style={{color:'#fff'}}>

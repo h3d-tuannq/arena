@@ -85,6 +85,7 @@ class FlatListScreen extends React.Component {
             filterDate: null,
             displaySelectDate: false,
             pageIndex:0,
+            totalPage:0,
 
         };
 
@@ -93,6 +94,8 @@ class FlatListScreen extends React.Component {
         this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
         this.displayFilterDate = this.displayFilterDate.bind(this);
         this.cancelDateFilter = this.cancelDateFilter.bind(this);
+        this.onLoadNextPageSuccess = this.onLoadNextPageSuccess.bind(this);
+        this.loadNextPage = this.loadNextPage.bind(this);
 
     }
 
@@ -112,7 +115,44 @@ class FlatListScreen extends React.Component {
     }
 
     loadNextPage = (pageIndex) => {
-        FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
+        console.log('Load next page');
+        if(this.state.pageIndex > this.state.totalPage){
+            FlatController.getFlat(this.onLoadNextPageSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
+        }
+    }
+
+
+    onLoadNextPageSuccess(data){
+        Def.flat_data = Def.appendToFlatData(data["data"]);
+        Def.flatCriteria = this.criteria;
+        let title = "Danh sách thiết kế";
+        let design_list = Def.flat_data;
+        AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+        let newPageIndex = this.state.pageIndex + 1;
+        Def.flatCurrentPage = newPageIndex;
+        AsyncStorage.setItem('flat_current_page', JSON.stringify(newPageIndex));
+        console.log('New Page Index : ' + newPageIndex + " Flat Data Length : " + Def.flat_data.length) ;
+        if(Def.criteria){
+            design_list =  Def.flat_data.filter(this.filterFunc);
+        }
+        this.setState({data:design_list, isRefresh:false, pageIndex:newPageIndex});
+    }
+
+    onGetFlatSuccess(data){
+        console.log("OnGetFlatSuccess Length : "  +  data['data'].length);
+        Def.flat_data = data["data"];
+        Def.flatCriteria = this.criteria;
+        let title = "Danh sách thiết kế";
+        let design_list = Def.flat_data;
+        AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+        let newPageIndex = this.state.pageIndex + 1;
+        Def.flatCurrentPage = newPageIndex;
+        AsyncStorage.setItem('flat_current_page', JSON.stringify(newPageIndex));
+        console.log('New Page Index : ' + newPageIndex + " Flat Data Length : " + Def.flat_data.length) ;
+        if(Def.criteria){
+            design_list =  Def.flat_data.filter(this.filterFunc);
+        }
+        this.setState({data:design_list, isRefresh:false, pageIndex:newPageIndex, totalPage: data['totalCount']});
     }
 
 
@@ -181,21 +221,6 @@ class FlatListScreen extends React.Component {
         this.setState({building: null, customer:null, name: "", deliverDate: null});
         this.criteria = {};
     }
-
-
-    onGetFlatSuccess(data){
-        Def.flat_data = Def.appendToFlatData(data["data"]);
-        let title = "Danh sách thiết kế";
-        let design_list = Def.flat_data;
-        AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
-        let newPageIndex = this.state.pageIndex + 1;
-        Def.flatCurrentPage = newPageIndex;
-        AsyncStorage.setItem('flat_current_page', newPageIndex);
-        console.log('New Page Index : ' + newPageIndex + " Flat Data Length : " + Def.flat_data.length) ;
-        this.setState({data:design_list, isRefresh:false, pageIndex:newPageIndex});
-    }
-
-
     onGetFlatFalse(data){
         console.log("false data : " + data);
         this.setState({isRefresh:false});
@@ -328,7 +353,6 @@ class FlatListScreen extends React.Component {
 
         this.setState(state)
     }
-
 
     componentDidMount() {
         if(Def.refresh_flat_data || Def.flat_data.length == 0){
@@ -567,7 +591,7 @@ class FlatListScreen extends React.Component {
                     data={this.state.data}
                     navigation={this.props.navigation}
                     header={ListHeader}
-                    styleList={{height: height-(ITEM_HEIGHT * 5 + 20)}}
+                    styleList={{height: height-(ITEM_HEIGHT * 5 + 50)}}
                     refreshControl={
                         <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
                     }
@@ -584,6 +608,7 @@ class FlatListScreen extends React.Component {
                             />
                         ))
                     }
+                    endListReach={this.loadNextPage}
                     />
             </View>
 

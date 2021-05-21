@@ -191,6 +191,10 @@ export default class FlatHelper {
     }
 
     static canSendRequestRepair(flat, user){
+        let calPif = FlatHelper.calPassPif(flat);
+        if(calPif.pass == calPif.total){
+            return false;
+        }
         let statusFinalDone = flat.status == FlatHelper.FINANCE_DONE_STATUS;
         let canDeliver = flat.status >= FlatHelper.DELIVERING_STATUS && flat.status != FlatHelper.DONE_STATUS;
         let isSignedStatus = flat.status >= FlatHelper.SIGNED_STATUS && flat.status != FlatHelper.DONE_STATUS;

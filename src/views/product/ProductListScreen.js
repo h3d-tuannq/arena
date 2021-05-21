@@ -150,11 +150,7 @@ class ProductListScreen extends React.Component {
         let products = Def.product_data;
         OfflineHelper.offlineProductData =  OfflineHelper.makeObjectDataWithIdKey(Def.product_data);
 
-        for (const key in  OfflineHelper.offlineProductData){
-            if(OfflineHelper.offlineProductData[key]){
-                OfflineHelper.downloadProductImage(OfflineHelper.offlineProductData[key], this.downloadProductSuccess, this.downloadProductFalse);
-            }
-        }
+       ``
         // OfflineHelper.offlineProductData.forEach((value, index) => {
         //    if(value){
         //        OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
@@ -180,17 +176,7 @@ class ProductListScreen extends React.Component {
     }
 
     itemClick(item){
-        let stack = this.props.stack ? this.props.stack :false;
-        let screen = this.props.screen ? this.props.screen :'flat-detail';
-        console.log("Stack : " + stack);
-        console.log("Screen : " + screen);
-
-
-        if(stack){
-            this.props.navigation.navigate(stack, {screen:screen, params: { item: item }});
-        } else {
-            this.props.navigation.navigate(screen, { item: item });
-        }
+        this.props.navigation.navigate('Product', {screen:'product-detail', params: { item: item }});
     }
 
 
@@ -446,7 +432,7 @@ class ProductListScreen extends React.Component {
             return (
                 <View style={{}}>
                     <ProductItemrenderer
-                        item ={item} click={this.itemClick} type={'product-template'}
+                        item ={item} click={this.itemClick}  type={'product-template'}
                         styleImage={{width: (width - 30) / 2, height: (width - 30) / 2}}
                     />
                 </View>
