@@ -168,6 +168,7 @@ class FlatDetailScreen extends React.Component {
                     }
                 }
             });
+            console.log('Request Repair Tree: ' + JSON.stringify(Def.requestRepairtFlat));
             this.processDownloadRepairInFlat();
         }
     };
@@ -184,19 +185,17 @@ class FlatDetailScreen extends React.Component {
             OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
             let flatRepairItems = [];
             let productInstances = this.state.item.productInstanceFlat;
-            let repairItems;
+            let repairItems, requestRepairs;
             productInstances.forEach(pif => {
                 if(Def.requestRepairtFlat[this.state.item.id][pif.id]) {
                     requestRepairs = Def.requestRepairtFlat[this.state.item.id][pif.id];
-                    repairItems = OfflineHelper.makeObjectDataWithIdKey(requestRepairs);
-                    if(repairItems.length > 0){
-                        // console.log('Request Repair : ' + pif.id + '---' + repairItems.length);
-                        // console.log('Request Repair content : '+ JSON.stringify(repairItems))
-                    }
+                    // repairItems = OfflineHelper.makeObjectDataWithIdKey(requestRepairs);
+                    // if(repairItems.length > 0){
+                    //     // console.log('Request Repair : ' + pif.id + '---' + repairItems.length);
+                    //     // console.log('Request Repair content : '+ JSON.stringify(repairItems))
+                    // }
                     flatRepairItems =  flatRepairItems.concat(repairItems);
                 }
-
-
             });
             console.log('Request repair item : ' + flatRepairItems.length);
             let imageRepairItems = flatRepairItems.filter((item) => {
@@ -224,7 +223,7 @@ class FlatDetailScreen extends React.Component {
 
     finishDownload() {
         console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.state.downloaded);
-        offlineItem = OfflineHelper.offlineFlatData[this.state.item.id];
+        let offlineItem = OfflineHelper.offlineFlatData[this.state.item.id];
         offlineItem['downloaded'] = this.state.downloaded;
         offlineItem['image_dowload'] = this.state.imageRepairItem;
         OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
@@ -868,9 +867,6 @@ class FlatDetailScreen extends React.Component {
 
                     </TouchableOpacity>
                 </Modal>
-
-
-
             </View>
         )
     }

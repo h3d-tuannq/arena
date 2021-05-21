@@ -89,7 +89,6 @@ class FlatListScreen extends React.Component {
 
         };
 
-        console.log('Flat-Screen Constructor : ' + JSON.stringify(this.props.route));
         this.handleDatePicked = this.handleDatePicked.bind(this);
         this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
         this.displayFilterDate = this.displayFilterDate.bind(this);
@@ -144,7 +143,10 @@ class FlatListScreen extends React.Component {
         Def.flatCriteria = this.criteria;
         let title = "Danh sách thiết kế";
         let design_list = Def.flat_data;
-        AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+        if(Def.flat_data){
+            AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+        }
+
         let newPageIndex = this.state.pageIndex + 1;
         Def.flatCurrentPage = newPageIndex;
         AsyncStorage.setItem('flat_current_page', JSON.stringify(newPageIndex));
@@ -191,6 +193,7 @@ class FlatListScreen extends React.Component {
         if(this.criteria.building){
             rs = item.building_id == this.criteria.building.id;
         }
+
         if(rs && this.criteria.customer){
             rs = item.customer_code == this.criteria.customer.code;
         }
@@ -377,7 +380,7 @@ class FlatListScreen extends React.Component {
                         });
 
                     } else {
-                        AsyncStorage.set('flat_data', null);
+                        AsyncStorage.removeItem('flat_data');
                     }
                 });
 

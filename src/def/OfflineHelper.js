@@ -1,6 +1,5 @@
 import Def from "./Def";
 import RNFetchBlob from "rn-fetch-blob";
-import FlatHelper from "./FlatHelper";
 
 const PRODUCT_TYPE = 0;
 const DESIGN_TYPE = 1;

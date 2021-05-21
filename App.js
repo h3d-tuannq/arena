@@ -353,7 +353,7 @@ class App extends React.Component {
                 });
 
             } else {
-                AsyncStorage.set('flat_data', null);
+                AsyncStorage.removeItem('flat_data');
             }
         });
 
