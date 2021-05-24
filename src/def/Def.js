@@ -1,5 +1,6 @@
 import {OfflineHelper} from "./OfflineHelper";
 import {Platform} from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Def {
     static URL_BASE = "https://eurotiledev.house3d.net";
@@ -256,6 +257,7 @@ export default class Def {
      */
     static ProductType = 0;
     static DesignType = 1;
+    static REQUESTREPAIRTYPE = 2;
     static OFFLINE_PRIORITY = 0;
     static ONLINE_PRIORITY = 1;
 
@@ -267,10 +269,26 @@ export default class Def {
         rs = rs.join('.') + '_200x200.' + lastItem;
         if(priority == Def.OFFLINE_PRIORITY) {
             let offlineData = type == Def.ProductType ? OfflineHelper.offlineProductData : OfflineHelper.offlineDesignData;
+            switch (type) {
+                case Def.ProductType:
+                    offlineData = OfflineHelper.offlineProductData;
+                    break;
+                case Def.DesignType:
+                    offlineData = OfflineHelper.offlineDesignData;
+                    break;
+                case Def.REQUESTREPAIRTYPE:
+                    offlineData = OfflineHelper.offlineRepairData;
+                    break;
+
+            }
+            console.log('Offline Data : ' + JSON.stringify(offlineData));
             if(offlineData[obj.id] && offlineData[obj.id].offline_img) {
                 rs = Platform.OS === 'android' ? 'file://' +offlineData[obj.id].offline_img : '' + offlineData[obj.id].offline_img;
             }
         }
+
+        console.log('RequestRepairData: ' + rs);
+
         return rs;
     }
 
@@ -401,6 +419,10 @@ export default class Def {
         return Def.FlatSTatusColorList[statusFilter];
     }
 
+    static getDesignStatusName( statusFilter = 0 ){
+        return statusFilter == 0  ? "Ngừng hoạt động" : "Hoạt động" ;
+    }
+
     static PRODUCT_ACTIVE_STATUS = 1; // Đạt
     static PRODUCT_REPAIRED_STATUS = 2 ; // Đã chỉnh sửa
     static PRODUCT_UNACTIVE_STATUS = 0; // Không đạt
@@ -417,7 +439,7 @@ export default class Def {
         return  Def.ProductStatusColor[status];
     }
 
-    static requestRepairsTree = [];
+    static requestRepairsTree = {};
 
     static refeshFlat = []; // Danh sách dự án cần được load lại trang chi tiết
 
@@ -495,7 +517,4 @@ export default class Def {
         var n = uri.search("com.arena");
         return n != -1;
     }
-
-
-
 }

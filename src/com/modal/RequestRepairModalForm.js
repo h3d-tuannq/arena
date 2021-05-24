@@ -23,6 +23,21 @@ class RequestRepairModalForm extends React.Component {
     constructor(props) {
         super(props);
         let title = props.type == 0 ? 'Tạo yêu cầu chỉnh sửa' : 'Hoàn thành chỉnh sửa';
+        let confirmMsg = 'Tạo yêu cầu chỉnh sửa thành công';
+        switch (props.type) {
+            case FlatHelper.COMMENT_TYPE:
+                 confirmMsg = 'Bình luận thành công';
+                 break;
+            case FlatHelper.REQUEST_TYPE:
+                confirmMsg = 'Tạo yêu cầu chỉnh sửa thành công';
+                break;
+            case FlatHelper.REPAIRED_TYPE:
+                confirmMsg = 'Cập nhật trạng thái sản phẩm thành công';
+                break;
+            case FlatHelper.APPROVE_REPAIR_TYPE:
+                confirmMsg = 'Cập nhật trạng thái sản phẩm thành công';
+                break;
+        }
 
         this.state = {
             title: title,
@@ -30,6 +45,7 @@ class RequestRepairModalForm extends React.Component {
             note:'',
             image: '',
             type: props.type , // 0 Tạo yêu cầu chỉnh sửa, 1 Hoàn thành chỉnh sửa, 2 wsh cho yêu cầu đạt
+            confirmMsg: confirmMsg,
         };
         this.handleChoosePhoto = this.handleChoosePhoto.bind(this);
         this.requestBtnClick = this.requestBtnClick.bind(this);
@@ -60,6 +76,17 @@ class RequestRepairModalForm extends React.Component {
         if(data['msg'] == "Ok"){
             console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
             this.props.appendRepairItem(data);
+            Alert.alert(
+                "Thông báo",
+                this.state.confirmMsg,
+                [
+                    {
+                        text: "Ok",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
         } else {
             Alert.alert(
                 "Thông báo",
@@ -67,7 +94,6 @@ class RequestRepairModalForm extends React.Component {
                 [
                     {
                         text: "Ok",
-                        onPress: () => {Def.setIsLogin(false)},
                         style: 'cancel',
                     }
                 ],
@@ -198,9 +224,10 @@ class RequestRepairModalForm extends React.Component {
 const styles = StyleSheet.create({
     container: {
         width:width * 0.8,
-        height:height * 0.5 -20,
+        // height:height * 0.5 -20,
         backgroundColor : '#fff',
         borderRadius : 10,
+        paddingBottom: 8,
 
     },
     itemImage: {

@@ -39,6 +39,7 @@ import BackIcon from './assets/icon/icon-back.svg';
 import FlatStack from './src/FlatStack';
 import ProductStack from './src/ProductStack';
 import DesignStack from './src/DesignStack';
+import SettingStack from './src/SettingStack';
 
 
 const {width, height} = Dimensions.get('window');
@@ -68,7 +69,7 @@ function CustomDrawerContent(props) {
                     <BackIcon width={25} height={25} />
                 </TouchableOpacity>
                 <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
-                    {Def.email == null || Def.email == '' ? 'Cài đặt' : 'Cài đặt'}
+                    {Def.email == null || Def.email == '' ? 'WSH' : 'WSH'}
                 </Text>
                 <View />
             </View>
@@ -232,8 +233,9 @@ function AppDrawer() {
                 name="Flat"
                 component={AppStack}
                 options={{
+                    title: 'Căn hộ',
                     drawerIcon: ({focused: boolean, color: string, size: number}) => {
-                        return <GuideIcon width={iconSize} height={iconSize} />;
+                        return <Icon name="building" size={iconSize} />;
                     },
                 }}
             />
@@ -242,6 +244,7 @@ function AppDrawer() {
                 name="Offline-Lib"
                 component={OfflineLibStack}
                 options={{
+                    title: 'Thư viện Offline',
                     drawerIcon: ({focused: boolean, color: string, size: number}) => {
                         return <Icon name="folder-open" size={iconSize} />;
                     },
@@ -249,15 +252,20 @@ function AppDrawer() {
             />
 
 
-
-
-
-
-
+            <Drawer.Screen
+                name="Setting"
+                component={SettingStack}
+                options={{
+                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
+                        return <Icon name="cogs" size={iconSize} />;
+                    },
+                }}
+            />
         </Drawer.Navigator>
     );
 }
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {OfflineHelper} from './src/def/OfflineHelper';
 
 const Tab = createBottomTabNavigator();
 
@@ -267,7 +275,7 @@ function OfflineTab() {
             style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
 
             // tabBar={(props) => <MyTabBar {...props} item={null} />}
-            initialRouteName={'Product'}
+            initialRouteName={'Design'}
             tabBarOptions={{
                 activeTintColor: Style.DEFAUT_RED_COLOR,
                 inactiveTintColor: '#b3b3b3',
@@ -344,6 +352,25 @@ class App extends React.Component {
                         console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
                     }
                 });
+
+                AsyncStorage.getItem('requestRepairsTree').then(value => {
+                   if(value){
+                       Def.requestRepairsTree = JSON.parse(value);
+                   }
+                });
+
+                AsyncStorage.getItem('offlineFlatData').then(value => {
+                    if(value){
+                        OfflineHelper.offlineFlatData = JSON.parse(value);
+                    }
+                });
+
+                AsyncStorage.getItem('offlineRepairData').then(value => {
+                    if(value){
+                        OfflineHelper.offlineRepairData = JSON.parse(value);
+                    }
+                });
+
 
 
                 AsyncStorage.getItem('flat_current_page').then((value) => {

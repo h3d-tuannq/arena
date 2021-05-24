@@ -594,7 +594,7 @@ class FlatListScreen extends React.Component {
                     data={this.state.data}
                     navigation={this.props.navigation}
                     header={ListHeader}
-                    styleList={{height: height-(ITEM_HEIGHT * 5 + 50)}}
+                    styleList={{height: height-(ITEM_HEIGHT * 5 + 30)}}
                     refreshControl={
                         <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
                     }

@@ -101,6 +101,7 @@ class DesignListScreen extends React.Component {
         this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
         this.displayFilterDate = this.displayFilterDate.bind(this);
         this.cancelDateFilter = this.cancelDateFilter.bind(this);
+        this.finishDownloadDesign = this.finishDownloadDesign.bind(this);
         this.itemClick = this.itemClick.bind(this);
 
     }
@@ -155,7 +156,16 @@ class DesignListScreen extends React.Component {
     downloadDesignSuccess = (obj,res) => {
         obj.offline_img = res.path();
         this.downloaded = this.downloaded + 1;
+        if(this.downloaded + this.downloadFalse == Def.design_data.length ){
+
+        }
         this.setState({downloaded: this.downloaded })
+    }
+
+    finishDownloadDesign = ()=> {
+        if(OfflineHelper.offlineDesignData){
+            AsyncStorage.setItem('offlineDesignData', JSON.stringify(OfflineHelper.offlineDesignData));
+        }
     }
 
     downloadDesignFalse = (obj,res) => {
@@ -183,17 +193,7 @@ class DesignListScreen extends React.Component {
     }
 
     itemClick(item){
-        let stack = this.props.stack ? this.props.stack :false;
-        let screen = this.props.screen ? this.props.screen :'flat-detail';
-        console.log("Stack : " + stack);
-        console.log("Screen : " + screen);
-
-
-        if(stack){
-            this.props.navigation.navigate(stack, {screen:screen, params: { item: item }});
-        } else {
-            this.props.navigation.navigate(screen, { item: item });
-        }
+       this.props.navigation.navigate('Design', {screen:'design-detail', params: { item: item }});
     }
 
 

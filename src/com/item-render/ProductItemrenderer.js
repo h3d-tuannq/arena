@@ -58,7 +58,7 @@ class ProductItemrenderer extends PureComponent{
                 <View style = {{width:this.props.styleImage.width, justifyContent:'center', alignItems: (this.props.type == 'product' ? 'flex-start' :'center')}}>
 
                     <Text style={[{position: 'absolute',zIndex:3 , paddingHorizontal : 5 , left : 5 , paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor: this.props.type == 'product' ? Style.DEFAUT_BLUE_COLOR :Style.DEFAUT_RED_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                          {Def.formatText(this.props.type == 'product' ? model.productInstance.code :product.model, 15)}
+                          {Def.formatText(this.props.type == 'product' ? (model.productInstance && model.productInstance.product ? model.productInstance.product.name : model.productInstance.product) :product.name, 15)}
                     </Text>
                 </View>
             </View>

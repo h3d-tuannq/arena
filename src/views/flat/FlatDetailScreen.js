@@ -31,6 +31,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import UpdateDeadlineModal from '../../com/modal/UpdateDeadlineModal';
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 
 import FullImageModal from  '../../../src/com/modal/FullImageModal'
 import {OfflineHelper} from "../../def/OfflineHelper";
@@ -168,7 +170,10 @@ class FlatDetailScreen extends React.Component {
                     }
                 }
             });
-            console.log('Request Repair Tree: ' + JSON.stringify(Def.requestRepairtFlat));
+            console.log('Request Repair Tree: ' + JSON.stringify(Def.requestRepairsTree));
+            if(Def.requestRepairsTree){
+                AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
+            }
             this.processDownloadRepairInFlat();
         }
     };
@@ -199,12 +204,12 @@ class FlatDetailScreen extends React.Component {
             });
             console.log('Request repair item : ' + flatRepairItems.length);
             let imageRepairItems = flatRepairItems.filter((item) => {
-                return item['image_path'] != null && item['image_path'].length > 0
+                return item &&  item['image_path'] != null && item['image_path'].length > 0;
             });
             this.setState({imageRepairItem: imageRepairItems.length});
             console.log('Total download : ' + imageRepairItems.length);
             imageRepairItems.forEach((value, index) => {
-                if (value) {
+                if (value && value['image_path']) {
                      OfflineHelper.downloadRepairItemImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
                 }
             });
@@ -212,21 +217,34 @@ class FlatDetailScreen extends React.Component {
     }
 
     downloadRepairInFlatSuccess = (obj,res) => {
+        console.log('Download Success');
         obj.offline_img = res.path();
         OfflineHelper.updateOfflineRepairItem(obj);
         this.downloaded = this.downloaded + 1;
+        this.setState({downloaded: this.downloaded });
         if(this.downloaded + this.downloadFalse == this.state.imageRepairItem) {
             this.finishDownload();
         }
-        this.setState({downloaded: this.downloaded })
     }
 
     finishDownload() {
-        console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.state.downloaded);
+        console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.downloaded);
         let offlineItem = OfflineHelper.offlineFlatData[this.state.item.id];
         offlineItem['downloaded'] = this.state.downloaded;
         offlineItem['image_dowload'] = this.state.imageRepairItem;
+
+
         OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
+        if(OfflineHelper.offlineFlatData){
+            AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
+        }
+
+        if(OfflineHelper.offlineRepairData){
+            AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineRepairData));
+        }
+
+
+
     }
 
     downloadRepairFalse = (obj,res) => {

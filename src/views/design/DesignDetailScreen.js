@@ -64,11 +64,9 @@ class DesignDetailScreen extends React.Component {
         Def.mainNavigate = this.props.navigation;
 
         let design_list = [];
-        let title = "Gian hàng";
+        let title = "Chi tiết thiết kế";
 
         this.closeFunction = this.closeFunction.bind(this);
-        let calPif = FlatHelper.calPassPif(this.props.route.params.item);
-        console.log('CanPif : ' + JSON.stringify(calPif));
 
 
         this.state = {
@@ -77,17 +75,9 @@ class DesignDetailScreen extends React.Component {
             stateCount: 0.0,
             slide_data : carouselItems,
             activeSlide : 0,
-            displayDeclineForm : false,
-            displaySignatureForm : false,
-            displaySendMailForm : false,
-            displayUpdateDeadline: false,
-            canSaveDeadline:false,
             type : -1,
-            totalProduct:calPif.total ? calPif.total : 0,
-            passProduct:calPif.pass ? calPif.pass : 0,
             isRefresh : false,
             selectedDate: new Date(),
-            deadlineCompleted: null,
             displayFullFlatImg : false,
 
         };
@@ -101,8 +91,6 @@ class DesignDetailScreen extends React.Component {
         this.onRefresh = this.onRefresh.bind(this);
         this.saveDeadline = this.saveDeadline.bind(this);
         this.readyToDeliver = this.readyToDeliver.bind(this);
-        this.onGetFlatDetailSuccess = this.onGetFlatDetailSuccess.bind(this);
-        this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
         this.displayFullImg = this.displayFullImg.bind(this);
     }
 
@@ -188,7 +176,6 @@ class DesignDetailScreen extends React.Component {
                 ],
                 {cancelable: false},
             );
-            this.updateFlatStatus(data['flat']);
         } else {
             Alert.alert(
                 "Thông báo",
@@ -212,7 +199,7 @@ class DesignDetailScreen extends React.Component {
 
     refresh()
     {
-        this.setState({ stateCount: Math.random(), deadlineCompleted: null });
+        this.setState({ stateCount: Math.random(),  });
     }
 
     updateFlatStatus =(flat) => {
@@ -301,19 +288,8 @@ class DesignDetailScreen extends React.Component {
         console.log('Component did mount -flat');
         let {navigation} = this.props;
         navigation =  this.props.navigation ? this.props.navigation : Def.mainNavigate ;
-
-        if(navigation){
-            console.log('Isset Navigation : ' + JSON.stringify(navigation));
-            this.focusListener = navigation.addListener("focus", this.forcusFunction);
-        }
     }
 
-    forcusFunction = () => {
-        console.log('Forcus function');
-        if(Def.user_info){
-            FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
-        }
-    };
 
     handleDatePicked = date => {
         this.hideDateTimePicker();
@@ -329,14 +305,13 @@ class DesignDetailScreen extends React.Component {
     render() {
         const {navigation} = this.props;
         const {item} = this.state;
-        const configMenu = Def.config_design_menu;
         Def.order_number = 20;
         const ListHeader = () => (
             <View>
                 <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
-                        {item.design && item.design.image_path ?
-                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.design.image_path)}}  />
+                        { item.image_path ?
+                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
                             :
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                         }
@@ -344,34 +319,10 @@ class DesignDetailScreen extends React.Component {
                         <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
 
                             <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                                {Def.formatText(item.code, 15)}
+                                {Def.formatText(item.name, 15)}
                             </Text>
                         </View>
                     </TouchableOpacity>
-
-                    {
-                        this.state.item.signature && this.state.item.signature['image_path'] ?
-                            <View style={styles.imageContainer}>
-                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.signature.image_path)}}  />
-                                <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
-                                    <TouchableOpacity style={[{   paddingVertical:1 , flexDirection:'row' , justifyContent:'space-around' , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, {}]}
-                                        onPress={this.clickSignature}
-                                    >
-                                        { FlatHelper.canReSigning(this.state.item, Def.user_info) ?
-                                            <Icon name="pencil" size={20} color="#fff" />
-                                            : <View/>
-                                        }
-                                        <Text style={Style.text_styles.whiteTitleText}>
-                                            {"Chữ Ký"}
-                                        </Text>
-                                        <View/>
-
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            : null
-
-                    }
                 </View>
 
                 <View style={styles.info}>
@@ -380,40 +331,9 @@ class DesignDetailScreen extends React.Component {
                             {"Tình trạng:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
+                            {Def.getDesignStatusName(item.status)}
                         </Text>
                     </View>
-
-                    {
-                        item.is_decline ?
-                            <View style={{flexDirection:'row'}}>
-                                <Text>
-                                    {"Lý do từ chối bàn giao:" + ' '}
-                                </Text>
-                                <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                    {item.decline_note}
-                                </Text>
-                            </View> : null
-                    }
-
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"Cán bộ bàn giao:" + ' '}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {item.handover ? item.handover.username+"" : ""}
-                        </Text>
-                    </View>
-
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"CSKH:" + ' '}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {item.cskh ? item.cskh.username+"" : ""}
-                        </Text>
-                    </View>
-
                     <View style={{flexDirection:'row'}}>
                         <Text>
                             {"Dự án:" + ' '}
@@ -422,314 +342,56 @@ class DesignDetailScreen extends React.Component {
                             {item.building ? item.building.name+"" : ""}
                         </Text>
                     </View>
-
-                    {
-                        item.authority_name ?
-                            <View style={{flexDirection:'row'}}>
-                                <Text>
-                                    {"Ủy quyền :" + ' '}
-                                </Text>
-                                <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                    { item.authority_name? item.authority_name+ (item.authority_phone ? '-' + item.authority_phone : '' ) : ""}
-                                </Text>
-                            </View>
-                            :
-                            <View style={{flexDirection:'row'}}>
-
-                                <Text>
-                                    {"Chủ sở hữu :" + ' '}
-                                </Text>
-                                <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                    { item.customer? item.customer.name+"" : ""}
-                                </Text>
-                            </View>
-                    }
-
-
-
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"Ngày bàn giao: "}
-                        </Text>
-
-                        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                            { item.deliver_date ? Def.getDateString(new Date(item.deliver_date *1000), "dd-MM-yyyy") : ""}
-                        </Text>
-                    </View>
-                    {
-                        item.signature ?
-                            <View style={{flexDirection:'row'}}>
-                                <Text>
-                                    {"Ngày ký nhận: "}
-                                </Text>
-
-                                <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                    { item.signature && item.signature.date_create ? Def.getDateString(new Date(item.signature.date_create *1000), "dd-MM-yyyy hh:mm") : ""}
-                                </Text>
-                            </View> : null
-                    }
-
-
-
-
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"Deadline hoàn thiện: "}
-                        </Text>
-
-                        <Text style={[{fontSize:Style.MIDLE_SIZE, paddingRight:5}, {color: this.state.canSaveDeadline ? Style.DEFAUT_RED_COLOR : '#000'}]}>
-                            { this.state.deadlineCompleted ? Def.getDateString(this.state.deadlineCompleted, "dd-MM-yyyy hh:mm") : ( item.deadline_date ? Def.getDateString(new Date(item.deadline_date *1000), "dd-MM-yyyy hh:mm") : "Không có")}
-                        </Text>
-                    </View>
-
-
                 </View>
-
-
-
-                {/*<View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>*/}
-                    <View style={{paddingHorizontal:10, paddingBottom:8 , flexDirection:'row', justifyContent:'space-between'}}>
-
-                        <Text style={styles.titleStyle}>{"Hạng mục bàn giao"}</Text>
-                        <Text style={styles.titleStyle}>{(this.state.passProduct +"/" +this.state.totalProduct )}</Text>
-                    </View>
-                {/*</View>*/}
+                <View style={{paddingHorizontal:10, marginTop:20 ,  paddingBottom:8 , flexDirection:'row', justifyContent:'space-between'}}>
+                    <Text style={styles.titleStyle}>{"Thiết bị nội thất"}</Text>
+                </View>
             </View>
         );
         return (
             <View style={{flex:1}}>
                 <View style={{flex:1, paddingTop:5 , paddingBottom : 5 }}>
-                    <ProgramVerList
-                        refreshControl={
-                            <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
-                        }
-                        data={this.state.item.productInstanceFlat}
-                        navigation={this.props.navigation}
-                        header={ListHeader}
-                        type={'product'}
-                        numColumns={2}
-                        stack={'Flat'}
-                        screen={'product-detail'}
-                        addToCart={this.addToCart}
-                    />
+
+                    <ListHeader />
+                    {/*<ProgramVerList*/}
+                    {/*    refreshControl={*/}
+                    {/*        <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>*/}
+                    {/*    }*/}
+                    {/*    data={this.state.item.product}*/}
+                    {/*    navigation={this.props.navigation}*/}
+                    {/*    header={ListHeader}*/}
+                    {/*    type={'product'}*/}
+                    {/*    numColumns={2}*/}
+                    {/*    stack={'Flat'}*/}
+                    {/*    screen={'product-detail'}*/}
+                    {/*    addToCart={this.addToCart}*/}
+                    {/*/>*/}
                 </View>
 
                 <View style={styles.controlBtn}>
-                    {
-                        Def.user_info ?
-
+                    {       false ?
                             <View style={{flexDirection: 'row', paddingBottom: 2}}>
-                                {FlatHelper.canDecline(this.state.item, Def.user_info) ?
-                                    <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                      onPress={() => this.changeFlatStatus(decline_deliver_form)}>
-                                        <Text style={Style.text_styles.whiteTitleText}>
-                                            Từ chối
-                                        </Text>
-                                    </TouchableOpacity> : null
-                                }
                                 {
-                                    FlatHelper.canSigning(this.state.item, Def.user_info) ?
+                                   true ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(signature_form)}>
+                                                          >
                                             <Text style={Style.text_styles.whiteTitleText}>
-                                                Ký nhận
+                                                Download
                                             </Text>
                                         </TouchableOpacity> : null
                                 }
-
-                                {FlatHelper.canSendRequestRepair(this.state.item, Def.user_info) ?
-                                    <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                      onPress={this.openSendMailModal}>
-                                        <Text style={Style.text_styles.whiteTitleText}>
-                                            Gửi biên bản
-                                        </Text>
-                                    </TouchableOpacity> : null
-                                }
                                 {
-                                    FlatHelper.canDone(this.state.item,Def.user_info) ?
+                                    true ?
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.DONE_STATUS)}>
+                                                          >
                                             <Text style={Style.text_styles.whiteTitleText}>
-                                                Hoàn thành
+                                                Xóa
                                             </Text>
                                         </TouchableOpacity> : null
                                 }
+                            </View> : null}
 
-
-
-                                {
-                                    FlatHelper.canChangeDeliverStatus(this.state.item,Def.user_info)  ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.CAN_DELIVER_STATUS)}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Đủ điều kiện
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-                                {
-                                    FlatHelper.readyToDeliver(this.state.item,Def.user_info)  ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.readyToDeliver()}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Sẵn sàng bàn giao
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-
-                                {
-                                    FlatHelper.canPerformDelivering(this.state.item,Def.user_info) ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.DELIVERING_STATUS)}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Thực hiện bàn giao
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-                                {
-                                    FlatHelper.canCompleteProfile(this.state.item,Def.user_info) ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.PROFILE_COMPLETED_STATUS)}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Hoàn thiện hồ sơ
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-                                {
-                                    FlatHelper.canRepairAfterSigned(this.state.item,Def.user_info) ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.REPAIR_AFTER_SIGN_STATUS)}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Yêu cầu sửa
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-                                {
-                                    FlatHelper.canRollbackFinalDone(this.state.item,Def.user_info)  ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.FINANCE_DONE_STATUS)}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Chưa đủ điều kiện
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-                                {
-                                    FlatHelper.canChangeDeadlineCompleted(this.state.item,Def.user_info)  ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={this.updateDeadlineCompleted}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Deadline hoàn thiện
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-                                {/*{*/}
-                                {/*    FlatHelper.canChangeDeadlineCompleted(this.state.item,Def.user_info) && this.state.item.deadlineCompleted ?*/}
-                                {/*        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}*/}
-                                {/*                          onPress={this.updateDeadlineCompleted}>*/}
-                                {/*            <Text style={Style.text_styles.whiteTitleText}>*/}
-                                {/*                Xóa Deadline*/}
-                                {/*            </Text>*/}
-                                {/*        </TouchableOpacity> : null*/}
-                                {/*}*/}
-
-                                {
-                                    FlatHelper.canChangeDeadlineCompleted(this.state.item,Def.user_info) && this.state.canSaveDeadline  ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          onPress={this.saveDeadline}>
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Lưu Deadline
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-
-
-                            </View> :  null
-                    }
                 </View>
-
-                <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayDeclineForm} >
-                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
-                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.5*height,  alignItems: "center",
-                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
-                            // props.closeFun(props.selectedDate)
-                            console.log('prevent click');
-                            e.preventDefault()
-                        }}>
-                            <View style={{zIndex : 5 }}>
-                                <DeclineDeliverModalForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item}  />
-                            </View>
-
-                        </TouchableWithoutFeedback>
-
-                    </TouchableOpacity>
-                </Modal>
-
-                <Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displaySignatureForm} style={styles.requestSignatureModalView}>
-                        {/*<TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.5*height,  alignItems: "center",*/}
-                            {/*justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {*/}
-                            {/*// props.closeFun(props.selectedDate)*/}
-                            {/*console.log('prevent click');*/}
-                            {/*e.preventDefault()*/}
-                        {/*}}>*/}
-                            <View style={{zIndex : 5 }}>
-                                <SignatureModalForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item} closeFunction={this.closeFunction} />
-                            </View>
-
-                        {/*</TouchableWithoutFeedback>*/}
-
-                </Modal>
-
-                <Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displaySendMailForm} style={styles.requestSignatureModalView}>
-                    <View style={{zIndex : 5 }}>
-                        <SendRepairReportForm updateFlatStatus={this.updateFlatStatus} flat={this.state.item} closeFunction={this.closeFunction} />
-                    </View>
-                </Modal>
-
-                {/*<Modal  onRequestClose={this.closeFunction}  transparent={false}  visible={this.state.displayUpdateDeadline} style={styles.requestSignatureModalView}>*/}
-                {/*    <View style={{zIndex : 5 }}>*/}
-                {/*        <UpdateDeadlineModal updateFlatStatus={this.updateFlatStatus} flat={this.state.item} closeFunction={this.closeFunction} />*/}
-                {/*    </View>*/}
-                {/*</Modal>*/}
-
-                <DateTimePickerModal
-                    isVisible={this.state.displayUpdateDeadline}
-                    onConfirm={(date) => {
-                        this.handleDatePicked(date);
-                        // this.hideDateTimePicker();
-                    }}
-                    onCancel={this.hideDateTimePicker}
-                    date={this.state.selectedDate}
-                    mode={'datetime'}
-                    display='spinner'
-                    style={{width: 400, opacity: 1, height: 100, marginTop: 540}}
-                    datePickerModeAndroid='spinner'
-                    timePickerModeAndroid='spinner'
-                />
-
-                <Modal  onRequestClose={this.closeFullImgFunc}  transparent={true}  visible={this.state.displayFullFlatImg} >
-                    <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
-                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width, height : height,  alignItems: "center",
-                            justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
-                            console.log('prevent click');
-                            e.preventDefault()
-                        }}>
-                            <View>
-                                <FullImageModal item={this.state.item ? this.state.item.design : null } />
-                            </View>
-
-                        </TouchableWithoutFeedback>
-
-                    </TouchableOpacity>
-                </Modal>
-
-
-
             </View>
         )
     }

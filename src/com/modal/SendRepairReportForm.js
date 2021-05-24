@@ -86,6 +86,17 @@ class SendRepairReportForm extends React.Component {
         if(data['result'] == 1){
             this.setState({repairList: FlatHelper.getRepairItemList(data['flat']), refresh: Math.random()});
             this.props.updateFlatStatus(data['flat']);
+            Alert.alert(
+                "Thông báo",
+                'Gửi biên bản chỉnh sửa thành công',
+                [
+                    {
+                        text: "Ok",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
         } else {
             Alert.alert(
                 "Thông báo",
@@ -112,7 +123,7 @@ class SendRepairReportForm extends React.Component {
     render() {
         const ListHeader = () => (
             <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start', marginTop:5}}>
-                <View style={{marginLeft:15, paddingBottom:8}}>
+                <View style={{marginLeft:5, paddingBottom:8}}>
                     <Text style={styles.titleStyle}>{(this.state.repairList ? this.state.repairList.length : 0) + " Sản phẩm chưa đạt"}</Text>
                 </View>
             </View>);
@@ -143,7 +154,7 @@ class SendRepairReportForm extends React.Component {
                         {this.state.title}
                     </Text>
                 </View>
-                <View style={{height:height -100}}>
+                <View style={{flex: 1,marginLeft: 15}}>
                     <ProgramVerList
                         data={this.state.repairList}
                         navigation={this.props.navigation}

@@ -99,6 +99,7 @@ class ProductListScreen extends React.Component {
 
         this.downloadProductSuccess = this.downloadProductSuccess.bind(this);
         this.downloadProduct = this.downloadProduct.bind(this);
+        this.finishDownloadProduct = this.finishDownloadProduct.bind(this);
     }
 
     downloadProduct = () => {
@@ -149,19 +150,26 @@ class ProductListScreen extends React.Component {
         let i = 0;
         let products = Def.product_data;
         OfflineHelper.offlineProductData =  OfflineHelper.makeObjectDataWithIdKey(Def.product_data);
-
-       ``
-        // OfflineHelper.offlineProductData.forEach((value, index) => {
-        //    if(value){
-        //        OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
-        //    }
-        // });
+        OfflineHelper.offlineProductData.forEach((value, index) => {
+            if(value){
+                OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
+            }
+        });
     }
 
     downloadProductSuccess = (obj,res) => {
         obj.offline_img = res.path();
         this.downloaded = this.downloaded + 1;
         this.setState({downloaded: this.downloaded })
+        if(this.downloaded + this.downloadFalse == Def.product_data.length){
+            this.finishDownloadProduct();
+        }
+    }
+
+    finishDownloadProduct = ()=> {
+        if(OfflineHelper.offlineProductData){
+            AsyncStorage.setItem('offlineProductData', JSON.stringify(OfflineHelper.offlineProductData));
+        }
     }
 
     downloadProductFalse = (obj,res) => {
@@ -402,7 +410,7 @@ class ProductListScreen extends React.Component {
                         });
 
                     } else {
-                        AsyncStorage.set('product_data', null);
+                        AsyncStorage.removeItem('product_data');
                     }
                 });
 

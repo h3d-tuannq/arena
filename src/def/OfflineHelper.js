@@ -1,5 +1,7 @@
 import Def from "./Def";
 import RNFetchBlob from "rn-fetch-blob";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNRestart from 'react-native-restart';
 
 const PRODUCT_TYPE = 0;
 const DESIGN_TYPE = 1;
@@ -14,6 +16,9 @@ export class OfflineHelper {
     static offlineDesignData = [];
     static offlineRepairData = [];
     static offlineFlatData = [];
+    static downloadProductList;
+    static downloadDesignList;
+    static downloadRepariItemInflat;
 
 
 
@@ -30,11 +35,6 @@ export class OfflineHelper {
         return /[.]/.exec(filename) ?
             /[^.]+$/.exec(filename) : undefined;
     };
-
-    static downloadProductList;
-    static downloadDesignList;
-    static downloadRepariItemInflat;
-
     static downloadRepairItemImage = (repairItem = null, callback, falseCallback = null) => {
         console.log('Download Repair item + ' + repairItem.id);
         return OfflineHelper.downloadImage(repairItem, callback, falseCallback , REPAIR_TYPE);
@@ -210,5 +210,25 @@ export class OfflineHelper {
         return rs;
 
     }
+
+    static resetLocalData = async () => {
+        try {
+            OfflineHelper.offlineProductData = {};
+            OfflineHelper.offlineDesignData = {};
+            OfflineHelper.offlineRepairData = {};
+            OfflineHelper.offlineFlatData = {};
+            OfflineHelper.downloadProductList = {} ;
+            OfflineHelper.downloadDesignList = {};
+            OfflineHelper.downloadRepariItemInflat = {};
+            OfflineHelper.requestRepairsTree = {};
+
+            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data'];
+            await AsyncStorage.multiRemove(keys);
+        }catch (e){
+
+        }
+        RNRestart.Restart();
+    }
+
 
 }

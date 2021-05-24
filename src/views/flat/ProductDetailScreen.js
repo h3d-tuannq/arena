@@ -1,8 +1,8 @@
 import React from 'react'
 import {
     Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList, Modal,
-    TouchableWithoutFeedback, Platform
-} from 'react-native'
+    TouchableWithoutFeedback, Platform, Alert,
+} from 'react-native';
 const {width, height} = Dimensions.get('window');
 import RequestRepairRenderer from '../../../src/com/item-render/RequestRepairRenderer';
 import ProgramVerList from  '../../../src/com/common/ProgramVerList'
@@ -109,12 +109,34 @@ class ProductDetailScreen extends React.Component {
     changeStatusSuccess = (data) => {
         if(data['pif']){
            this.setState({ item:data['pif']});
+            Alert.alert(
+                "Thông báo",
+                'Cập nhật trạng thái sản phẩm thành công',
+                [
+                    {
+                        text: "Ok",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
         }
 
     };
 
     changeStatusFalse = (data) => {
         console.log('Change Status False');
+        Alert.alert(
+            "Thông báo",
+            'Cập nhật sản phẩm thất bại!',
+            [
+                {
+                    text: "Ok",
+                    style: 'cancel',
+                }
+            ],
+            {cancelable: false},
+        );
     };
 
     closeFunction = () => {
@@ -140,12 +162,13 @@ class ProductDetailScreen extends React.Component {
         return true;
     }
     componentDidMount(){
+        let keyId = this.state.item.id + '';
         if(this.state.requestRepairs.length == 0) {
-           if(Def.requestRepairsTree && Def.requestRepairsTree[this.state.item.id]) {
+           if(Def.requestRepairsTree && Def.requestRepairsTree[keyId]) {
                console.log('Isset on  request Tree');
-               this.setState({requestRepairs:Def.requestRepairsTree[this.state.item.id]});
+               this.setState({requestRepairs:Def.requestRepairsTree[keyId]});
            } else {
-               console.log('Not Isset on  request Tree : ' + this.state.item.id);
+               console.log('Not Isset on  request Tree : ' + keyId);
                FlatController.getRequestRepair(this.getRequestRepairSuccess, this.getRequestRepairFalse , this.state.item.id);
                // this.setState({requestRepairs:Def.requestRepairsTree[this.state.item.id]});
            }
@@ -326,7 +349,7 @@ class ProductDetailScreen extends React.Component {
                 }
                 <Modal  onRequestClose={this.closeFunction}  transparent={true}  visible={this.state.displayRequestModal} >
                     <TouchableOpacity  onPress={this.closeFunction} style={[styles.requestDetailModalView, {justifyContent:'center', alignItems: 'center'}]}  activeOpacity={1}>
-                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8, height :0.6*height,  alignItems: "center",
+                        <TouchableWithoutFeedback activeOpacity={1}  style={{width : width * 0.8,   alignItems: "center",
                             justifyContent : 'center', zIndex: 3}} onPress ={ (e) => {
                             // props.closeFun(props.selectedDate)
                             console.log('prevent click');

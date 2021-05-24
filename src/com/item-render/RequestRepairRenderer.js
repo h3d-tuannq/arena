@@ -43,7 +43,7 @@ class RequestRepairRenderer extends React.PureComponent{
                 <View style={styles.imageContainer}>
                     {
                         item.image_path ?
-                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
+                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(item, Def.OFFLINE_PRIORITY, Def.REQUESTREPAIRTYPE)}}  />
                             : null
                     }
                 </View>
