@@ -199,7 +199,18 @@ class FlatListScreen extends React.Component {
         }
 
         if(rs && this.criteria.status){
-            rs = item.status == this.criteria.status['id'];
+            switch (this.criteria.status) {
+                case -2: // Filter cho trường hợp từ chối bàn giao
+                    rs = item.is_decline == 1;
+                    break;
+                case -1: // Filter cho trường hợp bàn giao vắng mặt
+                    rs = item.absentee_hanover == 1;
+                    break;
+                default :
+                    rs = item.status == this.criteria.status['id'];
+                    break;
+            }
+
         }
         if(rs && this.criteria.deliverDate){
             // console.log('Item : ' + JSON.stringify(item.deliverDate));
