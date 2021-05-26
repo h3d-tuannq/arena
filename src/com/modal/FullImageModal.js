@@ -20,7 +20,7 @@ class FullImageModal extends React.Component {
                 <View style={styles.imageContainer}>
                     {
                         item.image_path ?
-                            <Image  style={[styles.itemImage]}   source={{uri: Def.getThumnailImg(item.image_path)}}  />
+                            <Image  style={[styles.itemImage]}   source={{uri: Def.getObjImage(item, Def.OFFLINE_PRIORITY, this.props.type == 1 ? Def.ProductType : Def.DesignType ) }}  />
                             :
                             <Image  style={[styles.itemImage]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }

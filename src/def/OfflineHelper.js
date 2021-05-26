@@ -2,6 +2,7 @@ import Def from "./Def";
 import RNFetchBlob from "rn-fetch-blob";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
+import {Platform} from 'react-native';
 
 const PRODUCT_TYPE = 0;
 const DESIGN_TYPE = 1;
@@ -185,7 +186,7 @@ export class OfflineHelper {
         return rs;
     }
 
-    static makeObjectDataWithKeyObj = (arr, rs = null) => {
+    static makeObjectDataWithKeyObj = (arr, rs = {}) => {
         let totalItem  =0;
         if(arr){
             arr.forEach(item => {
@@ -196,6 +197,31 @@ export class OfflineHelper {
                         if(key == null || key == "") {
                         }else {
                             rs[key] = item[key];
+                            totalItem++;
+                        }
+                    }
+                }
+            })
+        }
+
+        console.log('rs : ' + JSON.stringify(rs));
+
+        return rs;
+
+    }
+
+    static makeRequestDataWithKeyObj = (arr, rs = {}) => {
+        let totalItem  =0;
+        if(arr){
+            arr.forEach(item => {
+                if(item != null && item != []){
+                    let i = 0;
+                    let key = 0;
+                    for(key in item){
+                        if(key == null || key == "") {
+                        }else {
+
+                            rs[item['id']] = item;
                             totalItem++;
                         }
                     }
@@ -229,6 +255,35 @@ export class OfflineHelper {
         }
         RNRestart.Restart();
     }
+
+    static checkOffline(obj, type = Def.ProductType) {
+        let offlineData, rs = false ;
+        switch (type) {
+            case Def.ProductType:
+                offlineData = OfflineHelper.offlineProductData;
+                break;
+            case Def.DesignType:
+                offlineData = OfflineHelper.offlineDesignData;
+                break;
+            case Def.REQUESTREPAIRTYPE:
+                offlineData = OfflineHelper.offlineRepairData;
+                break;
+
+            case Def.FlatType:
+                offlineData = OfflineHelper.offlineFlatData;
+                break;
+            case Def.REQUESTREPAIRTYPE:
+                offlineData = OfflineHelper.offlineRepairData;
+                break;
+
+        }
+        if(offlineData[obj.id] && (offlineData[obj.id].downloaded || offlineData[obj.id].offline_img )) {
+            rs = true;
+        }
+
+        return rs;
+    }
+
 
 
 }

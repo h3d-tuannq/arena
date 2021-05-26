@@ -389,7 +389,7 @@ class ProductDetailScreen extends React.Component {
                             e.preventDefault()
                         }}>
                             <View>
-                                <FullImageModal item={product} />
+                                <FullImageModal item={product} type={1} />
                             </View>
 
                         </TouchableWithoutFeedback>

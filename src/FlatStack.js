@@ -93,7 +93,7 @@ class FlatStack extends React.Component {
                                 }
                             }
                             onPress={() => this.downloadFlat(route.params.item.id)}>
-                            <Icon name="download" size={20} color="#fff" />
+                            <Icon name="download" size={20} color={OfflineHelper.checkOffline(route.params.item, Def.FlatType) ? "#03fc66" : "#fff" } />
                             {/*<Text style={{color:'#fff'}}>*/}
                                 {/*{route.params.item.id}*/}
                             {/*</Text>*/}

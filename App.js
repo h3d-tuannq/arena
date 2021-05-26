@@ -391,7 +391,11 @@ class App extends React.Component {
                     }
                 });
 
-
+                AsyncStorage.getItem('offlineFlatData').then(value => {
+                    if(value){
+                        OfflineHelper.offlineFlatData = JSON.parse(value);
+                    }
+                });
 
                 AsyncStorage.getItem('flat_current_page').then((value) => {
                     if(value){

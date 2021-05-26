@@ -258,6 +258,8 @@ export default class Def {
     static ProductType = 0;
     static DesignType = 1;
     static REQUESTREPAIRTYPE = 2;
+    static FlatType = 3;
+
     static OFFLINE_PRIORITY = 0;
     static ONLINE_PRIORITY = 1;
 
@@ -444,8 +446,12 @@ export default class Def {
     static updateFlatToFlatList(flat){
         let index = Def.flat_data.findIndex((element) => element.id == flat.id );
         if(index > -1){
-            Def.flat_data[index] = flat;
-            Def.refresh_flat_data = true;
+            if(flat.status == 7) { // Trong trường hợp căn họ hoàn thành thực hiện remote khỏi mảng
+               Def.flat_data.slice(index,1);
+            } else {
+                Def.flat_data[index] = flat;
+                Def.refresh_flat_data = true;
+            }
         }
         return index> -1;
     }

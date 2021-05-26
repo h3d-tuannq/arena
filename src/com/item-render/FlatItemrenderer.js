@@ -14,6 +14,8 @@ import FavoriteIconSelect from "../../../assets/icon/icon-like.svg";
 import Def from '../../def/Def'
 import Style from "../../def/Style";
 import FlatHelper from "../../def/FlatHelper";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {OfflineHelper} from '../../def/OfflineHelper';
 
 class FlatItemrenderer extends PureComponent{
     state = {
@@ -67,6 +69,14 @@ class FlatItemrenderer extends PureComponent{
                     click(model);
                 }
             } >
+
+                <Icon name="download"
+                      size={20}
+                      color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}
+                      style={{position: 'absolute', right : 10, top: width /8}}
+
+                />
+
                 <View style={styles.imageContainer}>
                     {model.design && model.design.image_path ?
                         <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(model.design, 0, Def.DesignType)}}  />

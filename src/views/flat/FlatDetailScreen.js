@@ -201,20 +201,26 @@ class FlatDetailScreen extends React.Component {
             productInstances.forEach(pif => {
                 if(Def.requestRepairtFlat[this.state.item.id][pif.id]) {
                     requestRepairs = Def.requestRepairtFlat[this.state.item.id][pif.id];
+
                     // repairItems = OfflineHelper.makeObjectDataWithIdKey(requestRepairs);
                     // if(repairItems.length > 0){
                     //     // console.log('Request Repair : ' + pif.id + '---' + repairItems.length);
                     //     // console.log('Request Repair content : '+ JSON.stringify(repairItems))
                     // }
-                    flatRepairItems =  flatRepairItems.concat(repairItems);
+                    if(requestRepairs.length){
+                        console.log('Request Repair For Product ID : ' + pif.id);
+                        console.log('Request Repair : ' + typeof requestRepairs + ' : ' + JSON.stringify(requestRepairs));
+                        flatRepairItems =  flatRepairItems.concat(requestRepairs);
+                    }
                 }
             });
 
             console.log('Request repair item : ' + flatRepairItems.length);
-            OfflineHelper.offlineRepairData = OfflineHelper.makeObjectDataWithKeyObj(flatRepairItems, OfflineHelper.offlineRepairData);
+            console.log('Request Repair : ' + JSON.stringify(flatRepairItems));
+            OfflineHelper.offlineRepairData = OfflineHelper.makeRequestDataWithKeyObj(flatRepairItems, OfflineHelper.offlineRepairData);
 
             let imageRepairItems = flatRepairItems.filter((item) => {
-                return item &&  item['image_path'] != null && item['image_path'].length > 0;
+                return item &&  item['image_path'] != null && item['image_path'].length != '';
             });
             this.setState({imageRepairItem: imageRepairItems.length});
             console.log('Total download : ' + imageRepairItems.length);
@@ -241,20 +247,14 @@ class FlatDetailScreen extends React.Component {
         console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.downloaded);
         let offlineItem = OfflineHelper.offlineFlatData[this.state.item.id];
         offlineItem['downloaded'] = this.state.downloaded;
-        offlineItem['image_dowload'] = this.state.imageRepairItem;
-
-
+        // offlineItem['image_dowload'] = this.state.imageRepairItem;
         OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
         if(OfflineHelper.offlineFlatData){
             AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
         }
-
         if(OfflineHelper.offlineRepairData){
-            AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineRepairData));
+            AsyncStorage.setItem('offlineRepairData', JSON.stringify(OfflineHelper.offlineRepairData));
         }
-
-
-
     }
 
     downloadRepairFalse = (obj,res) => {
@@ -888,7 +888,7 @@ class FlatDetailScreen extends React.Component {
                             e.preventDefault()
                         }}>
                             <View>
-                                <FullImageModal item={this.state.item ? this.state.item.design : null } />
+                                <FullImageModal item={this.state.item ? this.state.item.design : null } type={0} />
                             </View>
 
                         </TouchableWithoutFeedback>
