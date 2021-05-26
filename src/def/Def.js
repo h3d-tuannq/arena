@@ -281,14 +281,10 @@ export default class Def {
                     break;
 
             }
-            console.log('Offline Data : ' + JSON.stringify(offlineData));
             if(offlineData[obj.id] && offlineData[obj.id].offline_img) {
                 rs = Platform.OS === 'android' ? 'file://' +offlineData[obj.id].offline_img : '' + offlineData[obj.id].offline_img;
             }
         }
-
-        console.log('RequestRepairData: ' + rs);
-
         return rs;
     }
 

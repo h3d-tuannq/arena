@@ -80,7 +80,7 @@ class DesignItemrenderer extends PureComponent{
                                     {"Mã:" + ' '}
                                 </Text>
                                 <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
-                                    {model.id+""}
+                                    {model.model+""}
                                 </Text>
                             </View>
 
@@ -104,13 +104,36 @@ class DesignItemrenderer extends PureComponent{
 
                         <View style={{flexDirection:'row'}}>
                             <Text>
+                                {"Tên:" + ' '}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                { model.name+""}
+                            </Text>
+                        </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
                                 {"Dự án:" + ' '}
                             </Text>
 
-                            {/*<Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>*/}
-                            {/*    {model.building ? model.building.name+"" : ""}*/}
-                            {/*</Text>*/}
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {model.building ? model.building.name+"" : ""}
+                            </Text>
                         </View>
+
+                        <View style={{flexDirection:'row'}}>
+                            <Text>
+                                {"Trạng thái:" + ' '}
+                            </Text>
+
+                            <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                                {Def.getDesignStatusName(model.status)}
+                            </Text>
+                        </View>
+
+
+
                         {/*<View style={{flexDirection:'row'}}>*/}
                         {/*    <Text>*/}
                         {/*        {"Chủ sở hữu:" + ' '}*/}

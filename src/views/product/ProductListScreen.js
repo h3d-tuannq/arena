@@ -148,20 +148,21 @@ class ProductListScreen extends React.Component {
     downloadProductList = () => {
         this.setState({startDownload:true});
         let i = 0;
-        let products = Def.product_data;
+        this.downloaded = 0; this.downloadFalse =0;
         OfflineHelper.offlineProductData =  OfflineHelper.makeObjectDataWithIdKey(Def.product_data);
-        OfflineHelper.offlineProductData.forEach((value, index) => {
-            if(value){
-                OfflineHelper.downloadProductImage(value, this.downloadProductSuccess, this.downloadProductFalse);
+        for (const key in  OfflineHelper.offlineProductData) {
+            if (OfflineHelper.offlineProductData[key]) {
+                OfflineHelper.downloadProductImage(OfflineHelper.offlineProductData[key], this.downloadProductSuccess, this.downloadProductFalse);
             }
-        });
+
+        }
     }
 
     downloadProductSuccess = (obj,res) => {
         obj.offline_img = res.path();
         this.downloaded = this.downloaded + 1;
         this.setState({downloaded: this.downloaded })
-        if(this.downloaded + this.downloadFalse == Def.product_data.length){
+        if(this.downloaded + this.downloadFalse >= Def.product_data.length){
             this.finishDownloadProduct();
         }
     }
@@ -169,6 +170,7 @@ class ProductListScreen extends React.Component {
     finishDownloadProduct = ()=> {
         if(OfflineHelper.offlineProductData){
             AsyncStorage.setItem('offlineProductData', JSON.stringify(OfflineHelper.offlineProductData));
+            this.setState({startDownload: false});
         }
     }
 
@@ -239,7 +241,9 @@ class ProductListScreen extends React.Component {
     }
 
     onRefresh = () => {
-        this.setState({isRefresh:true, pageIndex:0});
+        if(!this.state.startDownload){
+            this.setState({isRefresh:true, pageIndex:0, downloaded: 0, downloadFalse : 0});
+        }
         this.resetCriteria();
         if(Def.user_info){
             FlatController.getProduct(this.onGetProductSuccess, this.onGetProductFalse);
@@ -388,6 +392,7 @@ class ProductListScreen extends React.Component {
 
 
     componentDidMount() {
+        console.log('Offline Data : ' + JSON.stringify(OfflineHelper.offlineProductData));
         if(!Def.product_data || Def.product_data.length == 0){
             if (Def.product_data.length > 0 && Def.product_data) {
                 this.setState({data:Def.product_data});

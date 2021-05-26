@@ -69,7 +69,7 @@ class FlatItemrenderer extends PureComponent{
             } >
                 <View style={styles.imageContainer}>
                     {model.design && model.design.image_path ?
-                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(model.design)}}  />
+                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(model.design, 0, Def.DesignType)}}  />
                         :
                         <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }

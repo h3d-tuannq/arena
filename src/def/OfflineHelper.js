@@ -12,10 +12,10 @@ export class OfflineHelper {
 
     }
 
-    static offlineProductData = [];
-    static offlineDesignData = [];
-    static offlineRepairData = [];
-    static offlineFlatData = [];
+    static offlineProductData = {};
+    static offlineDesignData = {};
+    static offlineRepairData = {};
+    static offlineFlatData = {};
     static downloadProductList;
     static downloadDesignList;
     static downloadRepariItemInflat;
@@ -176,18 +176,16 @@ export class OfflineHelper {
     }
 
     static makeObjectDataWithIdKey = (arr) => {
-        let rs = [];
+        let rs = {};
         if(arr){
             arr.forEach(item => {
                 rs[item['id']] = item;
             });
         }
-        console.log('RS : ' + JSON.stringify(rs));
         return rs;
     }
 
-    static makeObjectDataWithKeyObj = (arr) => {
-        let rs = {};
+    static makeObjectDataWithKeyObj = (arr, rs = null) => {
         let totalItem  =0;
         if(arr){
             arr.forEach(item => {
@@ -211,6 +209,8 @@ export class OfflineHelper {
 
     }
 
+
+
     static resetLocalData = async () => {
         try {
             OfflineHelper.offlineProductData = {};
@@ -222,7 +222,7 @@ export class OfflineHelper {
             OfflineHelper.downloadRepariItemInflat = {};
             OfflineHelper.requestRepairsTree = {};
 
-            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data'];
+            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data', 'offlineDesignData', 'offlineProductData'];
             await AsyncStorage.multiRemove(keys);
         }catch (e){
 

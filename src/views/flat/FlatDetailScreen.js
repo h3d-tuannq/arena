@@ -170,10 +170,17 @@ class FlatDetailScreen extends React.Component {
                     }
                 }
             });
+
             console.log('Request Repair Tree: ' + JSON.stringify(Def.requestRepairsTree));
             if(Def.requestRepairsTree){
                 AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
             }
+
+            if(Def.requestRepairtFlat){
+                AsyncStorage.setItem('requestRepairtFlat', JSON.stringify(Def.requestRepairtFlat));
+            }
+
+
             this.processDownloadRepairInFlat();
         }
     };
@@ -202,7 +209,10 @@ class FlatDetailScreen extends React.Component {
                     flatRepairItems =  flatRepairItems.concat(repairItems);
                 }
             });
+
             console.log('Request repair item : ' + flatRepairItems.length);
+            OfflineHelper.offlineRepairData = OfflineHelper.makeObjectDataWithKeyObj(flatRepairItems, OfflineHelper.offlineRepairData);
+
             let imageRepairItems = flatRepairItems.filter((item) => {
                 return item &&  item['image_path'] != null && item['image_path'].length > 0;
             });
@@ -210,7 +220,7 @@ class FlatDetailScreen extends React.Component {
             console.log('Total download : ' + imageRepairItems.length);
             imageRepairItems.forEach((value, index) => {
                 if (value && value['image_path']) {
-                     OfflineHelper.downloadRepairItemImage(value, this.downloadDesignSuccess, this.downloadDesignFalse);
+                     OfflineHelper.downloadRepairItemImage(value, this.downloadRepairInFlatSuccess, this.downloadRepairFalse);
                 }
             });
         }
@@ -222,7 +232,7 @@ class FlatDetailScreen extends React.Component {
         OfflineHelper.updateOfflineRepairItem(obj);
         this.downloaded = this.downloaded + 1;
         this.setState({downloaded: this.downloaded });
-        if(this.downloaded + this.downloadFalse == this.state.imageRepairItem) {
+        if(this.downloaded + this.downloadFalse >= this.state.imageRepairItem) {
             this.finishDownload();
         }
     }

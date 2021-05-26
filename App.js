@@ -362,8 +362,28 @@ class App extends React.Component {
                 AsyncStorage.getItem('offlineFlatData').then(value => {
                     if(value){
                         OfflineHelper.offlineFlatData = JSON.parse(value);
+                    } else {
+
                     }
                 });
+
+
+                AsyncStorage.getItem('offlineDesignData').then(value => {
+                    if(value){
+                        OfflineHelper.offlineDesignData = JSON.parse(value);
+                    } else {
+                        console.log('Offline Data not found');
+                    }
+                });
+
+                AsyncStorage.getItem('offlineProductData').then(value => {
+                    if(value){
+                        OfflineHelper.offlineProductData = JSON.parse(value);
+                    } else {
+                        console.log('Offline Data not found');
+                    }
+                });
+
 
                 AsyncStorage.getItem('offlineRepairData').then(value => {
                     if(value){

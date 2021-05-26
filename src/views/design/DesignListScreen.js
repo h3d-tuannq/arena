@@ -143,12 +143,11 @@ class DesignListScreen extends React.Component {
     downloadDesignList = () => {
         this.setState({startDownload:true});
         let i = 0;
-        let products = Def.design_data;
+        this.downloaded = 0; this.downloadFalse = 0;
         OfflineHelper.offlineDesignData = OfflineHelper.makeObjectDataWithIdKey(Def.design_data);
-
         for (const key in  OfflineHelper.offlineDesignData){
             if(OfflineHelper.offlineDesignData[key]){
-                OfflineHelper.downloadProductImage(OfflineHelper.offlineDesignData[key], this.downloadDesignSuccess, this.downloadDesignFalse);
+                OfflineHelper.downloadDesignImage(OfflineHelper.offlineDesignData[key], this.downloadDesignSuccess, this.downloadDesignFalse);
             }
         }
     }
@@ -156,15 +155,17 @@ class DesignListScreen extends React.Component {
     downloadDesignSuccess = (obj,res) => {
         obj.offline_img = res.path();
         this.downloaded = this.downloaded + 1;
-        if(this.downloaded + this.downloadFalse == Def.design_data.length ){
-
-        }
         this.setState({downloaded: this.downloaded })
+        if(this.downloaded + this.downloadFalse >= Def.design_data.length ){
+            this.finishDownloadDesign();
+        }
     }
 
     finishDownloadDesign = ()=> {
         if(OfflineHelper.offlineDesignData){
+            console.log('Offline Data : ' + JSON.stringify(OfflineHelper.offlineDesignData));
             AsyncStorage.setItem('offlineDesignData', JSON.stringify(OfflineHelper.offlineDesignData));
+            this.setState({startDownload:false});
         }
     }
 
@@ -251,7 +252,12 @@ class DesignListScreen extends React.Component {
     }
 
     onRefresh = () => {
-        this.setState({isRefresh:true, pageIndex:0});
+        if(!this.state.startDownload){
+
+            this.setState({isRefresh:true, pageIndex:0,downloaded : 0, downloadFalse:0});
+
+        }
+
         this.resetCriteria();
         if(Def.user_info){
             FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
@@ -400,6 +406,9 @@ class DesignListScreen extends React.Component {
 
 
     componentDidMount() {
+
+        console.log('Offline Design Data : ' + JSON.stringify(OfflineHelper.offlineDesignData));
+
         if(!Def.design_data || Def.design_data.length == 0){
             if (Def.design_data.length > 0 && Def.design_data) {
                 this.setState({data:Def.design_data});
