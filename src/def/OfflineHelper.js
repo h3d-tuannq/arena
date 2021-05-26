@@ -12,7 +12,6 @@ export class OfflineHelper {
     static getDownloadProduct(product){
 
     }
-
     static offlineProductData = {};
     static offlineDesignData = {};
     static offlineRepairData = {};
@@ -20,17 +19,11 @@ export class OfflineHelper {
     static downloadProductList;
     static downloadDesignList;
     static downloadRepariItemInflat;
-
-
-
-
     static updateOfflineRepairItem (repairItem) {
         if(OfflineHelper.offlineRepairData){
             OfflineHelper.offlineRepairData[repairItem.id] = repairItem;
         }
     }
-
-
     static getExtention(filename)  {
         // To get the file extension
         return /[.]/.exec(filename) ?
@@ -203,11 +196,8 @@ export class OfflineHelper {
                 }
             })
         }
-
         console.log('rs : ' + JSON.stringify(rs));
-
         return rs;
-
     }
 
     static makeRequestDataWithKeyObj = (arr, rs = {}) => {
@@ -228,11 +218,8 @@ export class OfflineHelper {
                 }
             })
         }
-
         console.log('rs : ' + JSON.stringify(rs));
-
         return rs;
-
     }
 
 
