@@ -181,7 +181,7 @@ class ProductDetailScreen extends React.Component {
                         <TouchableOpacity onPress={this.displayFullProduct}>
                         {item &&  item.image_path ?
 
-                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
+                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(item, 0, Def.ProductType)}}  />
 
                             :
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />

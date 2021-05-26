@@ -494,7 +494,7 @@ class FlatDetailScreen extends React.Component {
                 <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
                         {item.design && item.design.image_path ?
-                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(item.design)}}  />
+                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(item.design, 0, Def.DesignType)}}  />
                             :
                             <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                         }

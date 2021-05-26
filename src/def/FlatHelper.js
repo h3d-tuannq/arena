@@ -54,7 +54,7 @@ export default class FlatHelper {
     static FlatSTatusList = {0: "Chưa kích hoạt", 1: "Hoạt động", 2: "Hoàn thành nghĩa vụ tài chính", 3: "Đủ điều kiện bàn giao", 4: "Đang bàn giao", 5:"Đã ký nhận bàn giao" , 6:"Sữa chữa sau bàn giao", 8:"Đã hoàn thiện hồ sơ", 7:"Đã hoàn thành"};
     static FlatStatusData = [
             {'id': -2 , 'name': "Từ chối bàn giao"},
-            {'id': -1 , 'name' :"Bàn giao vắng mặt"},
+            {'id': -3 , 'name' :"Bàn giao vắng mặt"},
             {'id': 2 , 'name': "Hoàn thành nghĩa vụ tài chính"},
             {'id': 3 , 'name': "Đủ điều kiện bàn giao"},
             {'id': 4 , 'name': "Đang bàn giao"},

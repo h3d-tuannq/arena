@@ -199,11 +199,15 @@ class FlatListScreen extends React.Component {
         }
 
         if(rs && this.criteria.status){
-            switch (this.criteria.status) {
+            console.log('Status : ' + JSON.stringify(this.criteria.status));
+            switch (this.criteria.status['id']) {
+
                 case -2: // Filter cho trường hợp từ chối bàn giao
+                    console.log('Case -2');
                     rs = item.is_decline == 1;
                     break;
-                case -1: // Filter cho trường hợp bàn giao vắng mặt
+                case -3 : // Filter cho trường hợp bàn giao vắng mặt
+                    console.log('Case -3');
                     rs = item.absentee_hanover == 1;
                     break;
                 default :
@@ -232,7 +236,7 @@ class FlatListScreen extends React.Component {
     };
 
     resetCriteria = () => {
-        this.setState({building: null, customer:null, name: "", deliverDate: null});
+        this.setState({building: null, customer:null, name: "", deliverDate: null, status: null});
         this.criteria = {};
     }
     onGetFlatFalse(data){
