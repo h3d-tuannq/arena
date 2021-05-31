@@ -46,7 +46,6 @@ class FlatItemrenderer extends PureComponent{
     render(){
         const model = this.props.item;
         const click = this.props.click;
-        console.log('Update : ' + model['update'])
         //console.log(model);
         const FavoriteItem = ()=> {
             if(this.props.favorite ){
@@ -159,17 +158,22 @@ class FlatItemrenderer extends PureComponent{
                             color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}
                             style={{}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={()=> {
-                            if(this.props.itemHandleFunc && this.props.itemHandleFunc.removeOfflineItem){
-                                console.log('Remote offline item');
-                                this.props.itemHandleFunc.removeOfflineItem(model);
-                            }
-                        }}
-                        style={{width:30, height: 30, marginTop:5, paddingVertical: 10, paddingLeft:5, marginLeft: -5}} >
-                        <Icon name="trash" size={20}
-                              style={{}}/>
-                    </TouchableOpacity>
+                    {
+                        !Def.NetWorkMode && OfflineHelper.checkOffline(model, Def.FlatType) ?
+                        <TouchableOpacity
+                            onPress={()=> {
+                                if(this.props.itemHandleFunc && this.props.itemHandleFunc.removeOfflineItem){
+                                    console.log('Remote offline item');
+                                    this.props.itemHandleFunc.removeOfflineItem(model);
+                                }
+                            }}
+                            style={{width:30, height: 30, marginTop:5, paddingVertical: 10, paddingLeft:5, marginLeft: -5}} >
+                            <Icon name="trash" size={20}
+                                  style={{}}/>
+                        </TouchableOpacity>
+                        : null
+                    }
+
                     {
                         (model['update'] == 1 || model['update'] == '1') || OfflineHelper.checkChangeOfflineFlat(model)?
                         <TouchableOpacity

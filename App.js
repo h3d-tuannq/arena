@@ -182,30 +182,13 @@ function CustomDrawerContent(props) {
                                 }}>
                                 <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng nhập </Text>
                             </TouchableOpacity>
-                            {
-                                Def.user_info && Def.NetWorkMode != Def.NetWorkConnect ?
-                                    <TouchableOpacity
-                                        style={{
-                                            width: width * 0.35,
-                                            borderRadius: 5,
-                                            paddingVertical: PixelRatio.get() < 2 ? 5 :8,
-                                            backgroundColor: Style.DEFAUT_BLUE_COLOR,
-                                            alignItems: 'center',
-                                        }}
-                                        onPress={() => {
 
-                                        }}>
-                                        <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> {Def.NetWorkConnect ? 'Online' :'Offline'} </Text>
-                                    </TouchableOpacity> : null
-
-                            }
 
 
                         </View>
                     ) : (
                         <View
                             style={{
-                                // flexDirection: 'row',
                                 justifyContent: 'space-between',
                                 paddingVertical: PixelRatio.get() < 2 ? 3 :5,
                                 paddingHorizontal: 10,
@@ -223,6 +206,7 @@ function CustomDrawerContent(props) {
                                 </Text>
 
                             </View>
+                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
 
 
                             <TouchableOpacity
@@ -245,6 +229,27 @@ function CustomDrawerContent(props) {
                                 }}>
                                 <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng xuất </Text>
                             </TouchableOpacity>
+
+                            {
+                                ((Def.NetWorkMode != Def.NetWorkConnect) || Def.NetWorkMode) ?
+                                    <TouchableOpacity
+                                        style={{
+                                            width: width * 0.35,
+                                            borderRadius: 5,
+                                            paddingVertical: PixelRatio.get() < 2 ? 5 :8,
+                                            backgroundColor: Style.DEFAUT_BLUE_COLOR,
+                                            alignItems: 'center',
+
+                                        }}
+                                        onPress={() => {
+                                            OfflineHelper.changeAppMode();
+                                        }}>
+                                        <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> {Def.NetWorkMode ? 'Offline' : 'Online'} </Text>
+                                    </TouchableOpacity> : null
+
+                            }
+                            </View>
+
                         </View>
                     )}
 
@@ -453,8 +458,6 @@ class App extends React.Component {
 
                 OfflineHelper.offlineFlatData = JSON.parse( await  AsyncStorage.getItem('offlineFlatData'));
                 OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
-                console.log('reload data 1');
-                OfflineHelper.offlineFlatDataArr.forEach(item=> console.log(item['update']));
                 // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
 
 
@@ -466,14 +469,6 @@ class App extends React.Component {
 
                     }
                 });
-
-                // AsyncStorage.getItem('offlineFlatDataArr').then(value => {
-                //     if(value){
-                //         OfflineHelper.offlineFlatDataArr = JSON.parse(value);
-                //         console.log('OfflineHelper.offlineFlatDataArr.length ' + OfflineHelper.offlineFlatDataArr.length);
-                //     }
-                // });
-
                 AsyncStorage.getItem('pifChangeData').then(value => {
                     if(value){
                         OfflineHelper.pifChangeData = JSON.parse(value);

@@ -179,7 +179,6 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
-        console.log('Refresh ' + OfflineHelper.offlineFlatDataArr.length  );
         this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
     }
 
@@ -459,11 +458,7 @@ class FlatListScreen extends React.Component {
                 console.log('rewrite offlineFlatDataArr');
                 OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
             }
-            console.log('reload data');
-            OfflineHelper.offlineFlatDataArr.forEach(item=> console.log(item['update']));
-
             this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh:false});
-
             // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
             //
             // console.log('App Mode2' + JSON.stringify(OfflineHelper.offlineFlatData));
@@ -506,15 +501,15 @@ class FlatListScreen extends React.Component {
         let navigation =  this.props.navigation ? this.props.navigation : Def.mainNavigate ;
 
         if(navigation){
-            console.log('Isset Navigation : ' + JSON.stringify(navigation));
             this.focusListener = navigation.addListener("focus", this.forcusFunction);
         }
     }
 
     componentWillUnmount() {
-        if(this.hasOwnProperty('focusListener')){
+        // if(this.hasOwnProperty('focusListener')){
             // this.focusListener.remove();
-        }
+        // }
+        console.log('Component will unmount!');
     }
 
     forcusFunction = () => {

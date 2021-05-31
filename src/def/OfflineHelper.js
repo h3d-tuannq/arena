@@ -307,7 +307,7 @@ export class OfflineHelper {
                 break;
 
         }
-        if(offlineData[obj.id] && (offlineData[obj.id].downloaded || offlineData[obj.id].offline_img )) {
+        if(offlineData && offlineData[obj.id] && (offlineData[obj.id].downloaded || offlineData[obj.id].offline_img )) {
             rs = true;
         }
 
@@ -392,7 +392,6 @@ export class OfflineHelper {
         }
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
         console.log('Index : ' + index);
-        console.log('offlineFlatDataArr Before : ' + OfflineHelper.offlineFlatDataArr.length);
         if(index > -1){
             OfflineHelper.offlineFlatDataArr.splice(index,1);
             console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
@@ -431,12 +430,14 @@ export class OfflineHelper {
         return OfflineHelper.pifChangeData[pif.id] || OfflineHelper.pifChangeData[strId];
     }
     static checkChangeOfflineFlat = (flat) => {
-        let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
-        let rs = false;
-        if(index > -1){
-            rs = OfflineHelper.offlineFlatDataArr[index] && OfflineHelper.offlineFlatDataArr[index]['update'] == 1;
+        if(OfflineHelper.offlineFlatDataArr){
+            let index =  OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+            let rs = false;
+            if(index > -1){
+                rs = OfflineHelper.offlineFlatDataArr[index] && OfflineHelper.offlineFlatDataArr[index]['update'] == 1;
+            }
+            return rs;
         }
-        return rs;
     }
 
     static checkChangeData = () => {
@@ -445,14 +446,15 @@ export class OfflineHelper {
 
     static changeAppMode = async () => {
         let msg;
-        if(Def.NetWorkConnect) {
+        // Từ chế độ Offline chuyển sang chế độ Online
+        if(Def.NetWorkConnect && !Def.NetWorkMode) {
             msg = 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!'
             Alert.alert(
                 "Thông báo",
                 msg,
                 [
                     {   // Chuyển sang trạng thái online
-                        text: "Online",
+                        text: "OK",
                         onPress: async () => {
                             console.log('Change Mode');
                             Def.NetWorkMode = true;
@@ -471,21 +473,22 @@ export class OfflineHelper {
                         style: 'cancel',
                     },
                     {
-                        text: "Offline",
+                        text: "Cancel",
                         style: 'cancel',
                     }
                 ],
                 {cancelable: false},
             );
         }
-        // Chuyen sang che do Offline
-        else {
+        // Chuyen sang che do tử online chuyen sang offline Offline
+        else if(Def.NetWorkMode) {
+            msg = 'Chuyển sang chế Online, Dữ liệu Offline sẽ được khởi tạo từ dữ liệu Online!';
             Alert.alert(
                 "Thông báo",
                 msg,
                 [
                     {
-                        text: "Offline",
+                        text: "Ok",
                         onPress: async () => {
                             console.log('Change Mode');
                             Def.NetWorkMode = false;
