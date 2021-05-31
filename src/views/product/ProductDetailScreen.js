@@ -98,7 +98,7 @@ class ProductDetailScreen extends React.Component {
 
     approveRepair = (status = 1) => {
         if(Def.user_info) {
-            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.item.id,  'wsh' , Def.user_info['access_token'] ,2, '', null, status);
+            // FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.item.id,  'wsh' , Def.user_info['access_token'] ,2, '', null, status);
         } else  {
             console.log('User info not exits');
         }

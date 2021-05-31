@@ -26,6 +26,8 @@ import AutocompleteModal from '../../com/common/AutocompleteModal';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FlatHelper from '../../def/FlatHelper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Net from '../../controller/Net';
+import {OfflineHelper} from '../../def/OfflineHelper';
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -65,10 +67,13 @@ class FlatListScreen extends React.Component {
         this.displayImageLoaded = this.displayImageLoaded.bind(this);
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
+        this.removeOfflineItem = this.removeOfflineItem.bind(this);
+        this.resetOfflineFlat = this.resetOfflineFlat.bind(this);
+        this.forcusFunction = this.forcusFunction.bind(this);
 
         let title = "Căn hộ bàn giao";
         this.state = {
-            data: Def.flat_data,
+            data: Def.NetWorkMode ?  Def.flat_data : [],
             title: title,
             stateCount: 0.0,
             isRefresh : false,
@@ -116,7 +121,9 @@ class FlatListScreen extends React.Component {
     loadNextPage = (pageIndex) => {
         console.log('Load next page');
         if(this.state.pageIndex > this.state.totalPage){
-            FlatController.getFlat(this.onLoadNextPageSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
+            if(Def.NetWorkMode){
+                FlatController.getFlat(this.onLoadNextPageSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
+            }
         }
     }
 
@@ -172,7 +179,8 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
-        this.setState({ stateCount: Math.random() , data : Def.flat_data });
+        console.log('Refresh ' + OfflineHelper.offlineFlatDataArr.length  );
+        this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
     }
 
     searchButtonClick = () => {
@@ -183,7 +191,8 @@ class FlatListScreen extends React.Component {
     filterDataByCondition = () => {
         this.criteria['name'] = this.state.name;
        console.log('Run Filter Criteria : ' + JSON.stringify(this.criteria));
-       let dataFilter =  Def.flat_data.filter(this.filterFunc);
+       let allData = Def.NetWorkMode ? Def.flat_data : OfflineHelper.offlineFlatDataArr;
+       let dataFilter =  allData.filter(this.filterFunc);
        console.log('Filter-Data : ' + dataFilter.length);
        this.setState({data:dataFilter});
     }
@@ -228,10 +237,14 @@ class FlatListScreen extends React.Component {
     }
 
     onRefresh = () => {
-        this.setState({isRefresh:true, pageIndex:0});
         this.resetCriteria();
         if(Def.user_info){
-            FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+            if (Def.NetWorkMode){
+                this.setState({isRefresh:true, pageIndex:0});
+                FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+            }else {
+                Net.showNetworkMsg();
+            }
         }
     };
 
@@ -276,7 +289,11 @@ class FlatListScreen extends React.Component {
     choseBuildingClick = ()=> {
         console.log('Chose Building Click');
         if(!Def.buildingData && Def.buildingData.length < 1 ){
-            FlatController.getbuilding(this.getBuildingSuccess, this.getFilterDataFalse);
+            if (Def.NetWorkMode){
+                FlatController.getbuilding(this.getBuildingSuccess, this.getFilterDataFalse);
+            }else {
+                Net.showNetworkMsg();
+            }
         } else {
             this.showModal(Def.buildingData, 'Chọn Dự án', CHOSE_BUILDING);
         }
@@ -332,12 +349,62 @@ class FlatListScreen extends React.Component {
 
     }
 
+    removeOfflineItem = (item)=> {
+        Alert.alert(
+            "Xóa dữ liệu offline căn hộ " + item.code,
+            "Dữ liệu lưu trữ và tương tác offline sẽ bị xóa",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => {
+                        OfflineHelper.removeOfflineFlat(item);
+                        this.refresh();
+                    },
+                    style: 'Cancel',
+                },
+                {
+                    text: "Cancel",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+
+    }
+
+    resetOfflineFlat = (item) => {
+        Alert.alert(
+            "Xóa dữ liệu tương tác offline căn hộ " + item.code,
+            "Dữ liệu tương tác offline sẽ bị xóa",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => {
+                        OfflineHelper.resetChangeFlat(item);
+                        this.refresh();
+                    },
+                    style: 'Cancel',
+                },
+                {
+                    text: "Cancel",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+
+    }
+
 
 
     choseCustomerClick = ()=> {
         console.log('Chose Customer Click');
         if(!Def.customerData || Def.customerData.length < 1){
-            FlatController.getCustomer(this.getCustomerSuccess, this.getFilterDataFalse);
+            if(Def.NetWorkMode) {
+                FlatController.getCustomer(this.getCustomerSuccess, this.getFilterDataFalse);
+            } else {
+                Net.showNetworkMsg();
+            }
         } else {
             this.showModal(Def.customerData, 'Chọn Chủ sở hữu', CHOSE_CUSTOMER);
         }
@@ -372,7 +439,38 @@ class FlatListScreen extends React.Component {
         this.setState(state)
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        console.log('Flat list component did mount');
+        let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
+        OfflineHelper.offlineFlatData = JSON.parse( await  AsyncStorage.getItem('offlineFlatData'));
+        OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
+        if(!Def.user_info)
+            Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
+        Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
+        if(!Def.NetWorkMode) {
+            if(!OfflineHelper.offlineFlatDataArr || OfflineHelper.offlineFlatDataArr.length == 0){
+
+                if (!OfflineHelper.offlineFlatData && ( !OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({}))) {
+                    console.log('get data from storage');
+                    if(!Def.user_info)
+                        Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
+                    OfflineHelper.offlineFlatData = JSON.parse(await AsyncStorage.getItem('offlineFlatData'));
+                }
+                console.log('rewrite offlineFlatDataArr');
+                OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+            }
+            console.log('reload data');
+            OfflineHelper.offlineFlatDataArr.forEach(item=> console.log(item['update']));
+
+            this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh:false});
+
+            // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
+            //
+            // console.log('App Mode2' + JSON.stringify(OfflineHelper.offlineFlatData));
+            // OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+            // console.log('offlineFlatDataArr' + OfflineHelper.offlineFlatDataArr.length);
+            // this.setState({data: OfflineHelper.offlineFlatDataArr});
+        } else
         if(Def.refresh_flat_data || Def.flat_data.length == 0){
             if (Def.flat_data.length > 0 && Def.flat_data) {
                 this.setState({data:Def.flat_data});
@@ -405,7 +503,23 @@ class FlatListScreen extends React.Component {
             }
             Def.refresh_flat_data = false;
         }
+        let navigation =  this.props.navigation ? this.props.navigation : Def.mainNavigate ;
+
+        if(navigation){
+            console.log('Isset Navigation : ' + JSON.stringify(navigation));
+            this.focusListener = navigation.addListener("focus", this.forcusFunction);
+        }
     }
+
+    componentWillUnmount() {
+        if(this.hasOwnProperty('focusListener')){
+            // this.focusListener.remove();
+        }
+    }
+
+    forcusFunction = () => {
+        this.refresh();
+    };
 
     displayImageLoaded = (res) => {
        let path = Def.remoteVersion(res.path());
@@ -613,6 +727,11 @@ class FlatListScreen extends React.Component {
                     refreshControl={
                         <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
                     }
+                    itemHandleFunc={{
+                        removeOfflineItem: this.removeOfflineItem,
+                        resetOfflineFlat: this.resetOfflineFlat,
+                    }}
+
                     type={'flat'}
                     numColumns={1}
                     screen={'flat-detail'}

@@ -1,8 +1,10 @@
 import React from 'react'
-import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image} from 'react-native'
+import {Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, Alert} from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome5';
+
+import RNRestart from 'react-native-restart';
 
 
 import Style from '../../def/Style';
@@ -28,6 +30,7 @@ class SettingScreen extends React.Component {
         this.signInBtnClick = this.signInBtnClick.bind(this);
         this.refreshData = this.refreshData.bind(this);
         this.resetData = this.resetData.bind(this);
+        this.resetInteractData = this.resetInteractData.bind(this);
 
     }
     componentDicMount(){
@@ -49,9 +52,73 @@ class SettingScreen extends React.Component {
         this.props.navigation.navigate('Login', {'screen': 'signIn'});
     }
 
-    resetData = ()=> {
-        OfflineHelper.resetLocalData();
+    restartApp = () => {
+        Alert.alert(
+            "Thông báo",
+            "Bạn chắc chắn muốn khởi động lại ứng dụng",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => {
+                        RNRestart.restart();
+                    },
+                    style: 'Cancel',
+                },
+                {
+                    text: "Cancel",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+
     }
+
+    resetData = ()=> {
+        Alert.alert(
+            "Xóa dữ liệu offline căn hộ ",
+            "Dữ liệu lưu trữ và tương tác offline sẽ bị xóa",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => {
+                        OfflineHelper.resetLocalData();
+                        OfflineHelper.resetInteractOfflineData();
+                    },
+                    style: 'Cancel',
+                },
+                {
+                    text: "Cancel",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+
+    }
+
+    resetInteractData = ()=> {
+        Alert.alert(
+            "Xóa dữ liệu offline căn hộ ",
+            "Dữ liệu tương tác offline sẽ bị xóa",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => {
+                        OfflineHelper.resetInteractOfflineData();
+                    },
+                    style: 'Cancel',
+                },
+                {
+                    text: "Cancel",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+
+    }
+
 
     refreshData = ()=> {
 
@@ -99,6 +166,20 @@ class SettingScreen extends React.Component {
                             </View>
                             <Text style={[Style.text_styles.middleText, {marginLeft :10}]}>
                                 Xóa dữ liệu Offline
+                            </Text>
+                        </View>
+                        <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 10, backgroundColor : '#fff', marginTop:20}}
+                                      onPress={this.resetInteractData}
+                    >
+                        <View style={{flexDirection : 'row', alignItems : 'center'}}>
+                            <View style={{width :30}}>
+                                <Icon name="user-cog" size={25} color={Style.GREY_TEXT_COLOR} />
+                            </View>
+                            <Text style={[Style.text_styles.middleText, {marginLeft :10}]}>
+                                Xóa dữ liệu tương tác Offline
                             </Text>
                         </View>
                         <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />

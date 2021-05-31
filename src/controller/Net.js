@@ -1,4 +1,5 @@
 import Def from '../def/Def';
+import {Alert} from 'react-native';
 /*
   Phục vụ mục đích đăng nhập, đăng ký
 */
@@ -99,6 +100,29 @@ export default class Net{
                 })
                 .catch((error) => { errCallback(error);}) ;
         }
+    }
+
+    static showNetworkMsg= (msg = 'Bạn đang Offline', callBack = null) => {
+        if(!Def.NetWorkMode){
+            Alert.alert(
+                "Thông báo",
+                msg,
+                [
+                    {
+                        text: "Ok",
+                        style: 'cancel',
+                        onPress: () => {
+                            if(callBack){
+                                callBack();
+                            }
+                        },
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+        return Def.NetWorkMode;
+
     }
 
 

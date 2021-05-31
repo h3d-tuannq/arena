@@ -2,6 +2,7 @@ import React from 'react'
 import {View, Text, StyleSheet, Dimensions, Image, TouchableOpacity} from  'react-native'
 import Def from "../../def/Def";
 import Style from  "../../def/Style"
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const {width, height} = Dimensions.get('window');
 
@@ -15,15 +16,26 @@ class RequestRepairRenderer extends React.PureComponent{
         return (
             <TouchableOpacity style={styles.comment} onPress={() => {
                 if(item.image_path){
-                    this.props.click(item)
+                    // this.props.click(item)
                 }
             }}>
                 <View style={styles.content}>
+                    {
+                        item['offlineMode'] == 1?
+                            <Icon color={Style.DEFAUT_RED_COLOR}
+                                  name="wifi"
+                                  size={10}
+                                  style={{ position : 'absolute', right : 2, top: 3, borderRadius: 5}}
+                                  // style={[styles.favoriteIcon, {width:10, height:10, backgroundColor : '#FFAE00', position : 'absolute', right : 2, top: 3, borderRadius: 5}]}
+                            >
+                            </Icon> : null
+
+                    }
 
                     <View style={styles.infoContainer}>
                         <View style={{flexDirection:'row', justifyContent: 'space-between', paddingHorizontal:5 , width : width -30}}>
                             <Text style={styles.author}>
-                                {item.reporter ? item.reporter.username :  item.reporter_id}
+                                {item.reporter ? item.reporter.username :  item.offlineItem == 1 ? Def.user_info.username: item.reporter_id}
                             </Text>
                             <View style={styles.date}>
                             <Text style={{fontSize: Style.SMALL_SIZE, color: Style.GREY_TEXT_COLOR}}>{Def.getDateString(new Date(item.status == 1 ?  item.completed_repair *1000 : item.date * 1000), "dd-MM-yyyy hh:mm")}
@@ -42,8 +54,9 @@ class RequestRepairRenderer extends React.PureComponent{
 
                 <View style={styles.imageContainer}>
                     {
-                        item.image_path ?
-                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(item, Def.OFFLINE_PRIORITY, Def.REQUESTREPAIRTYPE)}}  />
+                        item.image_path ?(
+                            <Image  style={[styles.itemImage ]}  source={{uri:  item.offlineItem == 1 ? item.image_path : Def.getObjImage(item, Def.OFFLINE_PRIORITY, Def.REQUESTREPAIRTYPE)}}  />
+                            )
                             : null
                     }
                 </View>

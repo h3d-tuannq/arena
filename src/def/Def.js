@@ -10,13 +10,14 @@ export default class Def {
     static URL_DEFAULT_AVATAR = "https://cdn-content1.house3d.com/uploads/2019/07/02/5d1aa12048236.jpg";
     static LIFE_STYLE_BASE = "https://lifestylevietnamonline.com";
     static LIFE_STYLE_BASE_ASSET = "https://arenaadmin.house3d.com/data/acceptanceData/";
-
-
     static ARENA_BASE = "https://arena.house3d.com";
-
     static PARTNER_ACTIVE_STATUS = 1;
 
     static DEFAULT_MAX_SIZE = 1024;
+
+    static NetWorkMode = true; // 0 offline, 1 online
+    static NetWorkConnect = true; // 0 offline, 1 online
+    static AppMode = 1; // 0 offline, 1 online
 
     // token nhận được sau khi đăng nhập để gửi lên server lấy token user
     static firebase_token = '';
@@ -98,6 +99,7 @@ export default class Def {
     static OrderListForStatus = [];
 
     static setIsLogin = null;
+    static setLoader = null;
 
     static collection_detail_data = null;
     static collection_detail_menu = null;
@@ -396,9 +398,9 @@ export default class Def {
 
     static createPaymentUrl(orderId){
         console.log('UserInfo: ' + JSON.stringify(Def.user_info));
-        $rsUrl = Def.URL_BASE + '/user/sign-in/login-by-access-token?token=' + Def.user_info['access_token']+'&redirectUrl=' + Def.URL_BASE + '/payment?id=' + orderId;
-        console.log("Payment Url " + $rsUrl);
-        return $rsUrl;
+        let rsUrl = Def.URL_BASE + '/user/sign-in/login-by-access-token?token=' + Def.user_info['access_token']+'&redirectUrl=' + Def.URL_BASE + '/payment?id=' + orderId;
+        console.log("Payment Url " + rsUrl);
+        return rsUrl;
     }
 
     static formatOrderNumber(order_number){
@@ -447,7 +449,7 @@ export default class Def {
         let index = Def.flat_data.findIndex((element) => element.id == flat.id );
         if(index > -1){
             if(flat.status == 7) { // Trong trường hợp căn họ hoàn thành thực hiện remote khỏi mảng
-               Def.flat_data.slice(index,1);
+               Def.flat_data.splice(index,1);
             } else {
                 Def.flat_data[index] = flat;
                 Def.refresh_flat_data = true;
@@ -455,6 +457,8 @@ export default class Def {
         }
         return index> -1;
     }
+
+
 
     static updateProductToFlat(pif){
         let flat = Def.flat_data.findIndex((element) => element.id == pif.flat_id );
@@ -518,5 +522,11 @@ export default class Def {
     static checkTakePhotoImg = (uri) => {
         var n = uri.search("com.arena");
         return n != -1;
+    }
+
+    static async initFunc(){
+        console.log('init function');
+        let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
+        Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
     }
 }

@@ -47,6 +47,17 @@ export default class FlatHelper {
     static REPAIRED_TYPE = 1;
     static REQUEST_TYPE = 0;
 
+    static PIF_ACTIVE_STATUS = 1; // Đạt
+    static PIF_REPAIRED_STATUS = 2 ; // Đã chỉnh sửa
+    static PIF_UNACTIVE_STATUS = 0; // Không đạt
+    static PIF_CANCEL_STATUS  = -1; // Trang thái hủy bỏ ko sử dụng trong hệ thống
+
+    // Loại yêu cầu chỉnh sửa, comment, hoàn thành chỉnh sửa item
+    static STATUS_REQUEST_REPAIR_TYPE = 0; // Yêu cầu chỉnh sửa
+    static STATUS_REPAIRED_TYPE = 1 ; // Đã chỉnh sửa
+    static STATUS_CANCEL_TYPE = -1; // Hủy
+    static STATUS_COMMENT_TYPE = -2; // Yêu cầu chỉnh sửa
+
 
     static PriorityRoles = [FlatHelper.ROLE_ADMINISTRATOR,FlatHelper.ROLE_WSH,FlatHelper.ROLE_QUALITY_ASSURANCE,FlatHelper.ROLE_DEFECT,FlatHelper.ROLE_CSKH,FlatHelper.ROLE_HANDOVER, FlatHelper.ROLE_OWNER];
 

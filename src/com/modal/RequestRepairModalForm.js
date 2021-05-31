@@ -27,6 +27,7 @@ class RequestRepairModalForm extends React.Component {
         switch (props.type) {
             case FlatHelper.COMMENT_TYPE:
                  confirmMsg = 'Bình luận thành công';
+                 title == 'Bình luận';
                  break;
             case FlatHelper.REQUEST_TYPE:
                 confirmMsg = 'Tạo yêu cầu chỉnh sửa thành công';
@@ -65,7 +66,7 @@ class RequestRepairModalForm extends React.Component {
                 };
             }
             let status = this.state.type == FlatHelper.REPAIRED_TYPE ? 2 : (this.state.type == FlatHelper.COMMENT_TYPE  ? 3 :  0);
-            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product.id, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.props.type, this.state.note, img, status);
+            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.props.type, this.state.note, img, status);
         } else  {
             console.log('User info not exits');
         }
@@ -74,7 +75,7 @@ class RequestRepairModalForm extends React.Component {
     changeStatusSuccess = (data) => {
         console.log('Change Status Sucsess ' + JSON.stringify(data));
         if(data['msg'] == "Ok"){
-            console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
+            // console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
             this.props.appendRepairItem(data);
             Alert.alert(
                 "Thông báo",

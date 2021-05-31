@@ -122,6 +122,7 @@ class FlatDetailScreen extends React.Component {
         this.getRepairByFlatFalse = this.getRepairByFlatFalse.bind(this);
         this.getRepairByFlatSuccess = this.getRepairByFlatSuccess.bind(this);
         OfflineHelper.downloadRepariItemInflat = this.downloadFlat.bind(this);
+        this.showDownloadedMsg = this.showDownloadedMsg.bind(this);
     }
     downloadFlat = async () => {
         if (Platform.OS === 'ios') {
@@ -222,6 +223,12 @@ class FlatDetailScreen extends React.Component {
             let imageRepairItems = flatRepairItems.filter((item) => {
                 return item &&  item['image_path'] != null && item['image_path'].length != '';
             });
+
+            if(imageRepairItems.length == 0){ // Trong trường hợp không phải clone dữ liệu sẽ thực hiện gán downloaded == 1
+                OfflineHelper.offlineFlatData[this.state.item.id]['downloaded'] = 1;
+                this.showDownloadedMsg();
+            }
+
             this.setState({imageRepairItem: imageRepairItems.length});
             console.log('Total download : ' + imageRepairItems.length);
             imageRepairItems.forEach((value, index) => {
@@ -232,6 +239,21 @@ class FlatDetailScreen extends React.Component {
         }
     }
 
+    showDownloadedMsg = ()=> {
+        Alert.alert(
+            "Thông báo",
+            "Dữ liệu căn hộ "+ this.state.item.code + " tải xuống thành công!",
+            [
+                {
+                    text: "Ok",
+                    style: 'Cancel',
+                },
+            ],
+            {cancelable: false},
+        );
+
+    }
+
     downloadRepairInFlatSuccess = (obj,res) => {
         console.log('Download Success');
         obj.offline_img = res.path();
@@ -240,6 +262,7 @@ class FlatDetailScreen extends React.Component {
         this.setState({downloaded: this.downloaded });
         if(this.downloaded + this.downloadFalse >= this.state.imageRepairItem) {
             this.finishDownload();
+            this.showDownloadedMsg();
         }
     }
 
@@ -346,7 +369,13 @@ class FlatDetailScreen extends React.Component {
                 ],
                 {cancelable: false},
             );
-            this.updateFlatStatus(data['flat']);
+            if(data['offlineMode'] == 1){
+                this.updateOfflineFlatStatus(data['flat']);
+            }else {
+                this.updateFlatStatus(data['flat']);
+            }
+
+
         } else {
             Alert.alert(
                 "Thông báo",
@@ -389,6 +418,21 @@ class FlatDetailScreen extends React.Component {
 
         this.closeFunction();
     };
+
+    updateOfflineFlatStatus = (flat) => {
+        if(flat){
+            this.setState({item:flat, deadlineCompleted: null, canSaveDeadline : false});
+            if(OfflineHelper.offlineFlatDataArr) { // Update dữ liệu căn họ offline
+                let updated = OfflineHelper.updateOfflineFlat(flat);
+                if(updated){
+                    Def.refresh_flat_data = true;
+                    if (Def.refeshFlatList){
+                        Def.refeshFlatList();
+                    }
+                }
+            }
+        }
+    }
 
     closeFunction = () => {
         if(this.state.type == decline_deliver_form) {
@@ -469,7 +513,16 @@ class FlatDetailScreen extends React.Component {
     forcusFunction = () => {
         console.log('Forcus function');
         if(Def.user_info){
-            FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+            if(Def.NetWorkMode){
+                FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+            } else {
+                // thực hiện lấy dữ liệu từ hệ thống offline
+                let offlineFlat = OfflineHelper.getOfflineFlatById(this.state.item.id);
+                if(offlineFlat){
+                    this.updateFlatStatus(offlineFlat);
+                }
+            }
+
         }
     };
 
@@ -649,7 +702,7 @@ class FlatDetailScreen extends React.Component {
                     <View style={{paddingHorizontal:10, paddingBottom:8 , flexDirection:'row', justifyContent:'space-between'}}>
 
                         <Text style={styles.titleStyle}>{"Hạng mục bàn giao"}</Text>
-                        <Text style={styles.titleStyle}>{(this.state.passProduct +"/" +this.state.totalProduct )}</Text>
+                        <Text style={styles.titleStyle}>{FlatHelper.calPassPifStr(this.state.item)}</Text>
                     </View>
                 {/*</View>*/}
             </View>

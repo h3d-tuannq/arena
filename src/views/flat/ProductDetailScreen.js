@@ -14,6 +14,7 @@ import RequestRepairModalForm from "../../com/modal/RequestRepairModalForm";
 import FlatHelper from "../../def/FlatHelper";
 import Def from "../../def/Def";
 import FullImageModal from  '../../../src/com/modal/FullImageModal'
+import {OfflineHelper} from '../../def/OfflineHelper';
 
 
 const PROGRAM_IMAGE_WIDTH = (width - 30-8) /2;
@@ -22,6 +23,7 @@ const PROGRAM_IMAGE_HEIGHT = (width - 30-8) /2;
 
 
 class ProductDetailScreen extends React.Component {
+    currentStatus = 0;
 
     constructor(props){
         super(props);
@@ -42,12 +44,14 @@ class ProductDetailScreen extends React.Component {
         Def.product_detail_data = this.props.route.params.item;
         let item = this.props.route.params.item;
 
+        console.log(OfflineHelper.offlineRequestTree.hasOwnProperty(item.id))
 
         this.state = {
             stateCount: 0.0,
             item:this.props.route.params.item,
             activeSlide:0,
-            requestRepairs: Def.requestRepairsTree[item.id] ? Def.requestRepairsTree[item.id] : [],
+            requestRepairs: Def.NetWorkMode ? ( Def.requestRepairsTree.hasOwnProperty(item.id) ? Def.requestRepairsTree[item.id] : [] )
+                : (OfflineHelper.offlineRequestTree.hasOwnProperty(item.id) ? OfflineHelper.offlineRequestTree[item.id] : [] ) ,
             displayRequestModal:false,
             requestDetail:null,
             displayRequestForm: false,
@@ -70,7 +74,7 @@ class ProductDetailScreen extends React.Component {
 
     appendRepairItem = (data) => {
         let currentList = this.state.requestRepairs;
-        if(data['requestRepair']){
+        if(data['requestRepair'] && !data['pif']){ // Trong trường hợp offline thì thêm ở mình trường hợp data[pif]
             currentList.push(data['requestRepair']);
         }
         if( data['pif']){
@@ -98,17 +102,36 @@ class ProductDetailScreen extends React.Component {
 
 
     approveRepair = (status = 1) => {
+
         if(Def.user_info) {
-            FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.item.id,  'wsh' , Def.user_info['access_token'] ,2, '', null, status);
+            this.currentStatus = status;
+            // if(Def.NetWorkMode && Def.AppMode){
+                FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.item ,  'wsh' , Def.user_info['access_token'] ,2, '', null, status);
+            // } else {
+                // Thực hiện lưu vào bảng danh sách các request item.
+                // OfflineHelper.changeOfflineRepair(status, this.state.item);
+            // }
         } else  {
             console.log('User info not exits');
         }
 
     };
 
+
+
+
+
     changeStatusSuccess = (data) => {
-        if(data['pif']){
-           this.setState({ item:data['pif']});
+        console.log('Approve Data : ' + JSON.stringify(data));
+        if(data['msg'] == 'Ok'){
+            console.log('Isset PIF');
+            let item = this.state.item;
+            if(data['pif'] && data['pif'] != '') {
+                item = data['pif'];
+            } else {
+                item.status = this.currentStatus;
+            }
+            this.setState({ item:item});
             Alert.alert(
                 "Thông báo",
                 'Cập nhật trạng thái sản phẩm thành công',
@@ -120,6 +143,7 @@ class ProductDetailScreen extends React.Component {
                 ],
                 {cancelable: false},
             );
+
         }
 
     };
@@ -164,13 +188,18 @@ class ProductDetailScreen extends React.Component {
     componentDidMount(){
         let keyId = this.state.item.id + '';
         if(this.state.requestRepairs.length == 0) {
-           if(Def.requestRepairsTree && Def.requestRepairsTree[keyId]) {
-               console.log('Isset on  request Tree');
-               this.setState({requestRepairs:Def.requestRepairsTree[keyId]});
+           if(Def.NetWorkMode) {
+               if(Def.requestRepairsTree && Def.requestRepairsTree[keyId]) {
+                   console.log('Isset on  request Tree');
+                   this.setState({requestRepairs:Def.requestRepairsTree[keyId]});
+               } else {
+                   FlatController.getRequestRepair(this.getRequestRepairSuccess, this.getRequestRepairFalse , this.state.item.id);
+               }
            } else {
-               console.log('Not Isset on  request Tree : ' + keyId);
-               FlatController.getRequestRepair(this.getRequestRepairSuccess, this.getRequestRepairFalse , this.state.item.id);
-               // this.setState({requestRepairs:Def.requestRepairsTree[this.state.item.id]});
+               if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[keyId]) {
+                   console.log('Isset on  request Tree');
+                   this.setState({requestRepairs:OfflineHelper.offlineRequestTree[keyId]});
+               }
            }
         }
     }

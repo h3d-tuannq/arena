@@ -7,9 +7,10 @@
  */
 
 import React from 'react';
-import {Dimensions, StatusBar, PixelRatio, View , Button , TouchableOpacity, Text } from  'react-native';
+import {Dimensions, StatusBar, PixelRatio, View, Button, TouchableOpacity, Text, Alert} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import RNRestart from 'react-native-restart';
 import { createDrawerNavigator,
     DrawerItemList,
     DrawerContentScrollView,
@@ -40,6 +41,87 @@ import FlatStack from './src/FlatStack';
 import ProductStack from './src/ProductStack';
 import DesignStack from './src/DesignStack';
 import SettingStack from './src/SettingStack';
+import NetInfo from "@react-native-community/netinfo";
+
+
+
+
+NetInfo.addEventListener(async networkState => {
+    console.log("Connection type - ", networkState.type);
+    let msg;
+    Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
+    Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
+    if((networkState.isConnected != Def.NetWorkConnect)){
+        await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
+        if(networkState.isConnected) {
+            msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
+            Alert.alert(
+                "Thông báo",
+                msg,
+                [
+                    {   // Chuyển sang trạng thái online
+                        text: "Online",
+                        onPress: async () => {
+                            console.log('Change Mode');
+                            Def.NetWorkMode = networkState.isConnected;
+                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                            if (Def.NetWorkMode == true) {
+                                // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
+                                // Thực hiện đồng bộ trước
+                                // await OfflineHelper.initOfflineMode();
+                                RNRestart.Restart();
+                            } else {
+
+                            }
+
+
+                        },
+                        style: 'cancel',
+                    },
+                    {
+                        text: "Offline",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+        // Trong trường hợp mất mạng
+        else {
+            Alert.alert(
+                "Thông báo",
+                msg,
+                [
+                    {
+                        text: "Offline",
+                        onPress: async () => {
+                            console.log('Change Mode');
+                            Def.NetWorkMode = networkState.isConnected;
+                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                            if (!Def.NetWorkMode) {
+                                await OfflineHelper.initOfflineMode();
+                                RNRestart.Restart();
+                            } else {
+
+                            }
+
+
+                        },
+                        style: 'cancel',
+                    },
+                    {
+                        text: "Cancel",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+
+        }
+});
+
+Def.initFunc();
 
 
 const {width, height} = Dimensions.get('window');
@@ -51,6 +133,7 @@ import LoginStack from "./src/LoginStack";
 import FlatHelper from "./src/def/FlatHelper";
 
 function CustomDrawerContent(props) {
+
     return (
         <View style={{flex: 1}}>
             <View
@@ -99,19 +182,25 @@ function CustomDrawerContent(props) {
                                 }}>
                                 <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng nhập </Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={{
-                                    width: width * 0.35,
-                                    borderRadius: 5,
-                                    paddingVertical: PixelRatio.get() < 2 ? 5 :8,
-                                    backgroundColor: Style.DEFAUT_RED_COLOR,
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    props.navigation.navigate('Login', {screen: 'signUp'});
-                                }}>
-                                <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng ký </Text>
-                            </TouchableOpacity>
+                            {
+                                Def.user_info && Def.NetWorkMode != Def.NetWorkConnect ?
+                                    <TouchableOpacity
+                                        style={{
+                                            width: width * 0.35,
+                                            borderRadius: 5,
+                                            paddingVertical: PixelRatio.get() < 2 ? 5 :8,
+                                            backgroundColor: Style.DEFAUT_BLUE_COLOR,
+                                            alignItems: 'center',
+                                        }}
+                                        onPress={() => {
+
+                                        }}>
+                                        <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> {Def.NetWorkConnect ? 'Online' :'Offline'} </Text>
+                                    </TouchableOpacity> : null
+
+                            }
+
+
                         </View>
                     ) : (
                         <View
@@ -337,10 +426,13 @@ class App extends React.Component {
 
     constructor(props){
         super(props);
+
     }
 
-    componentDidMount(){
-        AsyncStorage.getItem('user_info').then((value) => {
+   async componentDidMount(){
+        let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
+        Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
+        AsyncStorage.getItem('user_info').then(async (value) => {
             if(value){
                 Def.user_info = JSON.parse(value);
                 Def.username = Def.user_info['user_name'];
@@ -359,6 +451,14 @@ class App extends React.Component {
                    }
                 });
 
+                OfflineHelper.offlineFlatData = JSON.parse( await  AsyncStorage.getItem('offlineFlatData'));
+                OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
+                console.log('reload data 1');
+                OfflineHelper.offlineFlatDataArr.forEach(item=> console.log(item['update']));
+                // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
+
+
+
                 AsyncStorage.getItem('offlineFlatData').then(value => {
                     if(value){
                         OfflineHelper.offlineFlatData = JSON.parse(value);
@@ -367,6 +467,21 @@ class App extends React.Component {
                     }
                 });
 
+                // AsyncStorage.getItem('offlineFlatDataArr').then(value => {
+                //     if(value){
+                //         OfflineHelper.offlineFlatDataArr = JSON.parse(value);
+                //         console.log('OfflineHelper.offlineFlatDataArr.length ' + OfflineHelper.offlineFlatDataArr.length);
+                //     }
+                // });
+
+                AsyncStorage.getItem('pifChangeData').then(value => {
+                    if(value){
+                        OfflineHelper.pifChangeData = JSON.parse(value);
+                        // console.log('OfflineHelper.pifChangeData.length ' + JSON.stringify(OfflineHelper.pifChangeData));
+                    } else {
+
+                    }
+                });
 
                 AsyncStorage.getItem('offlineDesignData').then(value => {
                     if(value){
@@ -394,6 +509,12 @@ class App extends React.Component {
                 AsyncStorage.getItem('offlineFlatData').then(value => {
                     if(value){
                         OfflineHelper.offlineFlatData = JSON.parse(value);
+                    }
+                });
+
+                AsyncStorage.getItem('offlineRequestTree').then(value => {
+                    if(value){
+                        OfflineHelper.offlineRequestTree = JSON.parse(value);
                     }
                 });
 

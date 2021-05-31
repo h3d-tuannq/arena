@@ -40,6 +40,7 @@ export default class SignIn extends Component {
         this.loginFalseCallback = this.loginFalseCallback.bind(this);
         Def.setLoader = this.setLoader;
         Def.setIsLogin = this.setLoader;
+        this.loginSuccessCallback = this.loginSuccessCallback.bind(this);
     }
 
     setLoader(isLoging){
@@ -79,8 +80,8 @@ export default class SignIn extends Component {
     }
 
     loginSuccessCallback(data){
-        this.state.isLoging = false;
-        console.log('Login success');
+        this.setState({isLoging : false});
+        console.log('Login success-----------------------------');
     }
 
     loginFalseCallback(data){

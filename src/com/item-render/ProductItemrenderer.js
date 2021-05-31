@@ -8,6 +8,8 @@ import PlusCircleIcon from "../../../assets/icons/Plus circle.svg";
 
 import Def from '../../def/Def'
 import Style from "../../def/Style";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {OfflineHelper} from '../../def/OfflineHelper';
 
 const {width,height} = Dimensions.get('window');
 
@@ -40,8 +42,23 @@ class ProductItemrenderer extends PureComponent{
 
                 {
                     this.props.type == "product" ?
-                    <TouchableOpacity style={[styles.favoriteIcon, {width:10, height:10, backgroundColor : Def.ProductStatusColor[model.status], alignItems : 'center', justifyContent:'center', borderRadius: 5}]}>
-                    </TouchableOpacity> : null
+                         <View style={[styles.favoriteIcon, {width:30, height:10 , alignItems: 'center', justifyContent: 'flex-end', flexDirection:'row'} ]}>
+                             {
+                                 OfflineHelper.checkPifOfflineChange(this.props.item) ?
+                                     <Icon color={Style.DEFAUT_RED_COLOR}
+                                           name="wifi"
+                                           size={10}
+                                           // style={{ position : 'absolute', right : 2, top: 3, borderRadius: 5}}
+                                         // style={[styles.favoriteIcon, {width:10, height:10, backgroundColor : '#FFAE00', position : 'absolute', right : 2, top: 3, borderRadius: 5}]}
+                                     >
+                                     </Icon> : null
+
+                             }
+                            <TouchableOpacity style={[{}, {width:10, height:10 , marginLeft: 3, backgroundColor : Def.ProductStatusColor[model.status], alignItems : 'center', justifyContent:'center', borderRadius: 5}]}>
+                            </TouchableOpacity>
+
+                        </View>
+                     : null
 
                 }
                 {
@@ -84,9 +101,10 @@ const  styles = StyleSheet.create({
         height:20,
         position: 'absolute',
         top:3,
-        right: 3,
+        right: 0,
         zIndex : 10,
         padding : 5,
+
     } ,
     itemImage: {
         width: PROGRAM_IMAGE_HEIGHT -5,

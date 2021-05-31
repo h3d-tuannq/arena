@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Button, TouchableOpacity, RefreshControl} from 'react-native';
+import {Text, View, Button, TouchableOpacity, RefreshControl, Alert} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import FlatListScreen from './views/flat/FlatListScreen';
 import FlatDetailScreen from './views/flat/FlatDetailScreen';
@@ -12,14 +12,12 @@ import Def from './def/Def'
 import FlatHelper from "./def/FlatHelper";
 import {OfflineHelper} from "./def/OfflineHelper";
 
-
-
-
 const RootStack = createStackNavigator();
 
 class FlatStack extends React.Component {
     constructor(props){
         super(props);
+        this.uploadOfflineFlat = this.uploadOfflineFlat.bind(this);
 
     }
 
@@ -31,6 +29,34 @@ class FlatStack extends React.Component {
         if(OfflineHelper.downloadRepariItemInflat){
             OfflineHelper.downloadRepariItemInflat();
         }
+    }
+
+    uploadAllOfflineFlat = () => {
+        Alert.alert(
+            "Thông báo",
+            "Tính năng đồng bộ toàn bộ căn hộ đang phát triển",
+            [
+                {
+                    text: "Ok",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+    }
+
+    uploadOfflineFlat = (flatId) => {
+        Alert.alert(
+            "Thông báo",
+            "Tính năng đồng bộ căn hộ đang phát triển",
+            [
+                {
+                    text: "Ok",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
     }
 
     render() {
@@ -57,6 +83,26 @@ class FlatStack extends React.Component {
                         </TouchableOpacity>
 
                     ),
+
+                    headerRight: !(Def.NetWorkMode == 1 || Def.NetWorkMode == '1') && Def.user_info  ?  () => {
+                        <TouchableOpacity
+                            style=  {
+                                {
+                                    width: Style.DRAWER_MENU_SIZE,
+                                    height: Style.DRAWER_MENU_SIZE,
+                                    justifyContent: 'center',
+                                    paddingRight:5 ,
+                                    alignItems : 'center'
+                                }
+                            }
+                            disabled={OfflineHelper.checkChangeData()}
+                            onPress={() => this.uploadAllOfflineFlat()}>
+                            <Icon name="upload" size={20}
+                                  color={OfflineHelper.checkChangeData() ? "#03fc66" : Style.GREY_BACKGROUND_COLOR } />
+
+                        </TouchableOpacity>
+                        } : null,
+
                     headerStyle: {
                         backgroundColor: Style.DEFAUT_BLUE_COLOR,
                         height: Style.HEADER_HEIGHT,
@@ -80,28 +126,49 @@ class FlatStack extends React.Component {
                     headerTitleStyle: {
 
                     },
-                    headerRight: Def.user_info ?  () => (
+                    headerRight: Def.user_info ?  () => {
+                        return (Def.NetWorkMode == 1 || Def.NetWorkMode == '1' ?
 
-                        <TouchableOpacity
-                            style=  {
-                                {
-                                    width: Style.DRAWER_MENU_SIZE,
-                                    height: Style.DRAWER_MENU_SIZE,
-                                    justifyContent: 'center',
-                                    paddingRight:5 ,
-                                    alignItems : 'center'
-                                }
-                            }
-                            onPress={() => this.downloadFlat(route.params.item.id)}>
-                            <Icon name="download" size={20} color={OfflineHelper.checkOffline(route.params.item, Def.FlatType) ? "#03fc66" : "#fff" } />
-                            {/*<Text style={{color:'#fff'}}>*/}
-                                {/*{route.params.item.id}*/}
-                            {/*</Text>*/}
+                            !OfflineHelper.checkOffline(route.params.item, Def.FlatType)
+                                ?
+                                <TouchableOpacity
+                                    style=  {
+                                        {
+                                            width: Style.DRAWER_MENU_SIZE,
+                                            height: Style.DRAWER_MENU_SIZE,
+                                            justifyContent: 'center',
+                                            paddingRight:5 ,
+                                            alignItems : 'center'
+                                        }
+                                    }
+                                    onPress={() => this.downloadFlat(route.params.item.id)}>
+                                    <Icon name="download" size={20} color={OfflineHelper.checkOffline(route.params.item, Def.FlatType) ? "#03fc66" : "#fff" } />
+                                </TouchableOpacity>
+                                :
+                                OfflineHelper.checkChangeOfflineFlat(route.params.item) ?
+                                    <TouchableOpacity
+                                        style=  {
+                                            {
+                                                width: Style.DRAWER_MENU_SIZE,
+                                                height: Style.DRAWER_MENU_SIZE,
+                                                justifyContent: 'center',
+                                                paddingRight:5 ,
+                                                alignItems : 'center'
+                                            }
+                                        }
+                                        disabled={(route.params.item['update'] == 1 || route.params.item['update'] == '1') || OfflineHelper.checkChangeOfflineFlat(route.params.item)}
+                                        onPress={() => this.uploadOfflineFlat(route.params.item.id)}>
+                                        <Icon name="upload" size={20}
+                                              color={(route.params.item['update'] == 1 || route.params.item['update'] == '1') || OfflineHelper.checkChangeOfflineFlat(route.params.item) ? "#03fc66" : Style.GREY_BACKGROUND_COLOR } />
 
-                        </TouchableOpacity>
+                                    </TouchableOpacity>
+                                    : null
+                            : null
+                            : null)
+                        } : null
 
 
-                    ) : null,
+                    ,
 
                     headerBackImage: ()=> {
                         return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />

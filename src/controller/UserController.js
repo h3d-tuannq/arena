@@ -6,6 +6,7 @@ import AsyncStorage  from '@react-native-async-storage/async-storage'
 import RNRestart from 'react-native-restart';
 
 export default class UserController{
+    loginSuccessFunc = null;
 
     static async  login(email, password ,navigation=null, successCallback, falseCallback) {
 
@@ -15,6 +16,7 @@ export default class UserController{
         }
 
         console.log("Url : " + Def.ARENA_BASE + '/api/user/login' + " Params : " + JSON.stringify(param));
+        UserController.loginSuccessFunc = successCallback;
 
         Net.sendRequest(this.onLoginSuccess,this.onLoginFalse,Def.ARENA_BASE + '/api/user/login' , Def.POST_METHOD , param);
         // if(Def.setLoader)
@@ -100,6 +102,8 @@ export default class UserController{
                 Def.username = data['username'];
                 Def.user_info = data;
                 AsyncStorage.setItem('user_info', JSON.stringify(data));
+                Def.setLoader(false);
+                // UserController.loginSuccessFunc();
 
 
                 // let token = await messaging().getToken();

@@ -2,7 +2,7 @@ import Def from "./Def";
 import RNFetchBlob from "rn-fetch-blob";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
-import {Platform} from 'react-native';
+import {Alert, Platform} from 'react-native';
 
 const PRODUCT_TYPE = 0;
 const DESIGN_TYPE = 1;
@@ -19,6 +19,36 @@ export class OfflineHelper {
     static downloadProductList;
     static downloadDesignList;
     static downloadRepariItemInflat;
+
+    static offlineFlatDataArr = [];
+    static offlineRequestTree = {};
+
+    static flatChangeData={}; // Lưu danh sách thay đổi trong quá trình làm việc offline
+    static requestChangeData=[]; // lưu danh sách request được thêm vào dữ liệu offline.
+    static pifChangeData={}; // Lưu danh sách các PIF thay đổi trong tương tác offline.
+
+
+    static convertObjectTreeToArray(obj){
+        let rs= [];
+        for (const key in obj){
+            rs.push(obj[key]);
+        }
+        return rs;
+    }
+
+    static initOfflineMode = async () => {
+        OfflineHelper.offlineRequestTree = Def.requestRepairsTree;
+        AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
+        if (!OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({})) {
+            if(!Def.user_info)
+                Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
+            OfflineHelper.offlineFlatData = JSON.parse(await AsyncStorage.getItem('offlineFlatData'));
+        }
+        OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+        AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
+    }
+
+
     static updateOfflineRepairItem (repairItem) {
         if(OfflineHelper.offlineRepairData){
             OfflineHelper.offlineRepairData[repairItem.id] = repairItem;
@@ -243,6 +273,19 @@ export class OfflineHelper {
         RNRestart.Restart();
     }
 
+    static resetInteractOfflineData = async ()=> {
+        OfflineHelper.initOfflineMode();
+        OfflineHelper.flatChangeData={};
+        OfflineHelper.requestChangeData=[];
+        OfflineHelper.pifChangeData = {};
+
+        AsyncStorage.setItem('requestChangeData',JSON.stringify(OfflineHelper.requestChangeData));
+        AsyncStorage.setItem('flatChangeData',JSON.stringify(OfflineHelper.flatChangeData));
+        AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+    }
+
+
+
     static checkOffline(obj, type = Def.ProductType) {
         let offlineData, rs = false ;
         switch (type) {
@@ -270,6 +313,205 @@ export class OfflineHelper {
 
         return rs;
     }
+    static changeOfflineRepair = ( item = null, pif = null ) => {
+        console.log('Offline Item Repair : ' + JSON.stringify(item));
+        OfflineHelper.requestChangeData.push(item);
+        AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
+        // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
+        let refFlat = OfflineHelper.offlineFlatData[item.flat_id];
+        refFlat['update'] = 1;
+        if(!OfflineHelper.flatChangeData[refFlat.id]){
+            OfflineHelper.changeOfflineFlat(refFlat);
+        }
+
+
+
+        // console.log('Update Reflat : '+ JSON.stringify(refFlat));
+
+        OfflineHelper.updateOfflineFlat(refFlat, pif);
+    }
+
+    static changeOfflineFlat = (flat) => {
+        OfflineHelper.flatChangeData[flat.id] = flat; // đánh dấu những flat được change
+        AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
+    }
+
+    static checkUpdateFlat = (flat) => {
+        return OfflineHelper.flatChangeData[flat.id] != null;
+    }
+    // cập nhật dữ liệu thay đổi
+    static updateOfflineFlat(flat, pif = null){
+        if(typeof flat == 'number'){
+            let flatIndex = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat );
+            if(flatIndex > -1){
+                flat = OfflineHelper.offlineFlatDataArr[flatIndex];
+            }
+        }
+        if(flat){
+        flat['update'] = 1;
+        if(pif){
+            let indexPif = flat.productInstanceFlat.findIndex(element => element.id == pif.id);
+            if(indexPif > -1){
+                flat.productInstanceFlat[indexPif]= pif;
+            }
+        }
+        // console.log('Flat change' + JSON.stringify(flat));
+            let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+            if(index > -1){
+                if(flat.status == 7) { // Trong trường hợp căn họ hoàn thành thực hiện remote khỏi mảng
+                    // OfflineHelper.offlineFlatDataArr.splice(index,1);
+                } else {
+                    OfflineHelper.offlineFlatDataArr[index] = flat;
+                    Def.refresh_flat_data = true;
+                }
+                AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
+            }
+            return index> -1;
+        }
+        return  false;
+    }
+    static getOfflineFlatById=(flatId)=> {
+        let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flatId );
+        return index > -1 ? OfflineHelper.offlineFlatDataArr[index] : false;
+    }
+    static updateOfflineRequestToFlat(request){
+        let flat = OfflineHelper.getOfflineFlatById(request.flat_id);
+        if(flat && flat['productInstanceFlat'] && flat['productInstanceFlat'][request.product_instance_flat_id] ){
+            let pifs = flat['productInstanceFlat'];
+            let pifIndex = flat['productInstanceFlat'].findIndex((element) => element.product_instance_flat_id == request.product_instance_flat_id);
+            if(pifIndex>0){
+            }
+            let requestRepair = flat['productInstanceFlat'][request.product_instance_flat_id]
+        }
+    }
+
+    static removeOfflineFlat = (flat) => {
+        if(OfflineHelper.offlineFlatData[flat.id]){
+            delete OfflineHelper.offlineFlatData[flat.id];
+            AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
+        }
+        let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+        console.log('Index : ' + index);
+        console.log('offlineFlatDataArr Before : ' + OfflineHelper.offlineFlatDataArr.length);
+        if(index > -1){
+            OfflineHelper.offlineFlatDataArr.splice(index,1);
+            console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
+            AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
+        }
+        // Khi thực hiện xóa căn hộ khỏi danh sách thì thực hiện xóa
+        let pifs = flat.productInstanceFlat;
+        pifs.forEach(pif =>  {
+            OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
+        })
+
+    }
+
+    /*
+        Trong trường hợp xóa dữ liệu thay đổi offline của một chung cư thực hiện bàn giao
+        B1. Thực hiện xóa dữ liệu flat
+        B2. Xóa các yêu cầu chỉnh sửa liên tới flat trong hệ thông
+        B3. Có thể thực hiện xóa ảnh // Optional
+        Chỉ thực hiện refresh không thực hiện xóa đối với căn hộ
+     */
+    static resetChangeFlat = (flat) => {
+        let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+        if(index > -1){
+            let pifs = flat.productInstanceFlat;
+            pifs.forEach(pif =>  {
+                OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
+            })
+            OfflineHelper.offlineFlatDataArr[index] = OfflineHelper.offlineFlatData[flat.id];
+            AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatData));
+            AsyncStorage.setItem('offlineRequestTree', JSON.stringify(OfflineHelper.offlineRequestTree));
+        }
+    }
+
+    static checkPifOfflineChange = (pif) => {
+        let strId = pif.id + '';
+        return OfflineHelper.pifChangeData[pif.id] || OfflineHelper.pifChangeData[strId];
+    }
+    static checkChangeOfflineFlat = (flat) => {
+        let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+        let rs = false;
+        if(index > -1){
+            rs = OfflineHelper.offlineFlatDataArr[index] && OfflineHelper.offlineFlatDataArr[index]['update'] == 1;
+        }
+        return rs;
+    }
+
+    static checkChangeData = () => {
+        return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData.length > 0;
+    }
+
+    static changeAppMode = async () => {
+        let msg;
+        if(Def.NetWorkConnect) {
+            msg = 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!'
+            Alert.alert(
+                "Thông báo",
+                msg,
+                [
+                    {   // Chuyển sang trạng thái online
+                        text: "Online",
+                        onPress: async () => {
+                            console.log('Change Mode');
+                            Def.NetWorkMode = true;
+                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                            if (Def.NetWorkMode == true) {
+                                // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
+                                // Thực hiện đồng bộ trước
+                                // await OfflineHelper.initOfflineMode();
+                                RNRestart.Restart();
+                            } else {
+
+                            }
+
+
+                        },
+                        style: 'cancel',
+                    },
+                    {
+                        text: "Offline",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+        // Chuyen sang che do Offline
+        else {
+            Alert.alert(
+                "Thông báo",
+                msg,
+                [
+                    {
+                        text: "Offline",
+                        onPress: async () => {
+                            console.log('Change Mode');
+                            Def.NetWorkMode = false;
+                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                            if (!Def.NetWorkMode) {
+                                await OfflineHelper.initOfflineMode();
+                                RNRestart.Restart();
+                            } else {
+
+                            }
+
+
+                        },
+                        style: 'cancel',
+                    },
+                    {
+                        text: "Cancel",
+                        style: 'cancel',
+                    }
+                ],
+                {cancelable: false},
+            );
+        }
+
+    }
+
 
 
 

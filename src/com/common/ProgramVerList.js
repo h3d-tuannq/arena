@@ -56,6 +56,7 @@ class ProgramVerList extends React.Component{
                             /> :
                         this.props.type == 'flat'?
                         <FlatItemrenderer
+                        itemHandleFunc={this.props.itemHandleFunc}
                         item ={item} click={this.itemClick} canPlayBack={this.props.canPlayBack}
                         styleImage={{width: PROGRAM_IMAGE_WIDTH, height: PROGRAM_IMAGE_HEIGHT}}
                         type={this.props.type}

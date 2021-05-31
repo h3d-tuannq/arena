@@ -46,6 +46,7 @@ class FlatItemrenderer extends PureComponent{
     render(){
         const model = this.props.item;
         const click = this.props.click;
+        console.log('Update : ' + model['update'])
         //console.log(model);
         const FavoriteItem = ()=> {
             if(this.props.favorite ){
@@ -70,12 +71,19 @@ class FlatItemrenderer extends PureComponent{
                 }
             } >
 
-                <Icon name="download"
-                      size={20}
-                      color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}
-                      style={{position: 'absolute', right : 10, top: width /8}}
+                {/*<Icon name="download"*/}
+                {/*      size={20}*/}
+                {/*      color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}*/}
+                {/*      style={{position: 'absolute', right : 10, top: width /8}}*/}
 
-                />
+                {/*/>*/}
+
+                {/*<Icon name="trash"*/}
+                {/*      size={20}*/}
+                {/*      color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}*/}
+                {/*      style={{position: 'absolute', right : 10, top: width /8 + 40}}*/}
+
+                {/*/>*/}
 
                 <View style={styles.imageContainer}>
                     {model.design && model.design.image_path ?
@@ -145,6 +153,40 @@ class FlatItemrenderer extends PureComponent{
                         </View>
                 </View>
 
+                <View style={{flex:0.2 , justifyContent: 'flex-start', height: width/5}}>
+                    <TouchableOpacity disabled={true}>
+                        <Icon name="download" size={20}
+                            color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}
+                            style={{}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={()=> {
+                            if(this.props.itemHandleFunc && this.props.itemHandleFunc.removeOfflineItem){
+                                console.log('Remote offline item');
+                                this.props.itemHandleFunc.removeOfflineItem(model);
+                            }
+                        }}
+                        style={{width:30, height: 30, marginTop:5, paddingVertical: 10, paddingLeft:5, marginLeft: -5}} >
+                        <Icon name="trash" size={20}
+                              style={{}}/>
+                    </TouchableOpacity>
+                    {
+                        (model['update'] == 1 || model['update'] == '1') || OfflineHelper.checkChangeOfflineFlat(model)?
+                        <TouchableOpacity
+                            onPress={()=> {
+                                if(this.props.itemHandleFunc && this.props.itemHandleFunc.resetOfflineFlat){
+                                    console.log('reset offline flat');
+                                    this.props.itemHandleFunc.resetOfflineFlat(model);
+                                }
+                            }}
+                            style={{width:30, height: 30, marginTop:5, paddingVertical: 10, paddingLeft:5, marginLeft: -5}} >
+                            <Icon name="retweet" size={20}
+                                  style={{}}/>
+                        </TouchableOpacity> : null
+                    }
+
+                </View>
+
 
                 </TouchableOpacity>
 
@@ -170,7 +212,6 @@ const  styles = StyleSheet.create({
 
     imageContainer:{
         flex: 1,
-        // backgroundColor: "red",
         borderRadius :5,
         justifyContent:'center'
     },
@@ -185,7 +226,7 @@ const  styles = StyleSheet.create({
 
     info: {
         marginLeft:5,
-        flex: 2.2,
+        flex: 2.5,
         // justifyContent: 'space-around',
         // paddingVertical: 5,
         // backgroundColor : 'red'
