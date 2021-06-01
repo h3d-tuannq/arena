@@ -419,6 +419,7 @@ export class OfflineHelper {
      */
     static resetChangeFlat = (flat) => {
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+        console.log('Start Reset');
         if(index > -1){
             let pifs = flat.productInstanceFlat;
             pifs.forEach(pif =>  {
@@ -426,6 +427,7 @@ export class OfflineHelper {
             })
             // Trong trường hợp reset thực hiện xóa trong bảng lưu đánh dấu thay đổi flatChangeData
             if(OfflineHelper.flatChangeData && OfflineHelper.flatChangeData[flat.id]){
+                console.log('Reset on flat change');
                 delete OfflineHelper.flatChangeData[flat.id];
                 AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
             } else {
