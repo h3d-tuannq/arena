@@ -460,8 +460,12 @@ class App extends React.Component {
                 });
                 let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
                 OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
-                OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
-                OfflineHelper.flatChangeData = JSON.parse( await  AsyncStorage.getItem('flatChangeData'));
+
+                let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
+                OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr ? JSON.parse( offlineFlatDataArrStr): [];
+
+                let flatChangeStr = await  AsyncStorage.getItem('flatChangeData');
+                OfflineHelper.flatChangeData = flatChangeStr && flatChangeStr !== undefined ? JSON.parse( flatChangeStr) : {};
                 // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
 
 

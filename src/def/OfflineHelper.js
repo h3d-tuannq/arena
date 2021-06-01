@@ -323,7 +323,7 @@ export class OfflineHelper {
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
         let refFlat = OfflineHelper.offlineFlatData[item.flat_id];
         refFlat['update'] = 1;
-        if(!OfflineHelper.flatChangeData[refFlat.id]){
+        if(OfflineHelper.flatChangeData &&  !OfflineHelper.flatChangeData[refFlat.id]){
             OfflineHelper.changeOfflineFlat(refFlat);
         }
 
@@ -335,6 +335,7 @@ export class OfflineHelper {
     }
 
     static changeOfflineFlat = (flat) => {
+        console.log('Set Flat Change Data');
         OfflineHelper.flatChangeData[flat.id] = flat; // đánh dấu những flat được change
         AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
     }
@@ -424,12 +425,14 @@ export class OfflineHelper {
                 OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
             })
             // Trong trường hợp reset thực hiện xóa trong bảng lưu đánh dấu thay đổi flatChangeData
-            if(OfflineHelper.flatChangeData[flat.id]){
+            if(OfflineHelper.flatChangeData && OfflineHelper.flatChangeData[flat.id]){
                 delete OfflineHelper.flatChangeData[flat.id];
                 AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
+            } else {
+                console.log('FlatChange Data : '+ JSON.stringify(OfflineHelper.flatChangeData));
             }
             OfflineHelper.offlineFlatDataArr[index] = OfflineHelper.offlineFlatData[flat.id];
-            AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatData));
+            AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
             AsyncStorage.setItem('offlineRequestTree', JSON.stringify(OfflineHelper.offlineRequestTree));
         }
     }

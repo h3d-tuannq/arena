@@ -442,9 +442,13 @@ class FlatListScreen extends React.Component {
         console.log('Flat list component did mount');
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
         let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
-        OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+        OfflineHelper.offlineFlatData = offlineFlatDataStr && offlineFlatDataStr!== undefined  ?JSON.parse(offlineFlatDataStr) : {};
         let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
-        OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr ? JSON.parse( offlineFlatDataArrStr): [];
+        OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr && offlineFlatDataArrStr !== undefined ? JSON.parse( offlineFlatDataArrStr): [];
+
+        let flatChangeStr = await  AsyncStorage.getItem('flatChangeData');
+        OfflineHelper.flatChangeData = flatChangeStr && flatChangeStr !== undefined ? JSON.parse( flatChangeStr) : {};
+
         console.log('OfflineHelper.offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
         OfflineHelper.offlineFlatDataArr.forEach(item => {
            console.log('Update --' + item['update']);
