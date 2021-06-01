@@ -38,11 +38,14 @@ export class OfflineHelper {
 
     static initOfflineMode = async () => {
         OfflineHelper.offlineRequestTree = Def.requestRepairsTree;
+        OfflineHelper.pifChangeData = {};
+        AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
         AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
         if (!OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({})) {
             if(!Def.user_info)
                 Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
-            OfflineHelper.offlineFlatData = JSON.parse(await AsyncStorage.getItem('offlineFlatData'));
+            let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
+            OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
         }
         OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
         AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
@@ -277,11 +280,11 @@ export class OfflineHelper {
         OfflineHelper.initOfflineMode();
         OfflineHelper.flatChangeData={};
         OfflineHelper.requestChangeData=[];
-        OfflineHelper.pifChangeData = {};
+        // OfflineHelper.pifChangeData = {};
 
         AsyncStorage.setItem('requestChangeData',JSON.stringify(OfflineHelper.requestChangeData));
         AsyncStorage.setItem('flatChangeData',JSON.stringify(OfflineHelper.flatChangeData));
-        AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+        // AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
     }
 
 
@@ -352,6 +355,7 @@ export class OfflineHelper {
         if(pif){
             let indexPif = flat.productInstanceFlat.findIndex(element => element.id == pif.id);
             if(indexPif > -1){
+                console.log('Update PIF in flat');
                 flat.productInstanceFlat[indexPif]= pif;
             }
         }
@@ -419,6 +423,11 @@ export class OfflineHelper {
             pifs.forEach(pif =>  {
                 OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
             })
+            // Trong trường hợp reset thực hiện xóa trong bảng lưu đánh dấu thay đổi flatChangeData
+            if(OfflineHelper.flatChangeData[flat.id]){
+                delete OfflineHelper.flatChangeData[flat.id];
+                AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
+            }
             OfflineHelper.offlineFlatDataArr[index] = OfflineHelper.offlineFlatData[flat.id];
             AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatData));
             AsyncStorage.setItem('offlineRequestTree', JSON.stringify(OfflineHelper.offlineRequestTree));
@@ -438,6 +447,7 @@ export class OfflineHelper {
             }
             return rs;
         }
+        return false;
     }
 
     static checkChangeData = () => {

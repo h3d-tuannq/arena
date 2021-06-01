@@ -46,7 +46,7 @@ class FlatItemrenderer extends PureComponent{
     render(){
         const model = this.props.item;
         const click = this.props.click;
-        //console.log(model);
+        console.log('Update : ' + model['update']);
         const FavoriteItem = ()=> {
             if(this.props.favorite ){
 

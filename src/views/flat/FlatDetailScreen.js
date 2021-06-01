@@ -195,7 +195,9 @@ class FlatDetailScreen extends React.Component {
             console.log('Start download in flat + ' + this.state.item.id);
             this.setState({startDownload: true});
             let offlineItem = this.state.item;
+
             OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
+
             let flatRepairItems = [];
             let productInstances = this.state.item.productInstanceFlat;
             let repairItems, requestRepairs;

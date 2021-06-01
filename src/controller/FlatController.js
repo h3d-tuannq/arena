@@ -1,9 +1,7 @@
-import Def from "../def/Def";
-import {Alert, Platform} from 'react-native'
-import Net from  './Net'
+import Def from '../def/Def';
+import Net from './Net';
 import {OfflineHelper} from '../def/OfflineHelper';
 import FlatHelper from '../def/FlatHelper';
-import Animated from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class FlatController {
@@ -70,7 +68,7 @@ export default class FlatController {
            let repairItem = null;
            if(type == FlatHelper.APPROVE_REPAIR_TYPE){ // Xử lí trường hợp phê duyệt hoặc từ chối của WSH
                pif[status] = status;
-               OfflineHelper.updateOfflineFlat(pif.flat_id);
+               OfflineHelper.updateOfflineFlat(pif.flat_id, pif);
            } else {
                repairItem = {
                    id: (new Date()).getTime(),
@@ -97,17 +95,20 @@ export default class FlatController {
                if(type == FlatHelper.COMMENT_TYPE){
                    repairItem['status'] = FlatHelper.STATUS_COMMENT_TYPE
                }
-               OfflineHelper.changeOfflineRepair(repairItem); // Hàm này đã bao gồm lưu thông tin căn hộ vào trong danh sách thay đổi
+               OfflineHelper.changeOfflineRepair(repairItem, pif); // Hàm này đã bao gồm lưu thông tin căn hộ vào trong danh sách thay đổi
                if(OfflineHelper.offlineRequestTree[pif.id]){
                    console.log('Push repair-item');
                    OfflineHelper.offlineRequestTree[pif.id].push(repairItem);
                }else {
                    OfflineHelper.offlineRequestTree[pif.id] = [repairItem];
                }
-               OfflineHelper.pifChangeData[pif.id] = pif;
-               AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+               // OfflineHelper.pifChangeData[pif.id] = pif;
+               // AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
                AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
            }
+           pif['time'] = (new Date()).getTime();
+           OfflineHelper.pifChangeData[pif.id] = pif;
+           AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
 
            let data = {
              msg:'Ok',
@@ -174,4 +175,92 @@ export default class FlatController {
         let param = {'flat_id' : flat_id, 'token' : token, 'pifs' : pifs};
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/send-repair-report" ,Def.POST_METHOD, param);
     }
+
+
+    static syncOfflineDataToServer(callback, errCallback, token) {
+        if(Def.NetWorkConnect) { // Xử lí trong trường hợp có mạng
+            let param = {
+                'token' : token,
+                'flat_change' : FlatController.getFlatChangeToSending(),
+                'pif_change' : OfflineHelper.getPifToSending() ,
+                'request_repair' : FlatController.getRequestRepairChange()
+            };
+
+            console.log('Sync Param : ' + JSON.stringify(param));
+
+            // Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/sync-offline-data" ,Def.POST_METHOD, param);
+        } else {
+            Net.showNetworkMsg('Mất kết nối mạng, ứng dụng không thể đồng bộ dữ liệu!');
+        }
+    }
+
+    static getFlatChangeToSending = () => {
+        let rs = [];
+        let sendingItem;
+        for (const key in OfflineHelper.flatChangeData) {
+            if(OfflineHelper.flatChangeData[key]) {
+                sendingItem = {
+                    id:OfflineHelper.flatChangeData[key].id,
+                    status:OfflineHelper.flatChangeData[key].status,
+                    highlight_re_schedule: OfflineHelper.flatChangeData[key].highlight_re_schedule,
+                    deadline_date: OfflineHelper.flatChangeData[key].deadline_date,
+                    is_decline: OfflineHelper.flatChangeData[key].is_decline,
+                    decline_note: OfflineHelper.flatChangeData[key].decline_note,
+                    highlight_deadline: OfflineHelper.flatChangeData[key].highlight_deadline,
+                    absentee_hanover: OfflineHelper.flatChangeData[key].absentee_hanover,
+                    offlineSignature: OfflineHelper.flatChangeData[key].offlineSignature
+                };
+                if(OfflineHelper.flatChangeData[key].offlineSignature){
+                    sendingItem.signatureImg = OfflineHelper.flatChangeData[key].offlineSignature.image;
+                    sendingItem.signature_create = OfflineHelper.flatChangeData[key].offlineSignature.create_at;
+                }
+                rs.push(sendingItem);
+            }
+        }
+        return rs;
+    }
+
+    static getPifToSending = () => {
+        let rs = [];
+        let sendingItem;
+        for (const key in OfflineHelper.pifChangeData) {
+            if(OfflineHelper.pifChangeData[key]) {
+                sendingItem = {
+                    pifId: OfflineHelper.pifChangeData[key].id,
+                    status: OfflineHelper.pifChangeData[key].status,
+                    time: pif['time']
+                };
+                rs.push(sendingItem);
+            }
+        }
+        return rs;
+    }
+
+    static getRequestRepairChange = () =>{
+        let rs = [];
+        for (const key in OfflineHelper.pifChangeData) {
+            if(OfflineHelper.offlineRequestTree[key]) {
+                rs = rs.concat(OfflineHelper.offlineRequestTree[key]);
+            }
+        }
+        rs = rs.filter(model => (model['offlineItem'] == 1 || model['offlineItem'] == '1'));
+        let sendingRs = [];
+        rs.forEach(item => {
+            let sendingItem = {
+                id:item.id,
+                product_instance_flat_id: item.product_instance_flat_id,
+                date:item.date,
+                status: item.status,
+                note: item.note,
+                image: item.image,
+            };
+            sendingRs.push(sendingItem);
+        });
+
+        return sendingRs;
+
+    }
+
+
+
 }

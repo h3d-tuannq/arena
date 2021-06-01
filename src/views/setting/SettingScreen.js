@@ -106,6 +106,7 @@ class SettingScreen extends React.Component {
                     text: "Ok",
                     onPress: () => {
                         OfflineHelper.resetInteractOfflineData();
+                        RNRestart.Restart();
                     },
                     style: 'Cancel',
                 },

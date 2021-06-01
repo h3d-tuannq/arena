@@ -32,6 +32,7 @@ import TileIcon from './assets/icons/Tile.svg';
 
 import RuleIcon from './assets/icon/icon-rule.svg';
 import UserController from './src/controller/UserController'
+import FlatController from './src/controller/FlatController'
 
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -69,7 +70,8 @@ NetInfo.addEventListener(async networkState => {
                                 // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
                                 // Thực hiện đồng bộ trước
                                 // await OfflineHelper.initOfflineMode();
-                                RNRestart.Restart();
+                                // FlatController.syncOfflineDataToServer();
+                                // RNRestart.Restart();
                             } else {
 
                             }
@@ -88,6 +90,7 @@ NetInfo.addEventListener(async networkState => {
         }
         // Trong trường hợp mất mạng
         else {
+            msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
             Alert.alert(
                 "Thông báo",
                 msg,
@@ -455,9 +458,10 @@ class App extends React.Component {
                        Def.requestRepairsTree = JSON.parse(value);
                    }
                 });
-
-                OfflineHelper.offlineFlatData = JSON.parse( await  AsyncStorage.getItem('offlineFlatData'));
+                let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
+                OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
                 OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
+                OfflineHelper.flatChangeData = JSON.parse( await  AsyncStorage.getItem('flatChangeData'));
                 // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
 
 
