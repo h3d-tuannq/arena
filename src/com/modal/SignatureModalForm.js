@@ -59,7 +59,6 @@ class SignatureModalForm extends React.Component {
 
 
     changeStatusSuccess = (data) => {
-        console.log('Change Status Sucsess ' + data['msg'] + data['result'] );
         if (data['msg'] == "Ok") {
             this.props.updateFlatStatus(data['flat']);
         } else {
@@ -113,7 +112,7 @@ class SignatureModalForm extends React.Component {
 
     render() {
         return (
-            <View style={{flexDirection: "column", }}>
+            <View style={{flexDirection: "column", height : height, paddingBottom : 10}}>
                 <View style={{height:50,  justifyContent:'flex-start' ,flexDirection:'row', alignItems:'center'}}>
                     <TouchableOpacity style={{paddingHorizontal : 10, paddingVertical:5}} onPress={this.props.closeFunction}>
                         <BackIcon width={25} height={25} />
@@ -148,7 +147,7 @@ class SignatureModalForm extends React.Component {
 
                 {/*</View>*/}
 
-                <View style={{ flexDirection: "row"}}>
+                <View style={{ flexDirection: "row", height : 60}}>
                     <TouchableOpacity style={styles.buttonStyle}
                                         onPress={() => {
                                             this.saveSign()
@@ -172,7 +171,7 @@ class SignatureModalForm extends React.Component {
 const styles = StyleSheet.create({
     signature: {
         width : width - 10,
-        height: height -100,
+        height: height -130,
         borderColor: '#000033',
         borderWidth: 1,
     },

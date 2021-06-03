@@ -498,6 +498,7 @@ class FlatDetailScreen extends React.Component {
         // this.setState({ configMenu: Def.config_news_menu});
         // console.log('SortData ddd:' + JSON.stringify(this.props.route));
         console.log('shouldComponentUpdate - flat');
+        // console.log('Original Change shouldComponentUpdate : ' + (OfflineHelper.offlineFlatData ?  OfflineHelper.offlineFlatData[this.state.item.id]['update'] : ''));
         return true;
     }
 
@@ -514,6 +515,7 @@ class FlatDetailScreen extends React.Component {
 
     forcusFunction = () => {
         console.log('Forcus function');
+
         if(Def.user_info){
             if(Def.NetWorkMode){
                 FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
@@ -523,6 +525,8 @@ class FlatDetailScreen extends React.Component {
                 if(offlineFlat){
                     this.updateFlatStatus(offlineFlat);
                 }
+                // console.log('Original Change0 : ' + (OfflineHelper.offlineFlatData && OfflineHelper.offlineFlatData[this.state.item.id] ?  OfflineHelper.offlineFlatData[this.state.item.id]['update'] : ''));
+
             }
 
         }
@@ -760,7 +764,7 @@ class FlatDetailScreen extends React.Component {
                                         </TouchableOpacity> : null
                                 }
 
-                                {FlatHelper.canSendRequestRepair(this.state.item, Def.user_info) ?
+                                {Def.NetWorkMode && Def.NetWorkConnect && FlatHelper.canSendRequestRepair(this.state.item, Def.user_info) ?
                                     <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
                                                       onPress={this.openSendMailModal}>
                                         <Text style={Style.text_styles.whiteTitleText}>

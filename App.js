@@ -161,7 +161,7 @@ function CustomDrawerContent(props) {
             </View>
             <DrawerContentScrollView {...props}>
                 <View style={{flex: 1}}>
-                    {Def.email == null || Def.email == '' ? (
+                    {Def.NetWorkMode && (Def.email == null || Def.email == '')  ? (
                         <View
                             style={{
                                 flexDirection: 'row',
@@ -211,27 +211,30 @@ function CustomDrawerContent(props) {
                             </View>
                             <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
 
+                                {
+                                    Def.NetWorkMode ?
+                                    <TouchableOpacity
+                                        style={{
+                                            width: width * 0.35,
+                                            borderRadius: 5,
+                                            paddingVertical: PixelRatio.get() < 2 ? 5 :8,
+                                            backgroundColor: 'green',
+                                            alignItems: 'center',
+                                        }}
+                                        onPress={() => {
+                                            // AsyncStorage.removeItem('email');
+                                            // AsyncStorage.removeItem('login_token');
+                                            // AsyncStorage.removeItem('user_info');
+                                            // AsyncStorage.removeItem('username');
+                                            // AsyncStorage.removeItem('firebase_token');
+                                            // AsyncStorage.removeItem('cart_data');
+                                            // RNRestart.Restart();
+                                            UserController.logoutLocal();
+                                        }}>
+                                        <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng xuất </Text>
+                                    </TouchableOpacity> : null
+                                }
 
-                            <TouchableOpacity
-                                style={{
-                                    width: width * 0.35,
-                                    borderRadius: 5,
-                                    paddingVertical: PixelRatio.get() < 2 ? 5 :8,
-                                    backgroundColor: 'green',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    // AsyncStorage.removeItem('email');
-                                    // AsyncStorage.removeItem('login_token');
-                                    // AsyncStorage.removeItem('user_info');
-                                    // AsyncStorage.removeItem('username');
-                                    // AsyncStorage.removeItem('firebase_token');
-                                    // AsyncStorage.removeItem('cart_data');
-                                    // RNRestart.Restart();
-                                    UserController.logoutLocal();
-                                }}>
-                                <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng xuất </Text>
-                            </TouchableOpacity>
 
                             {
                                 ((Def.NetWorkMode != Def.NetWorkConnect) || Def.NetWorkMode) ?
@@ -460,19 +463,21 @@ class App extends React.Component {
                 });
                 let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
                 OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+
                 OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
-                OfflineHelper.flatChangeData = JSON.parse( await  AsyncStorage.getItem('flatChangeData'));
+                let flatChangeDataStr = await  AsyncStorage.getItem('flatChangeData');
+                OfflineHelper.flatChangeData = flatChangeDataStr && flatChangeDataStr != undefined ? JSON.parse( flatChangeDataStr) : {};
                 // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
 
 
 
-                AsyncStorage.getItem('offlineFlatData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineFlatData = JSON.parse(value);
-                    } else {
-
-                    }
-                });
+                // AsyncStorage.getItem('offlineFlatData').then(value => {
+                //     if(value){
+                //         OfflineHelper.offlineFlatData = JSON.parse(value);
+                //     } else {
+                //
+                //     }
+                // });
                 AsyncStorage.getItem('pifChangeData').then(value => {
                     if(value){
                         OfflineHelper.pifChangeData = JSON.parse(value);
@@ -505,11 +510,11 @@ class App extends React.Component {
                     }
                 });
 
-                AsyncStorage.getItem('offlineFlatData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineFlatData = JSON.parse(value);
-                    }
-                });
+                // AsyncStorage.getItem('offlineFlatData').then(value => {
+                //     if(value){
+                //         OfflineHelper.offlineFlatData = JSON.parse(value);
+                //     }
+                // });
 
                 AsyncStorage.getItem('offlineRequestTree').then(value => {
                     if(value){

@@ -54,7 +54,6 @@ class UpdateDeadlineModal extends React.Component {
     };
 
     changeStatusSuccess = (data) => {
-        console.log('Change Status Sucsess ' + JSON.stringify(data));
         if(data['msg'] == "Ok"){
             console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
             this.props.updateFlatStatus(data['flat']);

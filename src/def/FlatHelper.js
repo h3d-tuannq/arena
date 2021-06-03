@@ -260,8 +260,8 @@ export default class FlatHelper {
     }
 
     static calPassPif(flat){
-        let pifs = flat.productInstanceFlat;
-        let activePif = pifs.filter(function (item) {
+        let pifs = flat.productInstanceFlat ? flat.productInstanceFlat : [];
+        let activePif =  pifs.filter(function (item) {
             return item.is_deleted != 1;
         });
         let passPif = activePif.filter(function (activeItem) {

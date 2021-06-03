@@ -179,6 +179,7 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
+        // console.log('OfflineHelper.offlineFlatDataArr ' +  JSON.stringify(OfflineHelper.offlineFlatDataArr));
         this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
     }
 
@@ -377,7 +378,7 @@ class FlatListScreen extends React.Component {
             "Dữ liệu tương tác offline sẽ bị xóa",
             [
                 {
-                    text: "Ok",
+                    text: "Đồng ý",
                     onPress: () => {
                         OfflineHelper.resetChangeFlat(item);
                         this.refresh();

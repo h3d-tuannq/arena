@@ -77,6 +77,7 @@ class ProductDetailScreen extends React.Component {
         if(data['requestRepair'] && !data['pif']){ // Trong trường hợp offline thì thêm ở mình trường hợp data[pif]
             currentList.push(data['requestRepair']);
         }
+
         if( data['pif']){
             this.setState({requestRepairs : currentList, displayRequestForm : false, item:data['pif']});
         } else {
@@ -143,6 +144,16 @@ class ProductDetailScreen extends React.Component {
                 ],
                 {cancelable: false},
             );
+
+
+            if(OfflineHelper.offlineFlatData){
+                console.log('Offline Flat Data : --------------------------------------');
+                for(const key in OfflineHelper.offlineFlatData ){
+                    console.log('Key : '+ OfflineHelper.offlineFlatData[key]['update']  );
+                }
+            }
+
+
 
         }
 

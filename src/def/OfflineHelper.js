@@ -30,8 +30,12 @@ export class OfflineHelper {
 
     static convertObjectTreeToArray(obj){
         let rs= [];
-        for (const key in obj){
-            rs.push(obj[key]);
+        let cloneObj = {... obj};
+        for (const key in cloneObj){
+            let flat = cloneObj[key];
+            let cloneFlat = JSON.parse(JSON.stringify(flat));
+            // Object.assign(cloneFlat, flat);
+            rs.push(cloneFlat);
         }
         return rs;
     }
@@ -47,7 +51,7 @@ export class OfflineHelper {
             let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
             OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
         }
-        OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+        OfflineHelper.offlineFlatDataArr = OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
         AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
     }
 
@@ -317,25 +321,31 @@ export class OfflineHelper {
         return rs;
     }
     static changeOfflineRepair = ( item = null, pif = null ) => {
-        console.log('Offline Item Repair : ' + JSON.stringify(item));
         OfflineHelper.requestChangeData.push(item);
         AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
-        let refFlat = OfflineHelper.offlineFlatData[item.flat_id];
-        refFlat['update'] = 1;
-        if(!OfflineHelper.flatChangeData[refFlat.id]){
-            OfflineHelper.changeOfflineFlat(refFlat);
+        let refFlat =  OfflineHelper.offlineFlatData[item.flat_id];
+        let refFlat2 = {... refFlat};
+
+        refFlat2['update'] = 1;
+        if(OfflineHelper.flatChangeData && !OfflineHelper.flatChangeData[refFlat.id]){
+            OfflineHelper.changeOfflineFlat(refFlat2);
+        } else {
+            console.log('OfflineHelper.flatChangeData : '+ JSON.stringify(OfflineHelper.flatChangeData));
         }
-
-
-
         // console.log('Update Reflat : '+ JSON.stringify(refFlat));
+        OfflineHelper.updateOfflineFlat(refFlat2, pif);
 
-        OfflineHelper.updateOfflineFlat(refFlat, pif);
     }
 
     static changeOfflineFlat = (flat) => {
         OfflineHelper.flatChangeData[flat.id] = flat; // đánh dấu những flat được change
+        OfflineHelper.flatChangeData[flat.id]['update'] = 1;
+        if(OfflineHelper.flatChangeData[flat.id]){
+            console.log('Change Offline Flat Data');
+        } else {
+            console.log('Not exits');
+        }
         AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
     }
 
@@ -350,8 +360,24 @@ export class OfflineHelper {
                 flat = OfflineHelper.offlineFlatDataArr[flatIndex];
             }
         }
+
+
         if(flat){
-        flat['update'] = 1;
+            if(OfflineHelper.offlineFlatData){
+                console.log('Offline Flat Data Before : --------------------------------------');
+                for(const key in OfflineHelper.offlineFlatData ){
+                    console.log('Key : '+ OfflineHelper.offlineFlatData[key]['update']  );
+                }
+            }
+            flat['update'] = 1;
+            if(OfflineHelper.offlineFlatData){
+                console.log('Offline Flat Data After : --------------------------------------');
+                for(const key in OfflineHelper.offlineFlatData ){
+                    console.log('Key : '+ OfflineHelper.offlineFlatData[key]['update']  );
+                }
+            }
+
+
         if(pif){
             let indexPif = flat.productInstanceFlat.findIndex(element => element.id == pif.id);
             if(indexPif > -1){
@@ -395,7 +421,6 @@ export class OfflineHelper {
             AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
         }
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
-        console.log('Index : ' + index);
         if(index > -1){
             OfflineHelper.offlineFlatDataArr.splice(index,1);
             console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
@@ -417,20 +442,29 @@ export class OfflineHelper {
         Chỉ thực hiện refresh không thực hiện xóa đối với căn hộ
      */
     static resetChangeFlat = (flat) => {
+        console.log('Start reset Data : ' + flat.id);
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
         if(index > -1){
             let pifs = flat.productInstanceFlat;
             pifs.forEach(pif =>  {
                 OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
+                if (OfflineHelper.pifChangeData && OfflineHelper.pifChangeData[pif.id]) {
+                   delete OfflineHelper.pifChangeData[pif.id];
+                }
             })
             // Trong trường hợp reset thực hiện xóa trong bảng lưu đánh dấu thay đổi flatChangeData
             if(OfflineHelper.flatChangeData[flat.id]){
                 delete OfflineHelper.flatChangeData[flat.id];
+                console.log('test');
                 AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
+            } else {
+                console.log('Không tồn tại trong bảng flatChangeData ' + JSON.stringify(OfflineHelper.flatChangeData));
             }
+
             OfflineHelper.offlineFlatDataArr[index] = OfflineHelper.offlineFlatData[flat.id];
-            AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatData));
+            AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
             AsyncStorage.setItem('offlineRequestTree', JSON.stringify(OfflineHelper.offlineRequestTree));
+            AsyncStorage.setItem('pifChangeData', JSON.stringify(OfflineHelper.pifChangeData));
         }
     }
 

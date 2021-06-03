@@ -122,7 +122,7 @@ class SettingScreen extends React.Component {
 
 
     refreshData = ()=> {
-
+        RNRestart.Restart();
     }
 
     render() {

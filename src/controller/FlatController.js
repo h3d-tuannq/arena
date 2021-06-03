@@ -82,6 +82,9 @@ export default class FlatController {
                    flat_id:pif.flat_id,
                    pif:pif
                }
+
+
+
                if(type == FlatHelper.REQUEST_TYPE){
                    pif['status'] = FlatHelper.PIF_UNACTIVE_STATUS;
                    repairItem['status'] = FlatHelper.STATUS_REQUEST_REPAIR_TYPE;
@@ -95,9 +98,14 @@ export default class FlatController {
                if(type == FlatHelper.COMMENT_TYPE){
                    repairItem['status'] = FlatHelper.STATUS_COMMENT_TYPE
                }
+
+
+
                OfflineHelper.changeOfflineRepair(repairItem, pif); // Hàm này đã bao gồm lưu thông tin căn hộ vào trong danh sách thay đổi
+
+
+
                if(OfflineHelper.offlineRequestTree[pif.id]){
-                   console.log('Push repair-item');
                    OfflineHelper.offlineRequestTree[pif.id].push(repairItem);
                }else {
                    OfflineHelper.offlineRequestTree[pif.id] = [repairItem];
@@ -109,6 +117,7 @@ export default class FlatController {
            pif['time'] = (new Date()).getTime();
            OfflineHelper.pifChangeData[pif.id] = pif;
            AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+
 
            let data = {
              msg:'Ok',
