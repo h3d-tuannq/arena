@@ -6,7 +6,7 @@ import {Alert} from 'react-native';
 export default class Net{
 
   // jsonData là string json đã được stringify
-    static sendRequest(callback,errCallback,url,method,dataObject = null, contentType = 'application/json; charset=utf-8' )
+    static sendRequest(callback,errCallback,url,method,dataObject = null, contentType = 'application/json; charset=utf-8', imgs = null )
     {
         // console.log(`SENDING: ${JSON.stringify(dataObject)}`);
         // console.log(`TO: ${url}`);
@@ -44,6 +44,17 @@ export default class Net{
                 for (var property in dataObject) {
                     formData.append(property, dataObject[property]);
                 }
+            }
+
+            if(imgs){
+                imgs.forEach((item, i) => {
+                    formData.append("image[]", {
+                        uri: item.uri,
+                        type: item.type,
+                        name: item.name || `filename${i}.jpg`,
+                        repairId: item.repairId
+                    });
+                });
             }
 
             let sendObj = {

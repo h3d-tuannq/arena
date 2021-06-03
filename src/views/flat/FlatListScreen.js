@@ -484,7 +484,8 @@ class FlatListScreen extends React.Component {
                         Def.email = Def.user_info['email'];
 
                         AsyncStorage.getItem('flat_data').then((value) => {
-                            if(value){
+                            JSON.parse(value);
+                            if(value && JSON.parse(value).length > 0 ){
                                 Def.flat_data = JSON.parse(value);
                                 console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
                                 this.setState({data:Def.flat_data, pageIndex : Math.ceil(Def.flat_data.length/Def.pageSize) -1});

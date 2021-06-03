@@ -75,9 +75,6 @@ class RequestRepairModalForm extends React.Component {
     };
 
     changeStatusSuccess = (data) => {
-
-
-
         if(data['msg'] == "Ok"){
             // console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
             this.props.appendRepairItem(data);
@@ -150,6 +147,7 @@ class RequestRepairModalForm extends React.Component {
                             .then(resizedImage => {
                                 console.log("Attr : " + attr);
                                 resizedImage['type'] = response.type;
+                                console.log('resizedImage : '+ JSON.stringify(resizedImage))
                                 this.setState({[attr]: resizedImage});
                             })
                             .catch(err => {

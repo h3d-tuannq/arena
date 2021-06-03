@@ -70,10 +70,11 @@ export default class FlatController {
                pif[status] = status;
                OfflineHelper.updateOfflineFlat(pif.flat_id, pif);
            } else {
+
                repairItem = {
                    id: (new Date()).getTime(),
                    product_instance_flat_id: pif.id,
-                   date: (new Date()).getTime(),
+                   date: Math.ceil((new Date()).getTime()/1000),
                    image_path:image ? image.uri : '',
                    img_info:image,
                    reporter_id:Def.user_info.id,
@@ -81,6 +82,10 @@ export default class FlatController {
                    offlineItem:1,
                    flat_id:pif.flat_id,
                    pif:pif
+               }
+               // Gán Offline Id thực hiện đồng bộ trên server
+               if(repairItem.img_info){
+                   repairItem.img_info['repairId'] = repairItem.id;
                }
 
 
@@ -114,7 +119,7 @@ export default class FlatController {
                // AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
                AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
            }
-           pif['time'] = (new Date()).getTime();
+           pif['time'] = Math.ceil((new Date()).getTime() / 1000);
            OfflineHelper.pifChangeData[pif.id] = pif;
            AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
 
@@ -160,11 +165,12 @@ export default class FlatController {
                 flat['status'] = FlatHelper.SIGNED_STATUS;
                 let offlineSignature = {
                     image:image,
-                    create_at: (new Date()).getTime(),
+                    create_at: Math.ceil((new Date()).getTime()/1000),
                 }
                 flat['offlineSignature'] = offlineSignature;
             }
             flat['update'] = 1;
+            console.log('Flat status : ' + flat['status']);
             let data = {
                 msg: 'Ok',
                 offlineMode: 1,
@@ -189,15 +195,15 @@ export default class FlatController {
     static syncOfflineDataToServer(callback, errCallback, token) {
         if(Def.NetWorkConnect) { // Xử lí trong trường hợp có mạng
             let param = {
-                'token' : token,
-                'flat_change' : FlatController.getFlatChangeToSending(),
-                'pif_change' : OfflineHelper.getPifToSending() ,
-                'request_repair' : FlatController.getRequestRepairChange()
+                'token' : Def.user_info['access_token'],
+                'flat_change' : JSON.stringify(FlatController.getFlatChangeToSending()),
+                'pif_change' : JSON.stringify(FlatController.getPifToSending()) ,
+                'request_repair' : JSON.stringify(FlatController.getRequestRepairChange()),
             };
 
             console.log('Sync Param : ' + JSON.stringify(param));
 
-            // Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/sync-offline-data" ,Def.POST_METHOD, param);
+            Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/sync-offline-data" ,Def.POST_METHOD, param, 'application/json; charset=utf-8', FlatController.repairImg);
         } else {
             Net.showNetworkMsg('Mất kết nối mạng, ứng dụng không thể đồng bộ dữ liệu!');
         }
@@ -220,8 +226,8 @@ export default class FlatController {
                     offlineSignature: OfflineHelper.flatChangeData[key].offlineSignature
                 };
                 if(OfflineHelper.flatChangeData[key].offlineSignature){
-                    sendingItem.signatureImg = OfflineHelper.flatChangeData[key].offlineSignature.image;
-                    sendingItem.signature_create = OfflineHelper.flatChangeData[key].offlineSignature.create_at;
+                    sendingItem.image_data = OfflineHelper.flatChangeData[key].offlineSignature.image;
+                    sendingItem.create_at = Math.ceil(OfflineHelper.flatChangeData[key].offlineSignature.create_at/1000);
                 }
                 rs.push(sendingItem);
             }
@@ -237,13 +243,15 @@ export default class FlatController {
                 sendingItem = {
                     pifId: OfflineHelper.pifChangeData[key].id,
                     status: OfflineHelper.pifChangeData[key].status,
-                    time: pif['time']
+                    time: OfflineHelper.pifChangeData[key]['time']
                 };
                 rs.push(sendingItem);
             }
         }
         return rs;
     }
+
+    static repairImg = [];
 
     static getRequestRepairChange = () =>{
         let rs = [];
@@ -261,8 +269,11 @@ export default class FlatController {
                 date:item.date,
                 status: item.status,
                 note: item.note,
-                image: item.image,
+                image: item.img_info,
             };
+            if(item.img_info){
+                FlatController.repairImg.push(item.img_info);
+            }
             sendingRs.push(sendingItem);
         });
 

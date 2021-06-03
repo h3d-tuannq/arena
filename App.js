@@ -70,7 +70,7 @@ NetInfo.addEventListener(async networkState => {
                                 // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
                                 // Thực hiện đồng bộ trước
                                 // await OfflineHelper.initOfflineMode();
-                                // FlatController.syncOfflineDataToServer();
+                                //  FlatController.syncOfflineDataToServer();
                                 // RNRestart.Restart();
                             } else {
 
