@@ -12,7 +12,7 @@ import {
     RefreshControl,
     TextInput,
     Modal,
-    Alert, Platform, PermissionsAndroid,
+    Alert, Platform, PermissionsAndroid, ActivityIndicator,
 } from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
@@ -36,6 +36,14 @@ const CHOSE_DELIVER_DATE = 3;
 
 
 const ITEM_HEIGHT = 38;
+const LoadingModal = (props) => (
+    <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
+        <View style={{ justifyContent : 'center', alignItems:'center', flex: 1 }}>
+            <ActivityIndicator size="large" color="#0c5890"/>
+        </View>
+    </Modal>
+)
+
 
 
 class FlatListScreen extends React.Component {
@@ -91,6 +99,7 @@ class FlatListScreen extends React.Component {
             displaySelectDate: false,
             pageIndex:0,
             totalPage:0,
+            isLoading:false,
 
         };
 

@@ -42,7 +42,7 @@ export class OfflineHelper {
     }
 
     static initOfflineMode = async () => {
-        OfflineHelper.offlineRequestTree = Def.requestRepairsTree;
+        OfflineHelper.offlineRequestTree = {... Def.requestRepairsTree};
         OfflineHelper.pifChangeData = {};
         AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
         AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
@@ -474,6 +474,9 @@ export class OfflineHelper {
 
     static syncSuccessCallback = (data) => {
         console.log('SyncSuccessCallback : ' + JSON.stringify(data));
+        if(Def.setLoading){
+            Def.setLoading(false);
+        }
         if(data['result'] == 1){
             Alert.alert(
                 "Thông báo",
@@ -518,6 +521,9 @@ export class OfflineHelper {
     }
 
     static syncFalseCallback = (data) => {
+        if(Def.setLoading){
+            Def.setLoading(false);
+        }
         console.log('SyncFalseCallback : ' + JSON.stringify(data));
     }
 
@@ -536,6 +542,9 @@ export class OfflineHelper {
                             console.log('Change  Mode Dữ liệu thay đổi');
                             Def.NetWorkMode = true;
                             await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0');
+                            if(Def.setLoading){
+                                Def.setLoading(true);
+                            }
                             FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
                         },
                         style: 'cancel',

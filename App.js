@@ -7,7 +7,18 @@
  */
 
 import React from 'react';
-import {Dimensions, StatusBar, PixelRatio, View, Button, TouchableOpacity, Text, Alert} from 'react-native';
+import {
+    Dimensions,
+    StatusBar,
+    PixelRatio,
+    View,
+    Button,
+    TouchableOpacity,
+    Text,
+    Alert,
+    Modal,
+    ActivityIndicator
+} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RNRestart from 'react-native-restart';
@@ -432,12 +443,28 @@ function OfflineTab() {
     );
 }
 
+const LoadingModal = (props) => (
+        <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
+            <View style={{ justifyContent : 'center', alignItems:'center', flex: 1 }}>
+                <ActivityIndicator size="large" color="#0c5890"/>
+            </View>
+        </Modal>
+    )
+
+
 
 class App extends React.Component {
 
     constructor(props){
         super(props);
+        this.state={'isLoading' : false};
+        this.setLoading = this.setLoading.bind(this);
+        Def.setLoading = this.setLoading;
 
+    }
+
+    setLoading = (value) => {
+        this.setState({isLoading:value});
     }
 
    async componentDidMount(){
@@ -542,6 +569,7 @@ class App extends React.Component {
         return (
             <NavigationContainer>
                 <AppDrawer/>
+                <LoadingModal visible={this.state.isLoading}/>
             </NavigationContainer>
         );
     }

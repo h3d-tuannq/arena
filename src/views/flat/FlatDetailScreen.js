@@ -12,7 +12,7 @@ import {
     TouchableWithoutFeedback,
     Modal,
     Alert,
-    RefreshControl, PermissionsAndroid, Platform
+    RefreshControl, PermissionsAndroid, Platform, ActivityIndicator
 } from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
@@ -57,6 +57,14 @@ const signature_form = 2;
 const sendmail_form = 3;
 const update_deadline_form = 4;
 
+const LoadingModal = (props) => (
+    <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
+        <View style={{ justifyContent : 'center', alignItems:'center', flex: 1 }}>
+            <ActivityIndicator size="large" color="#0c5890"/>
+        </View>
+    </Modal>
+)
+
 
 class FlatDetailScreen extends React.Component {
 
@@ -98,6 +106,7 @@ class FlatDetailScreen extends React.Component {
             downloaded : false,
             startDownload : false,
             imageRepairItem : 0,
+            isLoading: false,
 
 
         };
@@ -155,6 +164,7 @@ class FlatDetailScreen extends React.Component {
 
     downloadRepairInFlat = () => {
         if(Def.user_info){
+            this.setState({isLoading:true});
             FlatController.getRequestRepairByFlat(this.getRepairByFlatSuccess, this.getRepairByFlatFalse, this.state.item.id);
         }
 
@@ -228,6 +238,7 @@ class FlatDetailScreen extends React.Component {
 
             if(imageRepairItems.length == 0){ // Trong trường hợp không phải clone dữ liệu sẽ thực hiện gán downloaded == 1
                 OfflineHelper.offlineFlatData[this.state.item.id]['downloaded'] = 1;
+                this.setState({ isLoading:false });
                 this.showDownloadedMsg();
             }
 
@@ -261,8 +272,9 @@ class FlatDetailScreen extends React.Component {
         obj.offline_img = res.path();
         OfflineHelper.updateOfflineRepairItem(obj);
         this.downloaded = this.downloaded + 1;
-        this.setState({downloaded: this.downloaded });
+        this.setState({downloaded: this.downloaded, isLoading:false });
         if(this.downloaded + this.downloadFalse >= this.state.imageRepairItem) {
+            this.setState({ isLoading:false });
             this.finishDownload();
             this.showDownloadedMsg();
         }
@@ -300,7 +312,7 @@ class FlatDetailScreen extends React.Component {
     }
 
     onGetFlatDetailSuccess(data){
-        this.setState({isRefresh:false});
+        this.setState({isRefresh:false, isLoading:false });
         if(data['result'] == 1){
             this.updateFlatStatus(data['flat']);
         } else {
@@ -318,7 +330,7 @@ class FlatDetailScreen extends React.Component {
         }
     }
     onGetDesignFalse(data){
-        this.setState({isRefresh:false});
+        this.setState({isRefresh:false, isLoading:false});
         console.log("false data : " + data);
     }
 
@@ -518,6 +530,7 @@ class FlatDetailScreen extends React.Component {
 
         if(Def.user_info){
             if(Def.NetWorkMode){
+                this.setState({isLoading:true})
                 FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
             } else {
                 // thực hiện lấy dữ liệu từ hệ thống offline
@@ -550,6 +563,7 @@ class FlatDetailScreen extends React.Component {
         Def.order_number = 20;
         const ListHeader = () => (
             <View>
+                <LoadingModal visible={this.state.isLoading}/>
                 <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
                         {item.design && item.design.image_path ?

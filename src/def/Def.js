@@ -81,6 +81,8 @@ export default class Def {
     static design_cate = null;
     static product_data = [];
     static cart_data = [];
+    static setLoading = null;
+
 
     static requestRepairtFlat ={} ;
 
