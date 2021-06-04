@@ -170,7 +170,7 @@ class FlatListScreen extends React.Component {
         if(Def.criteria){
             design_list =  Def.flat_data.filter(this.filterFunc);
         }
-        this.setState({data:design_list, isRefresh:false, pageIndex:newPageIndex, totalPage: data['totalCount']});
+        this.setState({data:design_list, isRefresh:false, isLoading:false,pageIndex:newPageIndex, totalPage: data['totalCount']});
     }
 
 
@@ -263,7 +263,7 @@ class FlatListScreen extends React.Component {
     }
     onGetFlatFalse(data){
         console.log("false data : " + data);
-        this.setState({isRefresh:false});
+        this.setState({isRefresh:false, isLoading:false});
     }
 
     formatText(text){
@@ -499,6 +499,7 @@ class FlatListScreen extends React.Component {
                                 console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
                                 this.setState({data:Def.flat_data, pageIndex : Math.ceil(Def.flat_data.length/Def.pageSize) -1});
                             } else {
+                                this.setState({isLoading:true});
                                 FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
                             }
 
@@ -615,6 +616,7 @@ class FlatListScreen extends React.Component {
 
 
             <View style={{flex:1, paddingTop:5}}>
+                <LoadingModal visible={this.state.isLoading}/>
                 <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>
                     <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', height:ITEM_HEIGHT,justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseStatusClick}

@@ -58,7 +58,7 @@ class DesignStack extends React.Component {
                         backgroundColor: Style.DEFAUT_BLUE_COLOR,
                         height: Style.HEADER_HEIGHT,
                     },
-                    headerRight: true ?  () => (
+                    headerRight: Def.NetWorkMode && Def.NetWorkConnect ?  () => (
 
                         <TouchableOpacity
                             style=  {

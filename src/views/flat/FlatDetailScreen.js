@@ -844,7 +844,7 @@ class FlatDetailScreen extends React.Component {
                                         <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
                                                           onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.REPAIR_AFTER_SIGN_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
-                                                Yêu cầu sửa
+                                                Theo dõi
                                             </Text>
                                         </TouchableOpacity> : null
                                 }

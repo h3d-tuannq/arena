@@ -10,6 +10,8 @@ import FavoriteIconSelect from "../../../assets/icon/icon-like.svg";
 import Def from '../../def/Def'
 import Style from "../../def/Style";
 import FlatHelper from "../../def/FlatHelper";
+import Icon from "react-native-vector-icons/FontAwesome";
+import {OfflineHelper} from "../../def/OfflineHelper";
 
 class DesignItemrenderer extends PureComponent{
     state = {
@@ -83,6 +85,16 @@ class DesignItemrenderer extends PureComponent{
                                     {model.model+""}
                                 </Text>
                             </View>
+                            {
+                                OfflineHelper.checkOffline(model, Def.DesignType) ?
+                                    <TouchableOpacity disabled={true}>
+                                        <Icon name="download" size={20}
+                                              color="#03fc66"
+                                              style={{}}/>
+                                    </TouchableOpacity>
+                                    : null
+
+                            }
 
                             {/*<View style={{flexDirection:'row', backgroundColor:Style.DEFAUT_RED_COLOR, borderRadius:2, borderColor:'#fff'}}>*/}
                             {/*        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5, color:'#fff'}}>*/}

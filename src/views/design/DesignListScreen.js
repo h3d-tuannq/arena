@@ -12,7 +12,7 @@ import {
     RefreshControl,
     TextInput,
     Modal,
-    Alert, Platform, PermissionsAndroid,
+    Alert, Platform, PermissionsAndroid, ActivityIndicator,
 } from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
@@ -37,6 +37,15 @@ const CHOSE_DELIVER_DATE = 3;
 
 
 const ITEM_HEIGHT = 38;
+
+const LoadingModal = (props) => (
+    <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
+        <View style={{ justifyContent : 'center', alignItems:'center', flex: 1 }}>
+            <ActivityIndicator size="large" color="#0c5890"/>
+        </View>
+    </Modal>
+)
+
 
 
 class DesignListScreen extends React.Component {
@@ -94,6 +103,7 @@ class DesignListScreen extends React.Component {
             downloaded: 0,
             startDownload : false,
             downloadFalse : 0,
+            isLoading:false
 
         };
 
@@ -155,7 +165,7 @@ class DesignListScreen extends React.Component {
     downloadDesignSuccess = (obj,res) => {
         obj.offline_img = res.path();
         this.downloaded = this.downloaded + 1;
-        this.setState({downloaded: this.downloaded })
+        this.setState({downloaded: this.downloaded , isLoading:true});
         if(this.downloaded + this.downloadFalse >= Def.design_data.length ){
             this.finishDownloadDesign();
         }
@@ -165,13 +175,13 @@ class DesignListScreen extends React.Component {
         if(OfflineHelper.offlineDesignData){
             console.log('Offline Data : ' + JSON.stringify(OfflineHelper.offlineDesignData));
             AsyncStorage.setItem('offlineDesignData', JSON.stringify(OfflineHelper.offlineDesignData));
-            this.setState({startDownload:false});
+            this.setState({startDownload:false, isLoading:true});
         }
     }
 
     downloadDesignFalse = (obj,res) => {
         this.downloadFalse = this.downloadFalse + 1;
-        this.setState({downloadFalse: this.downloadFalse })
+        this.setState({downloadFalse: this.downloadFalse,isLoading:true});
     }
 
     handleDatePicked = date => {
@@ -493,6 +503,7 @@ class DesignListScreen extends React.Component {
 
 
             <View style={{flex:1, paddingTop:5, paddingHorizontal:10}}>
+                <LoadingModal visible={this.state.isLoading}/>
                 {
                     this.state.startDownload ?
                         <View>
