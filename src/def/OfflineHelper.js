@@ -325,18 +325,20 @@ export class OfflineHelper {
         OfflineHelper.requestChangeData.push(item);
         AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
+        console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
         let refFlat =  OfflineHelper.offlineFlatData[item.flat_id];
-        let refFlat2 = {... refFlat};
+        if(refFlat){
+            let refFlat2 = {... refFlat};
 
-        refFlat2['update'] = 1;
-        if(OfflineHelper.flatChangeData && !OfflineHelper.flatChangeData[refFlat.id]){
-            OfflineHelper.changeOfflineFlat(refFlat2);
-        } else {
-            // console.log('OfflineHelper.flatChangeData : '+ JSON.stringify(OfflineHelper.flatChangeData));
+            refFlat2['update'] = 1;
+            if(OfflineHelper.flatChangeData && !OfflineHelper.flatChangeData[refFlat.id]){
+                OfflineHelper.changeOfflineFlat(refFlat2);
+            } else {
+                // console.log('OfflineHelper.flatChangeData : '+ JSON.stringify(OfflineHelper.flatChangeData));
+            }
+            // console.log('Update Reflat : '+ JSON.stringify(refFlat));
+            OfflineHelper.updateOfflineFlat(refFlat2, pif);
         }
-        // console.log('Update Reflat : '+ JSON.stringify(refFlat));
-        OfflineHelper.updateOfflineFlat(refFlat2, pif);
-
     }
 
     static changeOfflineFlat = (flat) => {
@@ -593,6 +595,7 @@ export class OfflineHelper {
     }
     // Thực hiện xóa dữ liệu FlatData để ứng dụng thực hiện reload
     static resetOldData = async () => {
+        await  OfflineHelper.resetLocalData();
         await  OfflineHelper.resetInteractOfflineData();
         Def.flat_data = [];
         Def.requestRepairsTree = {};

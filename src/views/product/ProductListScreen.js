@@ -186,7 +186,7 @@ class ProductListScreen extends React.Component {
 
     downloadProductFalse = (obj,res) => {
         this.downloadFalse = this.downloadFalse + 1;
-        this.setState({downloadFalse: this.downloadFalse, isLoading:false })
+        this.setState({downloadFalse: this.downloadFalse })
     }
 
 

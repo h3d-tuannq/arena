@@ -78,11 +78,10 @@ NetInfo.addEventListener(async networkState => {
                             Def.NetWorkMode = networkState.isConnected;
                             await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
                             if (Def.NetWorkMode == true) {
-                                // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
-                                // Thực hiện đồng bộ trước
-                                // await OfflineHelper.initOfflineMode();
-                                //  FlatController.syncOfflineDataToServer();
-                                // RNRestart.Restart();
+                                // if(Def.setLoading){
+                                //     Def.setLoading(true);
+                                // }
+                                FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
                             } else {
 
                             }
@@ -212,7 +211,7 @@ function CustomDrawerContent(props) {
 
                             <View style={{paddingBottom:10}}>
                                 <Text>
-                                    {Def.user_info['username']}
+                                    {Def.user_info ? Def.user_info['username'] : ''}
                                 </Text>
 
                                 <Text>
