@@ -480,7 +480,6 @@ export default class Def {
     static remoteVersion(path){
         console.log('path input ' + path);
         let rs = path.split("?v=");
-        console.log('RS: '+ JSON.stringify(rs));
         // rs.pop();
         // rs.join("=?");
         return rs[0];

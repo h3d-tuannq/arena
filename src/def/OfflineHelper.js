@@ -187,10 +187,6 @@ export class OfflineHelper {
         let url = Def.getThumnailImg(obj.image_path);
         let date = new Date();
         const { config, fs } = RNFetchBlob;
-        console.log('Url : ' + url);
-        console.log('Path Url : ' + path);
-
-
         let options = {
             fileCache: true,
             // addAndroidDownloads: {
@@ -256,7 +252,6 @@ export class OfflineHelper {
                 }
             })
         }
-        console.log('rs : ' + JSON.stringify(rs));
         return rs;
     }
 
@@ -278,7 +273,7 @@ export class OfflineHelper {
                 }
             })
         }
-        console.log('rs : ' + JSON.stringify(rs));
+        // console.log('rs : ' + JSON.stringify(rs));
         return rs;
     }
 
@@ -391,6 +386,7 @@ export class OfflineHelper {
     }
     // cập nhật dữ liệu thay đổi
     static updateOfflineFlat(flat, pif = null){
+        console.log('updateOfflineFlat: --------------------------------------------------------------');
         if(typeof flat == 'number'){
             let flatIndex = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat );
             if(flatIndex > -1){

@@ -190,7 +190,6 @@ class FlatDetailScreen extends React.Component {
                 }
             });
 
-            console.log('Request Repair Tree: ' + JSON.stringify(Def.requestRepairsTree));
             if(Def.requestRepairsTree){
                 AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
             }
@@ -230,15 +229,13 @@ class FlatDetailScreen extends React.Component {
                     //     // console.log('Request Repair content : '+ JSON.stringify(repairItems))
                     // }
                     if(requestRepairs.length){
-                        console.log('Request Repair For Product ID : ' + pif.id);
-                        console.log('Request Repair : ' + typeof requestRepairs + ' : ' + JSON.stringify(requestRepairs));
                         flatRepairItems =  flatRepairItems.concat(requestRepairs);
                     }
                 }
             });
 
-            console.log('Request repair item : ' + flatRepairItems.length);
-            console.log('Request Repair : ' + JSON.stringify(flatRepairItems));
+            // console.log('Request repair item : ' + flatRepairItems.length);
+            // console.log('Request Repair : ' + JSON.stringify(flatRepairItems));
             OfflineHelper.offlineRepairData = OfflineHelper.makeRequestDataWithKeyObj(flatRepairItems, OfflineHelper.offlineRepairData);
 
             let imageRepairItems = flatRepairItems.filter((item) => {
@@ -452,7 +449,8 @@ class FlatDetailScreen extends React.Component {
 
 
     updateFlatStatus =(flat, offline= null) => {
-        offline = offline || flat['offlineMode'] == 1 || Def.NetWorkMode;
+        console.log('Get Flat Detail Status');
+        offline = offline || flat['offlineMode'] == 1 || !Def.NetWorkMode;
         if(offline){
             this.updateOfflineFlatStatus(flat);
         } else {
