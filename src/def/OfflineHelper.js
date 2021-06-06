@@ -33,15 +33,19 @@ export class OfflineHelper {
         let rs= [];
         let cloneObj = {... obj};
         for (const key in cloneObj){
+
             let flat = cloneObj[key];
+            console.log('Affter clone ' + flat.update);
             let cloneFlat = JSON.parse(JSON.stringify(flat));
             // Object.assign(cloneFlat, flat);
             rs.push(cloneFlat);
+            console.log('Affter clone ' + cloneFlat.update);
         }
         return rs;
     }
 
     static initOfflineMode = async () => {
+        console.log('Init offline data');
         OfflineHelper.offlineRequestTree = {... Def.requestRepairsTree};
         OfflineHelper.pifChangeData = {};
         AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
@@ -52,7 +56,25 @@ export class OfflineHelper {
             let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
             OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
         }
+
+        for (const key in OfflineHelper.offlineFlatData){
+            console.log('OfflineHelper.offlineFlatData : Update : ' + OfflineHelper.offlineFlatData[key].update);
+        }
+        if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
+            OfflineHelper.offlineFlatDataArr.forEach(item => {
+                console.log('Update from offline data Before : --' + item['update']);
+            });
+        }
+
+
+
         OfflineHelper.offlineFlatDataArr = OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+
+        if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
+            OfflineHelper.offlineFlatDataArr.forEach(item => {
+                console.log('Update from offline data : --' + item['update']);
+            });
+        }
         AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
     }
 
@@ -267,18 +289,29 @@ export class OfflineHelper {
             OfflineHelper.offlineProductData = {};
             OfflineHelper.offlineDesignData = {};
             OfflineHelper.offlineRepairData = {};
+            OfflineHelper.offlineFlatDataArr = [];
             OfflineHelper.offlineFlatData = {};
             OfflineHelper.downloadProductList = {} ;
             OfflineHelper.downloadDesignList = {};
             OfflineHelper.downloadRepariItemInflat = {};
             OfflineHelper.requestRepairsTree = {};
 
-            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data', 'offlineDesignData', 'offlineProductData'];
+            await  AsyncStorage.setItem('offlineProductData',JSON.stringify(OfflineHelper.offlineProductData));
+            await  AsyncStorage.setItem('offlineDesignData',JSON.stringify(OfflineHelper.offlineDesignData));
+            await  AsyncStorage.setItem('offlineRepairData',JSON.stringify(OfflineHelper.offlineRepairData));
+            await  AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
+            await  AsyncStorage.setItem('offlineFlatData',JSON.stringify(OfflineHelper.offlineFlatData));
+            await  AsyncStorage.setItem('downloadProductList',JSON.stringify(OfflineHelper.downloadProductList));
+            await  AsyncStorage.setItem('downloadDesignList',JSON.stringify(OfflineHelper.downloadDesignList));
+            await  AsyncStorage.setItem('downloadRepariItemInflat',JSON.stringify(OfflineHelper.downloadRepariItemInflat));
+            await  AsyncStorage.setItem('requestRepairsTree',JSON.stringify(OfflineHelper.requestRepairsTree));
+
+            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data', 'offlineDesignData', 'offlineProductData','offlineFlatDataArr'];
             await AsyncStorage.multiRemove(keys);
         }catch (e){
 
         }
-        RNRestart.Restart();
+        // RNRestart.Restart();
     }
 
     static resetInteractOfflineData = async ()=> {
@@ -326,7 +359,8 @@ export class OfflineHelper {
         AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
         console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
-        let refFlat =  OfflineHelper.offlineFlatData[item.flat_id];
+        // thực hiện lấy dữ liệu trong bản offline nếu khong có sẽ thwucj hiện lấy trong dữ liệu originnal.
+        let refFlat = OfflineHelper.getOfflineFlatById(item.flat_id) ? OfflineHelper.getOfflineFlatById(item.flat_id)  : OfflineHelper.offlineFlatData[item.flat_id] ;
         if(refFlat){
             let refFlat2 = {... refFlat};
 
@@ -533,7 +567,7 @@ export class OfflineHelper {
         let msg;
         // Từ chế độ Offline chuyển sang chế độ Online
         if(Def.NetWorkConnect && !Def.NetWorkMode) {
-            msg = 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!'
+            msg =  OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
             Alert.alert(
                 "Thông báo",
                 msg,
@@ -544,10 +578,15 @@ export class OfflineHelper {
                             console.log('Change  Mode Dữ liệu thay đổi');
                             Def.NetWorkMode = true;
                             await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0');
-                            if(Def.setLoading){
-                                Def.setLoading(true);
+                            // Trong trường hợp thay đổi dữ liệu thì mới thực hiện đồng bộ lên dữ liệu online.
+                            if(OfflineHelper.checkChangeData()) {
+                                if (Def.setLoading) {
+                                    Def.setLoading(true);
+                                }
+                                FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
+                            } else {
+                                RNRestart.Restart();
                             }
-                            FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
                         },
                         style: 'cancel',
                     },
@@ -595,14 +634,21 @@ export class OfflineHelper {
     }
     // Thực hiện xóa dữ liệu FlatData để ứng dụng thực hiện reload
     static resetOldData = async () => {
+        console.log('resetOldData');
         await  OfflineHelper.resetLocalData();
         await  OfflineHelper.resetInteractOfflineData();
         Def.flat_data = [];
         Def.requestRepairsTree = {};
         await AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
         await AsyncStorage.setItem('requestRepairsTree',JSON.stringify(Def.requestRepairsTree));
-
+        console.log('resetOldData End');
     }
+
+    static checkChangeData = () => {
+       return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData != '' && JSON.stringify(OfflineHelper.flatChangeData) != JSON.stringify({})
+    }
+
+
 
 
 

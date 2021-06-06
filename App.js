@@ -66,7 +66,8 @@ NetInfo.addEventListener(async networkState => {
     if((networkState.isConnected != Def.NetWorkConnect)){
         await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
         if(networkState.isConnected) {
-            msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
+            // msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
+            msg = OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
             Alert.alert(
                 "Thông báo",
                 msg,
@@ -81,7 +82,12 @@ NetInfo.addEventListener(async networkState => {
                                 // if(Def.setLoading){
                                 //     Def.setLoading(true);
                                 // }
-                                FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
+                                if(OfflineHelper.checkChangeData()){
+                                    FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
+                                } else {
+                                    RNRestart.Restart();
+                                }
+
                             } else {
 
                             }
@@ -487,8 +493,8 @@ class App extends React.Component {
                        Def.requestRepairsTree = JSON.parse(value);
                    }
                 });
-                let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
-                OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+                // let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
+                // OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
 
                 OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
                 let flatChangeDataStr = await  AsyncStorage.getItem('flatChangeData');

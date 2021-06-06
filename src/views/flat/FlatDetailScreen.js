@@ -83,6 +83,7 @@ class FlatDetailScreen extends React.Component {
         this.closeFunction = this.closeFunction.bind(this);
         let calPif = FlatHelper.calPassPif(this.props.route.params.item);
         console.log('CanPif : ' + JSON.stringify(calPif));
+        console.log('item data0 : ' + this.props.route.params.item.update);
 
 
         this.state = {
@@ -132,8 +133,11 @@ class FlatDetailScreen extends React.Component {
         this.getRepairByFlatSuccess = this.getRepairByFlatSuccess.bind(this);
         OfflineHelper.downloadRepariItemInflat = this.downloadFlat.bind(this);
         this.showDownloadedMsg = this.showDownloadedMsg.bind(this);
+        this.updateOnlineStatus = this.updateOnlineStatus.bind(this);
+        this.storeOfflineData = this.storeOfflineData.bind(this);
     }
     downloadFlat = async () => {
+        console.log('item data 1 : ' + this.state.item.update);
         if (Platform.OS === 'ios') {
             this.downloadRepairInFlat();
         } else {
@@ -143,6 +147,8 @@ class FlatDetailScreen extends React.Component {
                     {
                         title: 'Storage Permission Required',
                         message:
+
+
                             'App needs access to your storage to download Photos',
                     }
                 );
@@ -165,6 +171,7 @@ class FlatDetailScreen extends React.Component {
     downloadRepairInFlat = () => {
         if(Def.user_info){
             this.setState({isLoading:true});
+            console.log('item data0.01 : ' + this.state.item.update);
             FlatController.getRequestRepairByFlat(this.getRepairByFlatSuccess, this.getRepairByFlatFalse, this.state.item.id);
         }
 
@@ -174,6 +181,7 @@ class FlatDetailScreen extends React.Component {
         if( data['result']  && data['request_repairs']){
             Def.requestRepairtFlat[this.state.item.id] = OfflineHelper.makeObjectDataWithKeyObj (data['request_repairs']);
             let requestRepair = data['request_repairs'];
+            console.log('item data0.1 : ' + this.state.item.update);
              requestRepair.forEach((pifRepair) => {
                 if(pifRepair){
                     for (const key in pifRepair) {
@@ -191,6 +199,8 @@ class FlatDetailScreen extends React.Component {
                 AsyncStorage.setItem('requestRepairtFlat', JSON.stringify(Def.requestRepairtFlat));
             }
 
+            console.log('item data0.2 : ' + this.state.item.update);
+
 
             this.processDownloadRepairInFlat();
         }
@@ -205,7 +215,6 @@ class FlatDetailScreen extends React.Component {
             console.log('Start download in flat + ' + this.state.item.id);
             this.setState({startDownload: true});
             let offlineItem = this.state.item;
-
             OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
 
             let flatRepairItems = [];
@@ -239,6 +248,7 @@ class FlatDetailScreen extends React.Component {
             if(imageRepairItems.length == 0){ // Trong trường hợp không phải clone dữ liệu sẽ thực hiện gán downloaded == 1
                 OfflineHelper.offlineFlatData[this.state.item.id]['downloaded'] = 1;
                 this.setState({ isLoading:false });
+                this.storeOfflineData(true);
                 this.showDownloadedMsg();
             }
 
@@ -280,18 +290,25 @@ class FlatDetailScreen extends React.Component {
         }
     }
 
-    finishDownload() {
-        console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.downloaded);
+    storeOfflineData = async (downloaded = null) =>  {
         let offlineItem = OfflineHelper.offlineFlatData[this.state.item.id];
-        offlineItem['downloaded'] = this.state.downloaded;
-        // offlineItem['image_dowload'] = this.state.imageRepairItem;
+        offlineItem['downloaded'] = downloaded !== null  ? downloaded :this.state.downloaded;
         OfflineHelper.offlineFlatData[this.state.item.id] = offlineItem;
+        for (const key in OfflineHelper.offlineFlatData){
+            console.log('store data : ' + OfflineHelper.offlineFlatData[key].update);
+        }
+
         if(OfflineHelper.offlineFlatData){
-            AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
+           await AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
         }
         if(OfflineHelper.offlineRepairData){
-            AsyncStorage.setItem('offlineRepairData', JSON.stringify(OfflineHelper.offlineRepairData));
+           await AsyncStorage.setItem('offlineRepairData', JSON.stringify(OfflineHelper.offlineRepairData));
         }
+    }
+
+    finishDownload() {
+        console.log('total download : ' + this.state.imageRepairItem  + ' downloaded' + this.downloaded);
+        this.storeOfflineData();
     }
 
     downloadRepairFalse = (obj,res) => {
@@ -370,7 +387,6 @@ class FlatDetailScreen extends React.Component {
 
 
     changeStatusSuccess = (data) => {
-        console.log('REady : '+ JSON.stringify(data['flat']['highlight_re_schedule']));
         if(data['msg'] == "Ok"){
             // this.setState({canSaveDeadline:false});
             Alert.alert(
@@ -386,14 +402,14 @@ class FlatDetailScreen extends React.Component {
             if(data['offlineMode'] == 1){
                 this.updateOfflineFlatStatus(data['flat']);
             }else {
-                this.updateFlatStatus(data['flat']);
+                this.updateOnlineStatus(data['flat']);
             }
 
 
         } else {
             Alert.alert(
                 "Thông báo",
-                data['msg'],
+                'Test Ko cập nhật',
                 [
                     {
                         text: "Ok",
@@ -416,7 +432,7 @@ class FlatDetailScreen extends React.Component {
         this.setState({ stateCount: Math.random(), deadlineCompleted: null });
     }
 
-    updateFlatStatus =(flat) => {
+    updateOnlineStatus =(flat) => {
         if(flat) {
             this.setState({item:flat, deadlineCompleted: null, canSaveDeadline : false});
             if(Def.flat_data) { // Update dữ liệu
@@ -433,10 +449,21 @@ class FlatDetailScreen extends React.Component {
         this.closeFunction();
     };
 
-    updateOfflineFlatStatus = (flat) => {
+
+
+    updateFlatStatus =(flat, offline= null) => {
+        offline = offline || flat['offlineMode'] == 1 || Def.NetWorkMode;
+        if(offline){
+            this.updateOfflineFlatStatus(flat);
+        } else {
+            this.updateOnlineStatus(flat);
+        }
+    };
+
+    updateOfflineFlatStatus = (flat, dontSaveOffline = false) => {
         if(flat){
             this.setState({item:flat, deadlineCompleted: null, canSaveDeadline : false});
-            if(OfflineHelper.offlineFlatDataArr) { // Update dữ liệu căn họ offline
+            if(OfflineHelper.offlineFlatDataArr && !dontSaveOffline) { // Update dữ liệu căn họ offline
                 let updated = OfflineHelper.updateOfflineFlat(flat);
                 if(updated){
                     Def.refresh_flat_data = true;
@@ -445,6 +472,7 @@ class FlatDetailScreen extends React.Component {
                     }
                 }
             }
+            this.closeFunction();
         }
     }
 
@@ -510,12 +538,12 @@ class FlatDetailScreen extends React.Component {
         // this.setState({ configMenu: Def.config_news_menu});
         // console.log('SortData ddd:' + JSON.stringify(this.props.route));
         console.log('shouldComponentUpdate - flat');
+        console.log('item update : ' + this.state.item.update);
         // console.log('Original Change shouldComponentUpdate : ' + (OfflineHelper.offlineFlatData ?  OfflineHelper.offlineFlatData[this.state.item.id]['update'] : ''));
         return true;
     }
 
     componentDidMount() {
-        console.log('Component did mount -flat');
         let {navigation} = this.props;
         navigation =  this.props.navigation ? this.props.navigation : Def.mainNavigate ;
 
@@ -536,7 +564,7 @@ class FlatDetailScreen extends React.Component {
                 // thực hiện lấy dữ liệu từ hệ thống offline
                 let offlineFlat = OfflineHelper.getOfflineFlatById(this.state.item.id);
                 if(offlineFlat){
-                    this.updateFlatStatus(offlineFlat);
+                    this.updateOfflineFlatStatus(offlineFlat, true);
                 }
                 // console.log('Original Change0 : ' + (OfflineHelper.offlineFlatData && OfflineHelper.offlineFlatData[this.state.item.id] ?  OfflineHelper.offlineFlatData[this.state.item.id]['update'] : ''));
 
@@ -581,9 +609,12 @@ class FlatDetailScreen extends React.Component {
                     </TouchableOpacity>
 
                     {
-                        this.state.item.signature && this.state.item.signature['image_path'] ?
+                        (this.state.item.signature && this.state.item.signature['image_path']) || ( this.state.item.offlineSignature && this.state.item.offlineSignature['image']) ?
                             <View style={styles.imageContainer}>
-                                <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.signature.image_path)}}  />
+                                <Image  style={[styles.itemImage ]}  source={{uri:  this.state.item.offlineSignature && this.state.item.offlineSignature['image'] ?
+                                        'data:image/png;base64,' + this.state.item.offlineSignature['image']:
+
+                                        Def.getThumnailImg(item.signature.image_path)}}  />
                                 <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
                                     <TouchableOpacity style={[{   paddingVertical:1 , flexDirection:'row' , justifyContent:'space-around' , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, {}]}
                                         onPress={this.clickSignature}

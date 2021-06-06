@@ -181,7 +181,7 @@ class FlatItemrenderer extends PureComponent{
                     }
 
                     {
-                        !Def.NetWorkMode && ((model['update'] == 1 || model['update'] == '1') || OfflineHelper.checkChangeOfflineFlat(model))?
+                        !Def.NetWorkMode && ((model['update'] == 1 || model['update'] == '1') )?
                         <TouchableOpacity
                             onPress={()=> {
                                 if(this.props.itemHandleFunc && this.props.itemHandleFunc.resetOfflineFlat){

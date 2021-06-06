@@ -48,10 +48,10 @@ class SignatureModalForm extends React.Component {
         }
     };
 
-    saveSignatureToServer = (data) => {
+    saveSignatureToServer = (data = null) => {
         console.log("Request button click");
         if (Def.user_info) {
-            FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'], this.state.flat.id, FlatHelper.SIGNED_STATUS, 0, data ? data.encoded : null, this.state.note, FlatHelper.SIGNATURE_PAD_TYPE);
+            FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'], this.state.flat.id, FlatHelper.SIGNED_STATUS, 0, data , this.state.note, FlatHelper.SIGNATURE_PAD_TYPE);
         } else {
             console.log('User info not exits');
         }

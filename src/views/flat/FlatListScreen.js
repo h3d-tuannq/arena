@@ -456,9 +456,12 @@ class FlatListScreen extends React.Component {
         let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
         OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr ? JSON.parse( offlineFlatDataArrStr): [];
         console.log('OfflineHelper.offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
-        OfflineHelper.offlineFlatDataArr.forEach(item => {
-           console.log('Update --' + item['update']);
-        });
+        // if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
+        //     OfflineHelper.offlineFlatDataArr.forEach(item => {
+        //         console.log('Update --' + item['update']);
+        //     });
+        // }
+
         if(!Def.user_info)
             Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
         Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;

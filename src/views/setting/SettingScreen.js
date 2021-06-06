@@ -81,9 +81,11 @@ class SettingScreen extends React.Component {
             [
                 {
                     text: "Ok",
-                    onPress: () => {
-                        OfflineHelper.resetLocalData();
-                        OfflineHelper.resetInteractOfflineData();
+                    onPress: async () => {
+                        await OfflineHelper.resetInteractOfflineData();
+                        await OfflineHelper.resetLocalData();
+                        RNRestart.Restart();
+
                     },
                     style: 'Cancel',
                 },

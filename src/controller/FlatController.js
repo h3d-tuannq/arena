@@ -3,6 +3,7 @@ import Net from './Net';
 import {OfflineHelper} from '../def/OfflineHelper';
 import FlatHelper from '../def/FlatHelper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Platform} from "react-native";
 
 export default class FlatController {
     static getFlat(callback,errCallback , get_all = false, pageSize = Def.pageSize, pageIndex) {
@@ -134,10 +135,13 @@ export default class FlatController {
        }
 
     }
-
+    /*
+         //image.encoded - for the base64 encoded png
+        //image.pathName - for the file path name
+     */
     static changeStatusFlat(callback, errCallback, token, flat_id, status, is_decline = null , image, note, type, newDeadline = null, readyToDeliver = null , absentee_hanover = null){
         if(Def.NetWorkMode){
-            let param = {'flat_id' : flat_id, 'token' : token, 'type' : type , 'note': note, 'image_data':image, 'status' : status , 'is_decline' : is_decline, 'new_deadline': newDeadline, 'ready_deliver':readyToDeliver};
+            let param = {'flat_id' : flat_id, 'token' : token, 'type' : type , 'note': note, 'image_data':image ? image.encoded : null, 'status' : status , 'is_decline' : is_decline, 'new_deadline': newDeadline, 'ready_deliver':readyToDeliver};
             Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/change-flat-status" ,Def.POST_METHOD, param);
         } else {
             let flat = OfflineHelper.getOfflineFlatById(flat_id);
@@ -164,12 +168,15 @@ export default class FlatController {
 
                 flat['status'] = FlatHelper.SIGNED_STATUS;
                 let offlineSignature = {
-                    image:image,
+                    image:image ? image.encoded : '',
+                    image_path: image ? Platform.OS === "android" ? image.pathName : image.pathName.replace("file://", "")  : '',
                     create_at: Math.ceil((new Date()).getTime()/1000),
                 }
                 flat['offlineSignature'] = offlineSignature;
+                console.log('OfflineSignature : ' + JSON.stringify(offlineSignature));
             }
             flat['update'] = 1;
+            flat['offlineMode'] = 1;
             console.log('Flat status : ' + flat['status']);
             let data = {
                 msg: 'Ok',
@@ -202,7 +209,6 @@ export default class FlatController {
             };
 
             console.log('Sync Param : ' + JSON.stringify(param));
-
             Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/sync-offline-data" ,Def.POST_METHOD, param, 'application/json; charset=utf-8', FlatController.repairImg);
         } else {
             Net.showNetworkMsg('Mất kết nối mạng, ứng dụng không thể đồng bộ dữ liệu!');

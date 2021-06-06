@@ -171,8 +171,6 @@ export default class FlatHelper {
     static canPerformDelivering(flat, user){
         let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER);
         let status = flat.status == FlatHelper.CAN_DELIVER_STATUS;
-
-        console.log('Deliver Date : ' + flat.deliver_date )
         return isHandover && status && flat.deliver_date;
     }
 
