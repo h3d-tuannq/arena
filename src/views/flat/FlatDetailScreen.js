@@ -432,9 +432,14 @@ class FlatDetailScreen extends React.Component {
     updateOnlineStatus =(flat) => {
         if(flat) {
             this.setState({item:flat, deadlineCompleted: null, canSaveDeadline : false});
+            // Trong trường hợp forcus và tải lại dữ liệu trong trường hợp App ở chế độ Online sẽ thực hiện lưu dữ liệu mới nhất cho dữ liệu Offline
+            // if(OfflineHelper.offlineFlatData[flat.id]){
+            //     OfflineHelper.offlineFlatData[flat.id] = flat;
+            // }
             if(Def.flat_data) { // Update dữ liệu
                 let updated = Def.updateFlatToFlatList(flat);
                 if(updated){
+
                     Def.refresh_flat_data = true;
                     if (Def.refeshFlatList){
                         Def.refeshFlatList();

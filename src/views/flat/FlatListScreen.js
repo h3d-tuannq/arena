@@ -161,7 +161,14 @@ class FlatListScreen extends React.Component {
         let design_list = Def.flat_data;
         if(Def.flat_data){
             AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+            // Def.flat_data.forEach(flat => {
+            //     // Cập nhật dữ liệu thiết kế cho căn hộ đã lưu offline
+            //     if(OfflineHelper.offlineFlatData[flat.id]){
+            //         OfflineHelper.offlineFlatData[flat.id] = flat;
+            //     }
+            // });
         }
+
 
         let newPageIndex = this.state.pageIndex + 1;
         Def.flatCurrentPage = newPageIndex;
