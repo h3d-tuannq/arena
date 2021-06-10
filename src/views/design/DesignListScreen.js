@@ -175,7 +175,7 @@ class DesignListScreen extends React.Component {
         if(OfflineHelper.offlineDesignData){
             console.log('Offline Data : ' + JSON.stringify(OfflineHelper.offlineDesignData));
             AsyncStorage.setItem('offlineDesignData', JSON.stringify(OfflineHelper.offlineDesignData));
-            this.setState({startDownload:false, isLoading:true});
+            this.setState({startDownload:false, isLoading:false});
         }
     }
 

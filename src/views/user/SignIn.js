@@ -97,41 +97,54 @@ export default class SignIn extends Component {
 
         return (
             <View style={wraper}>
-                <View style={[loginform, {marginTop:-10}]}>
-                    <TextInput
-                        onFocus={() => this.setState({focus:1})}
-                        onBlur={()=> this.setState({focus:0})}
-                        style={this.state.focus == 1 ? textInputHover : textInputNormal}
-                        value={this.state.email}
-                        onChangeText={text => this.setState({email:text})}
-                        placeholder='Nhập Email'
-                        placeholderTextColor="#b3b3b3"
-                        autoCapitalize = 'none'
-                        // underlineColorAndroid = "transparent"
-                    />
-                    {/*<Text style={this.state.focus == 2 ? labelInputHover : labelInputNormal}>Password</Text>*/}
-                    <TextInput
-                        onFocus={() => this.setState({focus:2})}
-                        onBlur={()=> this.setState({focus:0})}
-                        style={this.state.focus == 2 ? textInputHover : textInputNormal}
-                        value={this.state.password}
-                        onChangeText={text => this.setState({password:text})}
-                        secureTextEntry={true}
-                        placeholder='Nhập mật khẩu'
-                        placeholderTextColor="#b3b3b3"
-                        autoCapitalize = 'none'
-                        underlineColorAndroid = "transparent"
-                    />
+                {
+                    Def.NetWorkMode && Def.NetWorkConnect ?
 
-                    <View style={{flexDirection: 'row', justifyContent : 'flex-end', alignItems : 'center' , marginTop:10 }}>
-                        <TouchableOpacity style={loginButton} onPress={()=>this.signIn()}>
-                            <Text style={loginText}>
-                                Đăng nhập
-                            </Text>
-                        </TouchableOpacity>
+                    <View style={[loginform, {marginTop: -10}]}>
+                        <TextInput
+                            onFocus={() => this.setState({focus: 1})}
+                            onBlur={() => this.setState({focus: 0})}
+                            style={this.state.focus == 1 ? textInputHover : textInputNormal}
+                            value={this.state.email}
+                            onChangeText={text => this.setState({email: text})}
+                            placeholder='Nhập Email'
+                            placeholderTextColor="#b3b3b3"
+                            autoCapitalize='none'
+                            // underlineColorAndroid = "transparent"
+                        />
+                        {/*<Text style={this.state.focus == 2 ? labelInputHover : labelInputNormal}>Password</Text>*/}
+                        <TextInput
+                            onFocus={() => this.setState({focus: 2})}
+                            onBlur={() => this.setState({focus: 0})}
+                            style={this.state.focus == 2 ? textInputHover : textInputNormal}
+                            value={this.state.password}
+                            onChangeText={text => this.setState({password: text})}
+                            secureTextEntry={true}
+                            placeholder='Nhập mật khẩu'
+                            placeholderTextColor="#b3b3b3"
+                            autoCapitalize='none'
+                            underlineColorAndroid="transparent"
+                        />
+
+                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                            marginTop: 10
+                        }}>
+                            <TouchableOpacity style={loginButton} onPress={() => this.signIn()}>
+                                <Text style={loginText}>
+                                    Đăng nhập
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        <LoadingModal visible={this.state.isLoging}/>
                     </View>
-                    <LoadingModal visible={this.state.isLoging}/>
-                </View>
+                        :
+                    <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
+                        Để đăng nhập bạn vui lòng kết nối mạng Internet!
+                    </Text>
+                }
             </View>
         )
     }

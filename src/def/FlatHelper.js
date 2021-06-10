@@ -116,8 +116,8 @@ export default class FlatHelper {
 
     static getPriorityRole(user){
         let permission = false;
-        let userPermission = user.listRoleName.split();
         if(user){
+            let userPermission = user.listRoleName.split();
             FlatHelper.PriorityRoles.forEach(element => {
                 if(userPermission.indexOf(element) != -1){
                     permission = element;

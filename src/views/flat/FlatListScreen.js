@@ -195,7 +195,9 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
-        // console.log('OfflineHelper.offlineFlatDataArr ' +  JSON.stringify(OfflineHelper.offlineFlatDataArr));
+        if(OfflineHelper.offlineFlatDataArr) {
+            console.log('OfflineHelper.offlineFlatDataArr Forcus - Refresh ' +  OfflineHelper.offlineFlatDataArr.length);
+        }
         this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
     }
 
@@ -605,6 +607,7 @@ class FlatListScreen extends React.Component {
         return (
 
             !Def.user_info ?
+                Def.NetWorkMode && Def.NetWorkConnect ?
 
                 <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
                     <View style={{flexDirection: 'row'}}>
@@ -621,10 +624,13 @@ class FlatListScreen extends React.Component {
                         để sử dụng đầy đủ tính năng cá nhân
                     </Text>
 
-                </View>
+                </View > :
+                    <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
+                        <Text>
+                            Vui lòng kết nối mạng Internet
+                        </Text>
+                    </View>
                 :
-
-
             <View style={{flex:1, paddingTop:5}}>
                 <LoadingModal visible={this.state.isLoading}/>
                 <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>

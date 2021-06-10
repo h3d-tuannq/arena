@@ -54,7 +54,7 @@ export default class FlatController {
     }
 
     static changeStatusProduct(callback, errCallback, pif, role, token , type, note, image, status ){
-       if(Def.NetWorkMode) { // Xử lí trong trường hợp offline
+       if(Def.NetWorkMode) { // Xử lí trong trường hợp Online
            let param = {
                'product_instance_id': pif.id,
                'token': token,

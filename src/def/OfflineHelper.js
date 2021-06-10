@@ -280,9 +280,9 @@ export class OfflineHelper {
 
 
     static resetLocalData = async () => {
+        console.log('Reset Local Data');
         try {
-            OfflineHelper.offlineProductData = {};
-            OfflineHelper.offlineDesignData = {};
+
             OfflineHelper.offlineRepairData = {};
             OfflineHelper.offlineFlatDataArr = [];
             OfflineHelper.offlineFlatData = {};
@@ -291,8 +291,7 @@ export class OfflineHelper {
             OfflineHelper.downloadRepariItemInflat = {};
             OfflineHelper.requestRepairsTree = {};
 
-            await  AsyncStorage.setItem('offlineProductData',JSON.stringify(OfflineHelper.offlineProductData));
-            await  AsyncStorage.setItem('offlineDesignData',JSON.stringify(OfflineHelper.offlineDesignData));
+
             await  AsyncStorage.setItem('offlineRepairData',JSON.stringify(OfflineHelper.offlineRepairData));
             await  AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
             await  AsyncStorage.setItem('offlineFlatData',JSON.stringify(OfflineHelper.offlineFlatData));
@@ -301,12 +300,23 @@ export class OfflineHelper {
             await  AsyncStorage.setItem('downloadRepariItemInflat',JSON.stringify(OfflineHelper.downloadRepariItemInflat));
             await  AsyncStorage.setItem('requestRepairsTree',JSON.stringify(OfflineHelper.requestRepairsTree));
 
-            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data', 'offlineDesignData', 'offlineProductData','offlineFlatDataArr'];
+            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'offlineFlatDataArr'];
             await AsyncStorage.multiRemove(keys);
         }catch (e){
 
         }
         // RNRestart.Restart();
+    }
+
+    static resetTemplateData = async  () => {
+        OfflineHelper.offlineProductData = {};
+        OfflineHelper.offlineDesignData = {};
+        Def.product_data = [];
+        Def.design_data = [];
+        await  AsyncStorage.setItem('offlineProductData',JSON.stringify(OfflineHelper.offlineProductData));
+        await  AsyncStorage.setItem('offlineDesignData',JSON.stringify(OfflineHelper.offlineDesignData));
+        await  AsyncStorage.setItem('product_data',JSON.stringify(Def.product_data));
+        await  AsyncStorage.setItem('design_data',JSON.stringify(Def.design_data));
     }
 
     static resetInteractOfflineData = async ()=> {
@@ -581,6 +591,7 @@ export class OfflineHelper {
                                 }
                                 FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
                             } else {
+                                await OfflineHelper.resetOldData();
                                 RNRestart.Restart();
                             }
                         },
@@ -643,9 +654,6 @@ export class OfflineHelper {
     static checkChangeData = () => {
        return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData != '' && JSON.stringify(OfflineHelper.flatChangeData) != JSON.stringify({})
     }
-
-
-
 
 
 

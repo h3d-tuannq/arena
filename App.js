@@ -59,7 +59,6 @@ import NetInfo from "@react-native-community/netinfo";
 
 
 NetInfo.addEventListener(async networkState => {
-    console.log("Connection type - ", networkState.type);
     let msg;
     Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
     Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
@@ -85,6 +84,7 @@ NetInfo.addEventListener(async networkState => {
                                 if(OfflineHelper.checkChangeData()){
                                     FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
                                 } else {
+                                    await OfflineHelper.resetOldData();
                                     RNRestart.Restart();
                                 }
 
@@ -475,97 +475,43 @@ class App extends React.Component {
    async componentDidMount(){
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
         Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
-        AsyncStorage.getItem('user_info').then(async (value) => {
-            if(value){
-                Def.user_info = JSON.parse(value);
-                Def.username = Def.user_info['user_name'];
-                Def.email = Def.user_info['email'];
 
-                AsyncStorage.getItem('flat_data').then((value) => {
-                    if(value){
-                        Def.flat_data = JSON.parse(value);
-                        console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
-                    }
-                });
+        let userInfoRaw = await AsyncStorage.getItem('user_info');
+        if(userInfoRaw){
+            Def.user_info = JSON.parse(userInfoRaw);
+            Def.username = Def.user_info['user_name'];
+            Def.email = Def.user_info['email'];
+            let flatDataRaw = await AsyncStorage.getItem('flat_data');
+            Def.flat_data = flatDataRaw ? JSON.parse(flatDataRaw) : [];
+            let requestRepairsTreeRaw = await AsyncStorage.getItem('requestRepairsTree');
+            Def.requestRepairsTree = requestRepairsTreeRaw ? JSON.parse(requestRepairsTreeRaw) : [];
 
-                AsyncStorage.getItem('requestRepairsTree').then(value => {
-                   if(value){
-                       Def.requestRepairsTree = JSON.parse(value);
-                   }
-                });
-                // let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
-                // OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+            // let offlineFlatArrRaw = await  AsyncStorage.getItem('offlineFlatDataArr');
+            // OfflineHelper.offlineFlatDataArr = offlineFlatArrRaw ? JSON.parse(offlineFlatArrRaw) : [];
+            let flatChangeDataStr = await  AsyncStorage.getItem('flatChangeData');
+            OfflineHelper.flatChangeData = flatChangeDataStr && flatChangeDataStr != undefined ? JSON.parse( flatChangeDataStr) : {};
 
-                OfflineHelper.offlineFlatDataArr = JSON.parse( await  AsyncStorage.getItem('offlineFlatDataArr'));
-                let flatChangeDataStr = await  AsyncStorage.getItem('flatChangeData');
-                OfflineHelper.flatChangeData = flatChangeDataStr && flatChangeDataStr != undefined ? JSON.parse( flatChangeDataStr) : {};
-                // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
+            let pifChangeDataStr = await  AsyncStorage.getItem('pifChangeData');
+            OfflineHelper.pifChangeData = pifChangeDataStr && pifChangeDataStr != undefined ? JSON.parse( pifChangeDataStr) : {};
 
+            let offlineDesignDataStr = await  AsyncStorage.getItem('offlineDesignData');
+            OfflineHelper.offlineDesignData = offlineDesignDataStr && offlineDesignDataStr != undefined ? JSON.parse( offlineDesignDataStr) : {};
 
+            let offlineProductDataStr = await  AsyncStorage.getItem('offlineProductData');
+            OfflineHelper.offlineProductData = offlineProductDataStr && offlineProductDataStr != undefined ? JSON.parse( offlineProductDataStr) : {};
 
-                // AsyncStorage.getItem('offlineFlatData').then(value => {
-                //     if(value){
-                //         OfflineHelper.offlineFlatData = JSON.parse(value);
-                //     } else {
-                //
-                //     }
-                // });
-                AsyncStorage.getItem('pifChangeData').then(value => {
-                    if(value){
-                        OfflineHelper.pifChangeData = JSON.parse(value);
-                        // console.log('OfflineHelper.pifChangeData.length ' + JSON.stringify(OfflineHelper.pifChangeData));
-                    } else {
+            let offlineRepairDataStr = await  AsyncStorage.getItem('offlineRepairData');
+            OfflineHelper.offlineRepairData = offlineRepairDataStr && offlineRepairDataStr != undefined ? JSON.parse( offlineRepairDataStr) : {};
 
-                    }
-                });
+            let offlineRequestTreeStr = await  AsyncStorage.getItem('offlineRequestTree');
+            OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse( offlineRequestTreeStr) : {};
 
-                AsyncStorage.getItem('offlineDesignData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineDesignData = JSON.parse(value);
-                    } else {
-                        console.log('Offline Data not found');
-                    }
-                });
+            let flat_current_pageStr = await  AsyncStorage.getItem('flat_current_page');
+            Def.flatCurrentPage = flat_current_pageStr && flat_current_pageStr != undefined ? JSON.parse( flat_current_pageStr) : {};
 
-                AsyncStorage.getItem('offlineProductData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineProductData = JSON.parse(value);
-                    } else {
-                        console.log('Offline Data not found');
-                    }
-                });
-
-
-                AsyncStorage.getItem('offlineRepairData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineRepairData = JSON.parse(value);
-                    }
-                });
-
-                // AsyncStorage.getItem('offlineFlatData').then(value => {
-                //     if(value){
-                //         OfflineHelper.offlineFlatData = JSON.parse(value);
-                //     }
-                // });
-
-                AsyncStorage.getItem('offlineRequestTree').then(value => {
-                    if(value){
-                        OfflineHelper.offlineRequestTree = JSON.parse(value);
-                    }
-                });
-
-                AsyncStorage.getItem('flat_current_page').then((value) => {
-                    if(value){
-                        Def.flatCurrentPage = value;
-                    }
-                });
-
-            } else {
-                AsyncStorage.removeItem('flat_data');
-            }
-        });
-
-
+        } else {
+            AsyncStorage.removeItem('flat_data');
+        }
     }
 
 

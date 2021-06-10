@@ -488,17 +488,15 @@ export default class Def {
 
     static getFlatFromFlatData(flatId){
         let index = -1;
-        if(Def.flat_data){
-            index = Def.flat_data.findIndex((element) => element.id == flatId );
+        let flatData = Def.flat_data;
+        if(!Def.NetWorkMode && OfflineHelper.offlineFlatDataArr){
+           flatData = OfflineHelper.offlineFlatDataArr;
         }
-
-        if (index > -1){
+        if(flatData){
+            index = flatData.findIndex((element) => element.id == flatId );
         }
-
-
-        return index > -1 ? Def.flat_data[index] : null;
-
-
+        console.log('Flat Data : ' + index);
+        return index > -1 ? flatData[index] : null;
     }
 
     static onlyUnique(value, index, self){
