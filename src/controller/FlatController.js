@@ -68,7 +68,7 @@ export default class FlatController {
        } else {
            let repairItem = null;
            if(type == FlatHelper.APPROVE_REPAIR_TYPE){ // Xử lí trường hợp phê duyệt hoặc từ chối của WSH
-               pif[status] = status;
+               pif['status'] = status;
                OfflineHelper.updateOfflineFlat(pif.flat_id, pif);
            } else {
 
@@ -112,8 +112,10 @@ export default class FlatController {
 
 
                if(OfflineHelper.offlineRequestTree[pif.id]){
+                   console.log('Add thêm request_repair cho Pif : ' + pif.id);
                    OfflineHelper.offlineRequestTree[pif.id].push(repairItem);
                }else {
+                   console.log('Khởi tạo request repair cho Pif : ' + pif.id);
                    OfflineHelper.offlineRequestTree[pif.id] = [repairItem];
                }
                // OfflineHelper.pifChangeData[pif.id] = pif;

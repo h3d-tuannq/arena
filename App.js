@@ -58,6 +58,7 @@ import NetInfo from "@react-native-community/netinfo";
 
 
 
+
 NetInfo.addEventListener(async networkState => {
     let msg;
     Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
@@ -140,7 +141,7 @@ NetInfo.addEventListener(async networkState => {
         }
 });
 
-Def.initFunc();
+// Def.initFunc();
 
 
 const {width, height} = Dimensions.get('window');
@@ -286,9 +287,9 @@ function CustomDrawerContent(props) {
                     paddingLeft: 10,
                     zIndex: 10,
                 }}>
-                <Text style={styles.infoText}>Hotline: +84 24 3936 9284</Text>
-                <Text style={styles.infoText}>Email: arenacamranh@gmail.com</Text>
-                <Text style={styles.infoText}>Website: https://arenacamranh.com</Text>
+                {/*<Text style={styles.infoText}>Hotline: +84 24 3936 9284</Text>*/}
+                {/*<Text style={styles.infoText}>Email: arenacamranh@gmail.com</Text>*/}
+                <Text style={styles.infoText}>Website: https://bangiao.thearena.com</Text>
                 <Text style={styles.infoText}>Phiên bản 1.0</Text>
             </View>
         </View>

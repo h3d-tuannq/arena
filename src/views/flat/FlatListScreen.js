@@ -28,6 +28,7 @@ import FlatHelper from '../../def/FlatHelper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Net from '../../controller/Net';
 import {OfflineHelper} from '../../def/OfflineHelper';
+import NetInfo from "@react-native-community/netinfo";
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -460,6 +461,23 @@ class FlatListScreen extends React.Component {
     async componentDidMount() {
         console.log('Flat list component did mount');
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
+        if(network_mode){
+            Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
+        } else {
+            let network_connectRaw = await AsyncStorage.getItem('network_connect');
+            if(network_connectRaw) {
+                Def.NetWorkConnect = JSON.parse(network_connectRaw) == 1;
+                Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
+            } else {
+                let state = await NetInfo.fetch();
+                if(state){
+                    Def.NetWorkConnect = state.isConnected;
+                    Def.NetWorkMode = state.isConnected;
+                    await AsyncStorage.setItem('network_connect' , state.isConnected ? '1' : '0');
+                    await AsyncStorage.setItem('network_mode' , state.isConnected ? '1' : '0');
+                }
+            }
+        }
         let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
         OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
         let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
@@ -473,7 +491,7 @@ class FlatListScreen extends React.Component {
 
         if(!Def.user_info)
             Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
-        Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
+
         if(!Def.NetWorkMode) {
             if(!OfflineHelper.offlineFlatDataArr || OfflineHelper.offlineFlatDataArr.length == 0){
 
