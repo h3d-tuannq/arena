@@ -30,8 +30,8 @@ export default class SignIn extends Component {
         super(props);
         this.state = {
             focus : 0,
-            email:"nvbg1@wsh.com.vn",
-            password:"123123",
+            email:"",
+            password:"",
             isLoging : false,
         }
         this.signIn = this.signIn.bind(this);

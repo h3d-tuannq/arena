@@ -460,9 +460,9 @@ class FlatListScreen extends React.Component {
 
     async componentDidMount() {
         console.log('Flat list component did mount');
-        let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
-        if(network_mode){
-            Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
+        let network_mode_data = await AsyncStorage.getItem('network_mode');
+        if(network_mode_data){
+            Def.NetWorkMode = JSON.parse(network_mode_data) == 1 || JSON.parse(network_mode_data) == '-1' ;
         } else {
             let network_connectRaw = await AsyncStorage.getItem('network_connect');
             if(network_connectRaw) {

@@ -61,84 +61,93 @@ import NetInfo from "@react-native-community/netinfo";
 
 NetInfo.addEventListener(async networkState => {
     let msg;
-    Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
-    Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
-    if((networkState.isConnected != Def.NetWorkConnect)){
-        await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
-        if(networkState.isConnected) {
-            // msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
-            msg = OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
-            Alert.alert(
-                "Thông báo",
-                msg,
-                [
-                    {   // Chuyển sang trạng thái online
-                        text: "Online",
-                        onPress: async () => {
-                            console.log('Change Mode');
-                            Def.NetWorkMode = networkState.isConnected;
-                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
-                            if (Def.NetWorkMode == true) {
-                                // if(Def.setLoading){
-                                //     Def.setLoading(true);
-                                // }
-                                if(OfflineHelper.checkChangeData()){
-                                    FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
+    let network_mode_data = await AsyncStorage.getItem('network_mode');
+    if(network_mode_data) {
+
+        Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
+        Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
+        if ((networkState.isConnected != Def.NetWorkConnect)) {
+            await AsyncStorage.setItem('network_connect', networkState.isConnected ? '1' : '0');
+            if (networkState.isConnected) {
+                // msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
+                msg = OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
+                Alert.alert(
+                    "Thông báo",
+                    msg,
+                    [
+                        {   // Chuyển sang trạng thái online
+                            text: "Online",
+                            onPress: async () => {
+                                console.log('Change Mode');
+                                Def.NetWorkMode = networkState.isConnected;
+                                await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                                if (Def.NetWorkMode == true) {
+                                    // if(Def.setLoading){
+                                    //     Def.setLoading(true);
+                                    // }
+                                    if (OfflineHelper.checkChangeData()) {
+                                        FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
+                                    } else {
+                                        await OfflineHelper.resetOldData();
+                                        RNRestart.Restart();
+                                    }
+
                                 } else {
-                                    await OfflineHelper.resetOldData();
-                                    RNRestart.Restart();
+
                                 }
 
-                            } else {
 
-                            }
-
-
+                            },
+                            style: 'cancel',
                         },
-                        style: 'cancel',
-                    },
-                    {
-                        text: "Offline",
-                        style: 'cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
-        // Trong trường hợp mất mạng
-        else {
-            msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
-            Alert.alert(
-                "Thông báo",
-                msg,
-                [
-                    {
-                        text: "Offline",
-                        onPress: async () => {
-                            console.log('Change Mode');
-                            Def.NetWorkMode = networkState.isConnected;
-                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
-                            if (!Def.NetWorkMode) {
-                                await OfflineHelper.initOfflineMode();
-                                RNRestart.Restart();
-                            } else {
+                        {
+                            text: "Offline",
+                            style: 'cancel',
+                        }
+                    ],
+                    {cancelable: false},
+                );
+            }
+            // Trong trường hợp mất mạng
+            else {
+                msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
+                Alert.alert(
+                    "Thông báo",
+                    msg,
+                    [
+                        {
+                            text: "Offline",
+                            onPress: async () => {
+                                console.log('Change Mode');
+                                Def.NetWorkMode = networkState.isConnected;
+                                await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                                if (!Def.NetWorkMode) {
+                                    await OfflineHelper.initOfflineMode();
+                                    RNRestart.Restart();
+                                } else {
 
-                            }
+                                }
 
 
+                            },
+                            style: 'cancel',
                         },
-                        style: 'cancel',
-                    },
-                    {
-                        text: "Cancel",
-                        style: 'cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
+                        {
+                            text: "Cancel",
+                            style: 'cancel',
+                        }
+                    ],
+                    {cancelable: false},
+                );
+            }
 
         }
+    } else {
+        Def.NetWorkConnect = networkState.isConnected;
+        Def.NetWorkMode = networkState.isConnected;
+        await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
+        await AsyncStorage.setItem('network_mode' , networkState.isConnected ? '1' : '0');
+    }
 });
 
 // Def.initFunc();
