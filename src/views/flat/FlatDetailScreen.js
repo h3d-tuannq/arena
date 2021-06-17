@@ -177,7 +177,7 @@ class FlatDetailScreen extends React.Component {
 
     };
 
-    getRepairByFlatSuccess = (data) => {
+    getRepairByFlatSuccess = async (data) => {
         if( data['result']  && data['request_repairs']){
             Def.requestRepairtFlat[this.state.item.id] = OfflineHelper.makeObjectDataWithKeyObj (data['request_repairs']);
             let requestRepair = data['request_repairs'];
@@ -191,11 +191,11 @@ class FlatDetailScreen extends React.Component {
             });
 
             if(Def.requestRepairsTree){
-                AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
+               await AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
             }
 
             if(Def.requestRepairtFlat){
-                AsyncStorage.setItem('requestRepairtFlat', JSON.stringify(Def.requestRepairtFlat));
+               await AsyncStorage.setItem('requestRepairtFlat', JSON.stringify(Def.requestRepairtFlat));
             }
 
             console.log('item data0.2 : ' + this.state.item.update);

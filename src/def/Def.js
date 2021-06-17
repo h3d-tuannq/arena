@@ -518,7 +518,7 @@ export default class Def {
     static customerData = [];
 
     static checkTakePhotoImg = (uri) => {
-        var n = uri.search("com.arena");
+        var n = uri.search("com.thearena");
         return n != -1;
     }
 

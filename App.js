@@ -110,7 +110,7 @@ NetInfo.addEventListener(async networkState => {
                 );
             }
             // Trong trường hợp mất mạng và ứng dụng đang sử dụng ở chế độ
-            else if(Def.NetWorkMode){
+            else if( !networkState.isConnected && Def.NetWorkMode){
                 msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
                 Alert.alert(
                     "Thông báo",
