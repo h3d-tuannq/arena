@@ -63,12 +63,13 @@ NetInfo.addEventListener(async networkState => {
     let msg;
     let network_mode_data = await AsyncStorage.getItem('network_mode');
     if(network_mode_data) {
-
         Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
         Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
+        // Trong trường hợp khác trạng thái mạng đang lưu trên App thì mới thực hiện
         if ((networkState.isConnected != Def.NetWorkConnect)) {
             await AsyncStorage.setItem('network_connect', networkState.isConnected ? '1' : '0');
-            if (networkState.isConnected) {
+            // Trong trường hợp có mạng và ứng dụng đang ở mode offline thì hiển thị thông báo chuyển đổi chế độ sử dụng
+            if (networkState.isConnected && !Def.NetWorkMode) {
                 // msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
                 msg = OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
                 Alert.alert(
@@ -108,8 +109,8 @@ NetInfo.addEventListener(async networkState => {
                     {cancelable: false},
                 );
             }
-            // Trong trường hợp mất mạng
-            else {
+            // Trong trường hợp mất mạng và ứng dụng đang sử dụng ở chế độ
+            else if(Def.NetWorkMode){
                 msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
                 Alert.alert(
                     "Thông báo",
