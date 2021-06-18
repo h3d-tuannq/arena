@@ -508,7 +508,16 @@ class FlatListScreen extends React.Component {
                 console.log('rewrite offlineFlatDataArr');
                 OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
             }
+
+
+
             this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh:false});
+
+            let offlineRequestTreeStr = await  AsyncStorage.getItem('offlineRequestTree');
+            OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse( offlineRequestTreeStr) : {};
+
+            console.log('Read Offline Request Tree : '+ JSON.stringify(OfflineHelper.offlineRequestTree));
+
             // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
             //
             // console.log('App Mode2' + JSON.stringify(OfflineHelper.offlineFlatData));

@@ -47,9 +47,12 @@ export class OfflineHelper {
     static initOfflineMode = async () => {
         console.log('Init offline data');
         OfflineHelper.offlineRequestTree = {... Def.requestRepairsTree};
+
+        console.log('OfflineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree));
+
         OfflineHelper.pifChangeData = {};
-        AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
-        AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
+        await AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+        await AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
         if (!OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({})) {
             if(!Def.user_info)
                 Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
@@ -58,7 +61,7 @@ export class OfflineHelper {
         }
 
         for (const key in OfflineHelper.offlineFlatData){
-            console.log('OfflineHelper.offlineFlatData : Update : ' + OfflineHelper.offlineFlatData[key].update);
+            // console.log('OfflineHelper.offlineFlatData : Update : ' + OfflineHelper.offlineFlatData[key].update);
         }
         if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
             OfflineHelper.offlineFlatDataArr.forEach(item => {
@@ -75,7 +78,7 @@ export class OfflineHelper {
                 console.log('Update from offline data : --' + item['update']);
             });
         }
-        AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
+        await  AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
     }
 
 
@@ -363,7 +366,7 @@ export class OfflineHelper {
         OfflineHelper.requestChangeData.push(item);
         AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
-        console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
+        // console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
         // thực hiện lấy dữ liệu trong bản offline nếu khong có sẽ thwucj hiện lấy trong dữ liệu originnal.
         let refFlat = OfflineHelper.getOfflineFlatById(item.flat_id) ? OfflineHelper.getOfflineFlatById(item.flat_id)  : OfflineHelper.offlineFlatData[item.flat_id] ;
         if(refFlat){
@@ -449,7 +452,7 @@ export class OfflineHelper {
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
         if(index > -1){
             OfflineHelper.offlineFlatDataArr.splice(index,1);
-            console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
+            // console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
             AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
         }
         // Khi thực hiện xóa căn hộ khỏi danh sách thì thực hiện xóa

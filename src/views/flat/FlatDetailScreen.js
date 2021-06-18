@@ -194,6 +194,9 @@ class FlatDetailScreen extends React.Component {
                await AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
             }
 
+            console.log( 'Def.requestRepairsTree ' + JSON.stringify(Def.requestRepairsTree) );
+
+
             if(Def.requestRepairtFlat){
                await AsyncStorage.setItem('requestRepairtFlat', JSON.stringify(Def.requestRepairtFlat));
             }
