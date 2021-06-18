@@ -69,8 +69,7 @@ class ProductStack extends React.Component {
                         backgroundColor: Style.DEFAUT_BLUE_COLOR,
                         height: Style.HEADER_HEIGHT,
                     },
-                    headerRight: true ?  () => (
-
+                    headerRight: Def.NetWorkMode && Def.NetWorkConnect ?  () => (
                         <TouchableOpacity
                             style=  {
                                 {
@@ -84,8 +83,6 @@ class ProductStack extends React.Component {
                             onPress={this.downloadProduct}>
                             <Icon name="download" size={20} color="#fff" />
                         </TouchableOpacity>
-
-
                     ) : null,
                     headerTintColor: '#fff',
                     headerTitleStyle: {
@@ -106,7 +103,7 @@ class ProductStack extends React.Component {
                     headerTitleStyle: {
 
                     },
-                    headerRight: Def.user_info ?  () => (
+                    headerRight: false?  () => (
 
                         <TouchableOpacity
                             style=  {
@@ -120,10 +117,6 @@ class ProductStack extends React.Component {
                             }
                             onPress={() => this.goProductList}>
                             <Icon name="download" size={25} color="#fff" />
-                            {/*<Text style={{color:'#fff'}}>*/}
-                                {/*{route.params.item.id}*/}
-                            {/*</Text>*/}
-
                         </TouchableOpacity>
 
 

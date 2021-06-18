@@ -7,7 +7,18 @@
  */
 
 import React from 'react';
-import {Dimensions, StatusBar, PixelRatio, View, Button, TouchableOpacity, Text, Alert} from 'react-native';
+import {
+    Dimensions,
+    StatusBar,
+    PixelRatio,
+    View,
+    Button,
+    TouchableOpacity,
+    Text,
+    Alert,
+    Modal,
+    ActivityIndicator
+} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RNRestart from 'react-native-restart';
@@ -47,84 +58,100 @@ import NetInfo from "@react-native-community/netinfo";
 
 
 
+
 NetInfo.addEventListener(async networkState => {
-    console.log("Connection type - ", networkState.type);
     let msg;
-    Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
-    Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
-    if((networkState.isConnected != Def.NetWorkConnect)){
+    let network_mode_data = await AsyncStorage.getItem('network_mode');
+    if(network_mode_data) {
+        Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_mode')) == 1;
+        Def.NetWorkConnect = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
+        // Trong trường hợp khác trạng thái mạng đang lưu trên App thì mới thực hiện
+        if ((networkState.isConnected != Def.NetWorkConnect)) {
+            await AsyncStorage.setItem('network_connect', networkState.isConnected ? '1' : '0');
+            // Trong trường hợp có mạng và ứng dụng đang ở mode offline thì hiển thị thông báo chuyển đổi chế độ sử dụng
+            if (networkState.isConnected && !Def.NetWorkMode) {
+                // msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
+                msg = OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
+                Alert.alert(
+                    "Thông báo",
+                    msg,
+                    [
+                        {   // Chuyển sang trạng thái online
+                            text: "Online",
+                            onPress: async () => {
+                                console.log('Change Mode');
+                                Def.NetWorkMode = networkState.isConnected;
+                                await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                                if (Def.NetWorkMode == true) {
+                                    // if(Def.setLoading){
+                                    //     Def.setLoading(true);
+                                    // }
+                                    if (OfflineHelper.checkChangeData()) {
+                                        FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
+                                    } else {
+                                        await OfflineHelper.resetOldData();
+                                        RNRestart.Restart();
+                                    }
+
+                                } else {
+
+                                }
+
+
+                            },
+                            style: 'cancel',
+                        },
+                        {
+                            text: "Offline",
+                            style: 'cancel',
+                        }
+                    ],
+                    {cancelable: false},
+                );
+            }
+            // Trong trường hợp mất mạng và ứng dụng đang sử dụng ở chế độ
+            else if( !networkState.isConnected && Def.NetWorkMode){
+                msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
+                Alert.alert(
+                    "Thông báo",
+                    msg,
+                    [
+                        {
+                            text: "Offline",
+                            onPress: async () => {
+                                console.log('Change Mode');
+                                Def.NetWorkMode = networkState.isConnected;
+                                await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                                if (!Def.NetWorkMode) {
+                                    await OfflineHelper.initOfflineMode();
+                                    RNRestart.Restart();
+                                } else {
+
+                                }
+
+
+                            },
+                            style: 'cancel',
+                        },
+                        {
+                            text: "Cancel",
+                            style: 'cancel',
+                        }
+                    ],
+                    {cancelable: false},
+                );
+            }
+
+        }
+    } else {
+        Def.NetWorkConnect = networkState.isConnected;
+        Def.NetWorkMode = networkState.isConnected;
         await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
-        if(networkState.isConnected) {
-            msg = 'Mạng internet được khôi phục, bạn đồng bộ dữ liệu Offline sử dụng phiên bản online'
-            Alert.alert(
-                "Thông báo",
-                msg,
-                [
-                    {   // Chuyển sang trạng thái online
-                        text: "Online",
-                        onPress: async () => {
-                            console.log('Change Mode');
-                            Def.NetWorkMode = networkState.isConnected;
-                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
-                            if (Def.NetWorkMode == true) {
-                                // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
-                                // Thực hiện đồng bộ trước
-                                // await OfflineHelper.initOfflineMode();
-                                // FlatController.syncOfflineDataToServer();
-                                // RNRestart.Restart();
-                            } else {
-
-                            }
-
-
-                        },
-                        style: 'cancel',
-                    },
-                    {
-                        text: "Offline",
-                        style: 'cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
-        // Trong trường hợp mất mạng
-        else {
-            msg = 'Mất kết nối mạng internet vui chuyển trạng thái Offline';
-            Alert.alert(
-                "Thông báo",
-                msg,
-                [
-                    {
-                        text: "Offline",
-                        onPress: async () => {
-                            console.log('Change Mode');
-                            Def.NetWorkMode = networkState.isConnected;
-                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
-                            if (!Def.NetWorkMode) {
-                                await OfflineHelper.initOfflineMode();
-                                RNRestart.Restart();
-                            } else {
-
-                            }
-
-
-                        },
-                        style: 'cancel',
-                    },
-                    {
-                        text: "Cancel",
-                        style: 'cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
-
-        }
+        await AsyncStorage.setItem('network_mode' , networkState.isConnected ? '1' : '0');
+    }
 });
 
-Def.initFunc();
+// Def.initFunc();
 
 
 const {width, height} = Dimensions.get('window');
@@ -161,7 +188,7 @@ function CustomDrawerContent(props) {
             </View>
             <DrawerContentScrollView {...props}>
                 <View style={{flex: 1}}>
-                    {Def.email == null || Def.email == '' ? (
+                    {Def.NetWorkMode && (Def.email == null || Def.email == '')  ? (
                         <View
                             style={{
                                 flexDirection: 'row',
@@ -201,7 +228,7 @@ function CustomDrawerContent(props) {
 
                             <View style={{paddingBottom:10}}>
                                 <Text>
-                                    {Def.user_info['username']}
+                                    {Def.user_info ? Def.user_info['username'] : ''}
                                 </Text>
 
                                 <Text>
@@ -211,27 +238,30 @@ function CustomDrawerContent(props) {
                             </View>
                             <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
 
+                                {
+                                    Def.NetWorkMode ?
+                                    <TouchableOpacity
+                                        style={{
+                                            width: width * 0.35,
+                                            borderRadius: 5,
+                                            paddingVertical: PixelRatio.get() < 2 ? 5 :8,
+                                            backgroundColor: 'green',
+                                            alignItems: 'center',
+                                        }}
+                                        onPress={() => {
+                                            // AsyncStorage.removeItem('email');
+                                            // AsyncStorage.removeItem('login_token');
+                                            // AsyncStorage.removeItem('user_info');
+                                            // AsyncStorage.removeItem('username');
+                                            // AsyncStorage.removeItem('firebase_token');
+                                            // AsyncStorage.removeItem('cart_data');
+                                            // RNRestart.Restart();
+                                            UserController.logoutLocal();
+                                        }}>
+                                        <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng xuất </Text>
+                                    </TouchableOpacity> : null
+                                }
 
-                            <TouchableOpacity
-                                style={{
-                                    width: width * 0.35,
-                                    borderRadius: 5,
-                                    paddingVertical: PixelRatio.get() < 2 ? 5 :8,
-                                    backgroundColor: 'green',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    // AsyncStorage.removeItem('email');
-                                    // AsyncStorage.removeItem('login_token');
-                                    // AsyncStorage.removeItem('user_info');
-                                    // AsyncStorage.removeItem('username');
-                                    // AsyncStorage.removeItem('firebase_token');
-                                    // AsyncStorage.removeItem('cart_data');
-                                    // RNRestart.Restart();
-                                    UserController.logoutLocal();
-                                }}>
-                                <Text style={{fontSize: Style.TITLE_SIZE, color: '#fff'}}> Đăng xuất </Text>
-                            </TouchableOpacity>
 
                             {
                                 ((Def.NetWorkMode != Def.NetWorkConnect) || Def.NetWorkMode) ?
@@ -267,9 +297,9 @@ function CustomDrawerContent(props) {
                     paddingLeft: 10,
                     zIndex: 10,
                 }}>
-                <Text style={styles.infoText}>Hotline: +84 24 3936 9284</Text>
-                <Text style={styles.infoText}>Email: arenacamranh@gmail.com</Text>
-                <Text style={styles.infoText}>Website: https://arenacamranh.com</Text>
+                {/*<Text style={styles.infoText}>Hotline: +84 24 3936 9284</Text>*/}
+                {/*<Text style={styles.infoText}>Email: arenacamranh@gmail.com</Text>*/}
+                <Text style={styles.infoText}>Website: https://bangiao.thearena.com</Text>
                 <Text style={styles.infoText}>Phiên bản 1.0</Text>
             </View>
         </View>
@@ -429,110 +459,70 @@ function OfflineTab() {
     );
 }
 
+const LoadingModal = (props) => (
+        <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
+            <View style={{ justifyContent : 'center', alignItems:'center', flex: 1 }}>
+                <ActivityIndicator size="large" color="#0c5890"/>
+            </View>
+        </Modal>
+    )
+
+
 
 class App extends React.Component {
 
     constructor(props){
         super(props);
+        this.state={'isLoading' : false};
+        this.setLoading = this.setLoading.bind(this);
+        Def.setLoading = this.setLoading;
 
+    }
+
+    setLoading = (value) => {
+        this.setState({isLoading:value});
     }
 
    async componentDidMount(){
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
         Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
-        AsyncStorage.getItem('user_info').then(async (value) => {
-            if(value){
-                Def.user_info = JSON.parse(value);
-                Def.username = Def.user_info['user_name'];
-                Def.email = Def.user_info['email'];
 
-                AsyncStorage.getItem('flat_data').then((value) => {
-                    if(value){
-                        Def.flat_data = JSON.parse(value);
-                        console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
-                    }
-                });
+        let userInfoRaw = await AsyncStorage.getItem('user_info');
+        if(userInfoRaw){
+            Def.user_info = JSON.parse(userInfoRaw);
+            Def.username = Def.user_info['user_name'];
+            Def.email = Def.user_info['email'];
+            let flatDataRaw = await AsyncStorage.getItem('flat_data');
+            Def.flat_data = flatDataRaw ? JSON.parse(flatDataRaw) : [];
+            let requestRepairsTreeRaw = await AsyncStorage.getItem('requestRepairsTree');
+            Def.requestRepairsTree = requestRepairsTreeRaw ? JSON.parse(requestRepairsTreeRaw) : [];
 
-                AsyncStorage.getItem('requestRepairsTree').then(value => {
-                   if(value){
-                       Def.requestRepairsTree = JSON.parse(value);
-                   }
-                });
-                let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
-                OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+            // let offlineFlatArrRaw = await  AsyncStorage.getItem('offlineFlatDataArr');
+            // OfflineHelper.offlineFlatDataArr = offlineFlatArrRaw ? JSON.parse(offlineFlatArrRaw) : [];
+            let flatChangeDataStr = await  AsyncStorage.getItem('flatChangeData');
+            OfflineHelper.flatChangeData = flatChangeDataStr && flatChangeDataStr != undefined ? JSON.parse( flatChangeDataStr) : {};
 
-                let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
-                OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr ? JSON.parse( offlineFlatDataArrStr): [];
+            let pifChangeDataStr = await  AsyncStorage.getItem('pifChangeData');
+            OfflineHelper.pifChangeData = pifChangeDataStr && pifChangeDataStr != undefined ? JSON.parse( pifChangeDataStr) : {};
 
-                let flatChangeStr = await  AsyncStorage.getItem('flatChangeData');
-                OfflineHelper.flatChangeData = flatChangeStr && flatChangeStr !== undefined ? JSON.parse( flatChangeStr) : {};
-                // console.log('OfflineHelper.offlineFlatDataArr : ' + JSON.stringify(OfflineHelper.offlineFlatDataArr) )
+            let offlineDesignDataStr = await  AsyncStorage.getItem('offlineDesignData');
+            OfflineHelper.offlineDesignData = offlineDesignDataStr && offlineDesignDataStr != undefined ? JSON.parse( offlineDesignDataStr) : {};
 
+            let offlineProductDataStr = await  AsyncStorage.getItem('offlineProductData');
+            OfflineHelper.offlineProductData = offlineProductDataStr && offlineProductDataStr != undefined ? JSON.parse( offlineProductDataStr) : {};
 
+            let offlineRepairDataStr = await  AsyncStorage.getItem('offlineRepairData');
+            OfflineHelper.offlineRepairData = offlineRepairDataStr && offlineRepairDataStr != undefined ? JSON.parse( offlineRepairDataStr) : {};
 
-                AsyncStorage.getItem('offlineFlatData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineFlatData = JSON.parse(value);
-                    } else {
+            let offlineRequestTreeStr = await  AsyncStorage.getItem('offlineRequestTree');
+            OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse( offlineRequestTreeStr) : {};
 
-                    }
-                });
-                AsyncStorage.getItem('pifChangeData').then(value => {
-                    if(value){
-                        OfflineHelper.pifChangeData = JSON.parse(value);
-                        // console.log('OfflineHelper.pifChangeData.length ' + JSON.stringify(OfflineHelper.pifChangeData));
-                    } else {
+            let flat_current_pageStr = await  AsyncStorage.getItem('flat_current_page');
+            Def.flatCurrentPage = flat_current_pageStr && flat_current_pageStr != undefined ? JSON.parse( flat_current_pageStr) : {};
 
-                    }
-                });
-
-                AsyncStorage.getItem('offlineDesignData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineDesignData = JSON.parse(value);
-                    } else {
-                        console.log('Offline Data not found');
-                    }
-                });
-
-                AsyncStorage.getItem('offlineProductData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineProductData = JSON.parse(value);
-                    } else {
-                        console.log('Offline Data not found');
-                    }
-                });
-
-
-                AsyncStorage.getItem('offlineRepairData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineRepairData = JSON.parse(value);
-                    }
-                });
-
-                AsyncStorage.getItem('offlineFlatData').then(value => {
-                    if(value){
-                        OfflineHelper.offlineFlatData = JSON.parse(value);
-                    }
-                });
-
-                AsyncStorage.getItem('offlineRequestTree').then(value => {
-                    if(value){
-                        OfflineHelper.offlineRequestTree = JSON.parse(value);
-                    }
-                });
-
-                AsyncStorage.getItem('flat_current_page').then((value) => {
-                    if(value){
-                        Def.flatCurrentPage = value;
-                    }
-                });
-
-            } else {
-                AsyncStorage.removeItem('flat_data');
-            }
-        });
-
-
+        } else {
+            AsyncStorage.removeItem('flat_data');
+        }
     }
 
 
@@ -541,6 +531,7 @@ class App extends React.Component {
         return (
             <NavigationContainer>
                 <AppDrawer/>
+                <LoadingModal visible={this.state.isLoading}/>
             </NavigationContainer>
         );
     }

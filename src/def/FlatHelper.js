@@ -116,8 +116,8 @@ export default class FlatHelper {
 
     static getPriorityRole(user){
         let permission = false;
-        let userPermission = user.listRoleName.split();
         if(user){
+            let userPermission = user.listRoleName.split();
             FlatHelper.PriorityRoles.forEach(element => {
                 if(userPermission.indexOf(element) != -1){
                     permission = element;
@@ -171,8 +171,6 @@ export default class FlatHelper {
     static canPerformDelivering(flat, user){
         let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER);
         let status = flat.status == FlatHelper.CAN_DELIVER_STATUS;
-
-        console.log('Deliver Date : ' + flat.deliver_date )
         return isHandover && status && flat.deliver_date;
     }
 
@@ -260,8 +258,8 @@ export default class FlatHelper {
     }
 
     static calPassPif(flat){
-        let pifs = flat.productInstanceFlat;
-        let activePif = pifs.filter(function (item) {
+        let pifs = flat.productInstanceFlat ? flat.productInstanceFlat : [];
+        let activePif =  pifs.filter(function (item) {
             return item.is_deleted != 1;
         });
         let passPif = activePif.filter(function (activeItem) {

@@ -46,7 +46,8 @@ class FlatItemrenderer extends PureComponent{
     render(){
         const model = this.props.item;
         const click = this.props.click;
-        console.log('Update : ' + model['update']);
+        // console.log('Update : ' + model['update']);
+
         const FavoriteItem = ()=> {
             if(this.props.favorite ){
 
@@ -153,11 +154,16 @@ class FlatItemrenderer extends PureComponent{
                 </View>
 
                 <View style={{flex:0.2 , justifyContent: 'flex-start', height: width/5}}>
-                    <TouchableOpacity disabled={true}>
-                        <Icon name="download" size={20}
-                            color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}
-                            style={{}}/>
-                    </TouchableOpacity>
+                    {
+                        Def.NetWorkMode ?
+                        <TouchableOpacity disabled={true}>
+                            <Icon name="download" size={20}
+                                  color={OfflineHelper.checkOffline(model, Def.FlatType) ? "#03fc66" : Style.GREY_TEXT_COLOR}
+                                  style={{}}/>
+                        </TouchableOpacity>
+                            : null
+
+                    }
                     {
                         !Def.NetWorkMode && OfflineHelper.checkOffline(model, Def.FlatType) ?
                         <TouchableOpacity
@@ -175,7 +181,7 @@ class FlatItemrenderer extends PureComponent{
                     }
 
                     {
-                        (model['update'] == 1 || model['update'] == '1') || OfflineHelper.checkChangeOfflineFlat(model)?
+                        !Def.NetWorkMode && ((model['update'] == 1 || model['update'] == '1') )?
                         <TouchableOpacity
                             onPress={()=> {
                                 if(this.props.itemHandleFunc && this.props.itemHandleFunc.resetOfflineFlat){

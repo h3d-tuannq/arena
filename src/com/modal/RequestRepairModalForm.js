@@ -14,6 +14,7 @@ import FlatController from "../../controller/FlatController";
 import ImagePicker  from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer';
 import FlatHelper from "../../def/FlatHelper";
+import {OfflineHelper} from "../../def/OfflineHelper";
 
 const PROGRAM_IMAGE_WIDTH = width * 0.6;
 const PROGRAM_IMAGE_HEIGHT = width * 0.6;
@@ -27,7 +28,7 @@ class RequestRepairModalForm extends React.Component {
         switch (props.type) {
             case FlatHelper.COMMENT_TYPE:
                  confirmMsg = 'Bình luận thành công';
-                 title == 'Bình luận';
+                 title = 'Bình luận';
                  break;
             case FlatHelper.REQUEST_TYPE:
                 confirmMsg = 'Tạo yêu cầu chỉnh sửa thành công';
@@ -66,6 +67,7 @@ class RequestRepairModalForm extends React.Component {
                 };
             }
             let status = this.state.type == FlatHelper.REPAIRED_TYPE ? 2 : (this.state.type == FlatHelper.COMMENT_TYPE  ? 3 :  0);
+
             FlatController.changeStatusProduct(this.changeStatusSuccess, this.changeStatusFalse, this.state.product, this.state.type ? 'wsh' : 'handover', Def.user_info['access_token'] ,this.props.type, this.state.note, img, status);
         } else  {
             console.log('User info not exits');
@@ -73,7 +75,6 @@ class RequestRepairModalForm extends React.Component {
     };
 
     changeStatusSuccess = (data) => {
-        console.log('Change Status Sucsess ' + JSON.stringify(data));
         if(data['msg'] == "Ok"){
             // console.log("Request Repair Item : " + JSON.stringify(data['requestRepair']));
             this.props.appendRepairItem(data);
@@ -146,6 +147,7 @@ class RequestRepairModalForm extends React.Component {
                             .then(resizedImage => {
                                 console.log("Attr : " + attr);
                                 resizedImage['type'] = response.type;
+                                console.log('resizedImage : '+ JSON.stringify(resizedImage))
                                 this.setState({[attr]: resizedImage});
                             })
                             .catch(err => {

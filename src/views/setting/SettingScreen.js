@@ -31,6 +31,7 @@ class SettingScreen extends React.Component {
         this.refreshData = this.refreshData.bind(this);
         this.resetData = this.resetData.bind(this);
         this.resetInteractData = this.resetInteractData.bind(this);
+        this.resetTemplateData = this.resetTemplateData.bind(this);
 
     }
     componentDicMount(){
@@ -74,16 +75,42 @@ class SettingScreen extends React.Component {
 
     }
 
-    resetData = ()=> {
+    resetTemplateData = () => {
         Alert.alert(
-            "Xóa dữ liệu offline căn hộ ",
-            "Dữ liệu lưu trữ và tương tác offline sẽ bị xóa",
+            "Xóa dữ liệu sản phẩm và căn mẫu ",
+            "Dữ liệu căn Offline căn mẫu và sản phẩm sẽ bị xóa",
             [
                 {
                     text: "Ok",
-                    onPress: () => {
-                        OfflineHelper.resetLocalData();
-                        OfflineHelper.resetInteractOfflineData();
+                    onPress: async () => {
+                        // resetTemplateData
+                        await OfflineHelper.resetTemplateData();
+                        RNRestart.Restart();
+
+                    },
+                    style: 'Cancel',
+                },
+                {
+                    text: "Cancel",
+                    style: 'Cancel',
+                }
+            ],
+            {cancelable: false},
+        );
+    }
+
+    resetData = ()=> {
+        Alert.alert(
+            "Xóa dữ liệu offline căn hộ ",
+            "Dữ liệu căn hộ Offline và tương tác offline sẽ bị xóa",
+            [
+                {
+                    text: "Ok",
+                    onPress: async () => {
+                        await OfflineHelper.resetInteractOfflineData();
+                        await OfflineHelper.resetLocalData();
+                        RNRestart.Restart();
+
                     },
                     style: 'Cancel',
                 },
@@ -122,7 +149,7 @@ class SettingScreen extends React.Component {
 
 
     refreshData = ()=> {
-
+        RNRestart.Restart();
     }
 
     render() {
@@ -166,7 +193,21 @@ class SettingScreen extends React.Component {
                                 <Icon name="user-cog" size={25} color={Style.GREY_TEXT_COLOR} />
                             </View>
                             <Text style={[Style.text_styles.middleText, {marginLeft :10}]}>
-                                Xóa dữ liệu Offline
+                                Xóa dữ liệu Căn hộ Offline
+                            </Text>
+                        </View>
+                        <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 10, backgroundColor : '#fff', marginTop:20}}
+                                      onPress={this.resetData}
+                    >
+                        <View style={{flexDirection : 'row', alignItems : 'center'}}>
+                            <View style={{width :30}}>
+                                <Icon name="user-cog" size={25} color={Style.GREY_TEXT_COLOR} />
+                            </View>
+                            <Text style={[Style.text_styles.middleText, {marginLeft :10}]}>
+                                Xóa dữ liệu Sản phẩm và Căn mẫu
                             </Text>
                         </View>
                         <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR} />

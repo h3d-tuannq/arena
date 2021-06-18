@@ -12,7 +12,7 @@ import {
     RefreshControl,
     TextInput,
     Modal,
-    Alert, Platform, PermissionsAndroid,
+    Alert, Platform, PermissionsAndroid, ActivityIndicator,
 } from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
@@ -28,6 +28,7 @@ import FlatHelper from '../../def/FlatHelper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Net from '../../controller/Net';
 import {OfflineHelper} from '../../def/OfflineHelper';
+import NetInfo from "@react-native-community/netinfo";
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -36,6 +37,14 @@ const CHOSE_DELIVER_DATE = 3;
 
 
 const ITEM_HEIGHT = 38;
+const LoadingModal = (props) => (
+    <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
+        <View style={{ justifyContent : 'center', alignItems:'center', flex: 1 }}>
+            <ActivityIndicator size="large" color="#0c5890"/>
+        </View>
+    </Modal>
+)
+
 
 
 class FlatListScreen extends React.Component {
@@ -91,6 +100,7 @@ class FlatListScreen extends React.Component {
             displaySelectDate: false,
             pageIndex:0,
             totalPage:0,
+            isLoading:false,
 
         };
 
@@ -152,7 +162,14 @@ class FlatListScreen extends React.Component {
         let design_list = Def.flat_data;
         if(Def.flat_data){
             AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+            // Def.flat_data.forEach(flat => {
+            //     // Cập nhật dữ liệu thiết kế cho căn hộ đã lưu offline
+            //     if(OfflineHelper.offlineFlatData[flat.id]){
+            //         OfflineHelper.offlineFlatData[flat.id] = flat;
+            //     }
+            // });
         }
+
 
         let newPageIndex = this.state.pageIndex + 1;
         Def.flatCurrentPage = newPageIndex;
@@ -161,7 +178,7 @@ class FlatListScreen extends React.Component {
         if(Def.criteria){
             design_list =  Def.flat_data.filter(this.filterFunc);
         }
-        this.setState({data:design_list, isRefresh:false, pageIndex:newPageIndex, totalPage: data['totalCount']});
+        this.setState({data:design_list, isRefresh:false, isLoading:false,pageIndex:newPageIndex, totalPage: data['totalCount']});
     }
 
 
@@ -179,6 +196,9 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
+        if(OfflineHelper.offlineFlatDataArr) {
+            console.log('OfflineHelper.offlineFlatDataArr Forcus - Refresh ' +  OfflineHelper.offlineFlatDataArr.length);
+        }
         this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
     }
 
@@ -253,7 +273,7 @@ class FlatListScreen extends React.Component {
     }
     onGetFlatFalse(data){
         console.log("false data : " + data);
-        this.setState({isRefresh:false});
+        this.setState({isRefresh:false, isLoading:false});
     }
 
     formatText(text){
@@ -377,7 +397,7 @@ class FlatListScreen extends React.Component {
             "Dữ liệu tương tác offline sẽ bị xóa",
             [
                 {
-                    text: "Ok",
+                    text: "Đồng ý",
                     onPress: () => {
                         OfflineHelper.resetChangeFlat(item);
                         this.refresh();
@@ -440,7 +460,24 @@ class FlatListScreen extends React.Component {
 
     async componentDidMount() {
         console.log('Flat list component did mount');
-        let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
+        let network_mode_data = await AsyncStorage.getItem('network_mode');
+        if(network_mode_data){
+            Def.NetWorkMode = JSON.parse(network_mode_data) == 1 || JSON.parse(network_mode_data) == '-1' ;
+        } else {
+            let network_connectRaw = await AsyncStorage.getItem('network_connect');
+            if(network_connectRaw) {
+                Def.NetWorkConnect = JSON.parse(network_connectRaw) == 1;
+                Def.NetWorkMode = JSON.parse(await AsyncStorage.getItem('network_connect')) == 1;
+            } else {
+                let state = await NetInfo.fetch();
+                if(state){
+                    Def.NetWorkConnect = state.isConnected;
+                    Def.NetWorkMode = state.isConnected;
+                    await AsyncStorage.setItem('network_connect' , state.isConnected ? '1' : '0');
+                    await AsyncStorage.setItem('network_mode' , state.isConnected ? '1' : '0');
+                }
+            }
+        }
         let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
         OfflineHelper.offlineFlatData = offlineFlatDataStr && offlineFlatDataStr!== undefined  ?JSON.parse(offlineFlatDataStr) : {};
         let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
@@ -450,12 +487,15 @@ class FlatListScreen extends React.Component {
         OfflineHelper.flatChangeData = flatChangeStr && flatChangeStr !== undefined ? JSON.parse( flatChangeStr) : {};
 
         console.log('OfflineHelper.offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
-        OfflineHelper.offlineFlatDataArr.forEach(item => {
-           console.log('Update --' + item['update']);
-        });
+        // if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
+        //     OfflineHelper.offlineFlatDataArr.forEach(item => {
+        //         console.log('Update --' + item['update']);
+        //     });
+        // }
+
         if(!Def.user_info)
             Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
-        Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
+
         if(!Def.NetWorkMode) {
             if(!OfflineHelper.offlineFlatDataArr || OfflineHelper.offlineFlatDataArr.length == 0){
 
@@ -487,11 +527,13 @@ class FlatListScreen extends React.Component {
                         Def.email = Def.user_info['email'];
 
                         AsyncStorage.getItem('flat_data').then((value) => {
-                            if(value){
+                            JSON.parse(value);
+                            if(value && JSON.parse(value).length > 0 ){
                                 Def.flat_data = JSON.parse(value);
                                 console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
                                 this.setState({data:Def.flat_data, pageIndex : Math.ceil(Def.flat_data.length/Def.pageSize) -1});
                             } else {
+                                this.setState({isLoading:true});
                                 FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
                             }
 
@@ -587,6 +629,7 @@ class FlatListScreen extends React.Component {
         return (
 
             !Def.user_info ?
+                Def.NetWorkMode && Def.NetWorkConnect ?
 
                 <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
                     <View style={{flexDirection: 'row'}}>
@@ -603,11 +646,15 @@ class FlatListScreen extends React.Component {
                         để sử dụng đầy đủ tính năng cá nhân
                     </Text>
 
-                </View>
+                </View > :
+                    <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
+                        <Text>
+                            Vui lòng kết nối mạng Internet
+                        </Text>
+                    </View>
                 :
-
-
             <View style={{flex:1, paddingTop:5}}>
+                <LoadingModal visible={this.state.isLoading}/>
                 <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>
                     <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', height:ITEM_HEIGHT,justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseStatusClick}

@@ -3,6 +3,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 import {Alert, Platform} from 'react-native';
+import FlatController from '../controller/FlatController'
 
 const PRODUCT_TYPE = 0;
 const DESIGN_TYPE = 1;
@@ -30,14 +31,22 @@ export class OfflineHelper {
 
     static convertObjectTreeToArray(obj){
         let rs= [];
-        for (const key in obj){
-            rs.push(obj[key]);
+        let cloneObj = {... obj};
+        for (const key in cloneObj){
+
+            let flat = cloneObj[key];
+            console.log('Affter clone ' + flat.update);
+            let cloneFlat = JSON.parse(JSON.stringify(flat));
+            // Object.assign(cloneFlat, flat);
+            rs.push(cloneFlat);
+            console.log('Affter clone ' + cloneFlat.update);
         }
         return rs;
     }
 
     static initOfflineMode = async () => {
-        OfflineHelper.offlineRequestTree = Def.requestRepairsTree;
+        console.log('Init offline data');
+        OfflineHelper.offlineRequestTree = {... Def.requestRepairsTree};
         OfflineHelper.pifChangeData = {};
         AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
         AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
@@ -47,7 +56,25 @@ export class OfflineHelper {
             let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
             OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
         }
-        OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+
+        for (const key in OfflineHelper.offlineFlatData){
+            console.log('OfflineHelper.offlineFlatData : Update : ' + OfflineHelper.offlineFlatData[key].update);
+        }
+        if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
+            OfflineHelper.offlineFlatDataArr.forEach(item => {
+                console.log('Update from offline data Before : --' + item['update']);
+            });
+        }
+
+
+
+        OfflineHelper.offlineFlatDataArr = OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+
+        if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
+            OfflineHelper.offlineFlatDataArr.forEach(item => {
+                console.log('Update from offline data : --' + item['update']);
+            });
+        }
         AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
     }
 
@@ -160,10 +187,6 @@ export class OfflineHelper {
         let url = Def.getThumnailImg(obj.image_path);
         let date = new Date();
         const { config, fs } = RNFetchBlob;
-        console.log('Url : ' + url);
-        console.log('Path Url : ' + path);
-
-
         let options = {
             fileCache: true,
             // addAndroidDownloads: {
@@ -229,7 +252,6 @@ export class OfflineHelper {
                 }
             })
         }
-        console.log('rs : ' + JSON.stringify(rs));
         return rs;
     }
 
@@ -251,29 +273,50 @@ export class OfflineHelper {
                 }
             })
         }
-        console.log('rs : ' + JSON.stringify(rs));
+        // console.log('rs : ' + JSON.stringify(rs));
         return rs;
     }
 
 
 
     static resetLocalData = async () => {
+        console.log('Reset Local Data');
         try {
-            OfflineHelper.offlineProductData = {};
-            OfflineHelper.offlineDesignData = {};
+
             OfflineHelper.offlineRepairData = {};
+            OfflineHelper.offlineFlatDataArr = [];
             OfflineHelper.offlineFlatData = {};
             OfflineHelper.downloadProductList = {} ;
             OfflineHelper.downloadDesignList = {};
             OfflineHelper.downloadRepariItemInflat = {};
             OfflineHelper.requestRepairsTree = {};
 
-            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'product_data', 'design_data', 'offlineDesignData', 'offlineProductData'];
+
+            await  AsyncStorage.setItem('offlineRepairData',JSON.stringify(OfflineHelper.offlineRepairData));
+            await  AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
+            await  AsyncStorage.setItem('offlineFlatData',JSON.stringify(OfflineHelper.offlineFlatData));
+            await  AsyncStorage.setItem('downloadProductList',JSON.stringify(OfflineHelper.downloadProductList));
+            await  AsyncStorage.setItem('downloadDesignList',JSON.stringify(OfflineHelper.downloadDesignList));
+            await  AsyncStorage.setItem('downloadRepariItemInflat',JSON.stringify(OfflineHelper.downloadRepariItemInflat));
+            await  AsyncStorage.setItem('requestRepairsTree',JSON.stringify(OfflineHelper.requestRepairsTree));
+
+            let keys = ['offlineFlatData','offlineRepairData','requestRepairsTree', 'flat_current_page', 'offlineFlatDataArr'];
             await AsyncStorage.multiRemove(keys);
         }catch (e){
 
         }
-        RNRestart.Restart();
+        // RNRestart.Restart();
+    }
+
+    static resetTemplateData = async  () => {
+        OfflineHelper.offlineProductData = {};
+        OfflineHelper.offlineDesignData = {};
+        Def.product_data = [];
+        Def.design_data = [];
+        await  AsyncStorage.setItem('offlineProductData',JSON.stringify(OfflineHelper.offlineProductData));
+        await  AsyncStorage.setItem('offlineDesignData',JSON.stringify(OfflineHelper.offlineDesignData));
+        await  AsyncStorage.setItem('product_data',JSON.stringify(Def.product_data));
+        await  AsyncStorage.setItem('design_data',JSON.stringify(Def.design_data));
     }
 
     static resetInteractOfflineData = async ()=> {
@@ -317,26 +360,34 @@ export class OfflineHelper {
         return rs;
     }
     static changeOfflineRepair = ( item = null, pif = null ) => {
-        console.log('Offline Item Repair : ' + JSON.stringify(item));
         OfflineHelper.requestChangeData.push(item);
         AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
-        let refFlat = OfflineHelper.offlineFlatData[item.flat_id];
-        refFlat['update'] = 1;
-        if(OfflineHelper.flatChangeData &&  !OfflineHelper.flatChangeData[refFlat.id]){
-            OfflineHelper.changeOfflineFlat(refFlat);
+        console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
+        // thực hiện lấy dữ liệu trong bản offline nếu khong có sẽ thwucj hiện lấy trong dữ liệu originnal.
+        let refFlat = OfflineHelper.getOfflineFlatById(item.flat_id) ? OfflineHelper.getOfflineFlatById(item.flat_id)  : OfflineHelper.offlineFlatData[item.flat_id] ;
+        if(refFlat){
+            let refFlat2 = {... refFlat};
+
+            refFlat2['update'] = 1;
+            if(OfflineHelper.flatChangeData && !OfflineHelper.flatChangeData[refFlat.id]){
+                OfflineHelper.changeOfflineFlat(refFlat2);
+            } else {
+                // console.log('OfflineHelper.flatChangeData : '+ JSON.stringify(OfflineHelper.flatChangeData));
+            }
+            // console.log('Update Reflat : '+ JSON.stringify(refFlat));
+            OfflineHelper.updateOfflineFlat(refFlat2, pif);
         }
-
-
-
-        // console.log('Update Reflat : '+ JSON.stringify(refFlat));
-
-        OfflineHelper.updateOfflineFlat(refFlat, pif);
     }
 
     static changeOfflineFlat = (flat) => {
-        console.log('Set Flat Change Data');
         OfflineHelper.flatChangeData[flat.id] = flat; // đánh dấu những flat được change
+        OfflineHelper.flatChangeData[flat.id]['update'] = 1;
+        if(OfflineHelper.flatChangeData[flat.id]){
+            console.log('Change Offline Flat Data');
+        } else {
+            console.log('Not exits');
+        }
         AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
     }
 
@@ -345,30 +396,30 @@ export class OfflineHelper {
     }
     // cập nhật dữ liệu thay đổi
     static updateOfflineFlat(flat, pif = null){
+        console.log('updateOfflineFlat: --------------------------------------------------------------');
         if(typeof flat == 'number'){
             let flatIndex = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat );
             if(flatIndex > -1){
                 flat = OfflineHelper.offlineFlatDataArr[flatIndex];
             }
         }
+
+
         if(flat){
-        flat['update'] = 1;
-        if(pif){
-            let indexPif = flat.productInstanceFlat.findIndex(element => element.id == pif.id);
-            if(indexPif > -1){
-                console.log('Update PIF in flat');
-                flat.productInstanceFlat[indexPif]= pif;
+            flat['update'] = 1;
+            if(pif){
+                let indexPif = flat.productInstanceFlat.findIndex(element => element.id == pif.id);
+                if(indexPif > -1){
+                    console.log('Update PIF in flat');
+                    flat.productInstanceFlat[indexPif]= pif;
+                }
             }
-        }
         // console.log('Flat change' + JSON.stringify(flat));
             let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
             if(index > -1){
-                if(flat.status == 7) { // Trong trường hợp căn họ hoàn thành thực hiện remote khỏi mảng
-                    // OfflineHelper.offlineFlatDataArr.splice(index,1);
-                } else {
-                    OfflineHelper.offlineFlatDataArr[index] = flat;
-                    Def.refresh_flat_data = true;
-                }
+                OfflineHelper.changeOfflineFlat(flat);
+                OfflineHelper.offlineFlatDataArr[index] = flat;
+                Def.refresh_flat_data = true;
                 AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
             }
             return index> -1;
@@ -396,7 +447,6 @@ export class OfflineHelper {
             AsyncStorage.setItem('offlineFlatData', JSON.stringify(OfflineHelper.offlineFlatData));
         }
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
-        console.log('Index : ' + index);
         if(index > -1){
             OfflineHelper.offlineFlatDataArr.splice(index,1);
             console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
@@ -418,24 +468,29 @@ export class OfflineHelper {
         Chỉ thực hiện refresh không thực hiện xóa đối với căn hộ
      */
     static resetChangeFlat = (flat) => {
+        console.log('Start reset Data : ' + flat.id);
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
-        console.log('Start Reset');
         if(index > -1){
             let pifs = flat.productInstanceFlat;
             pifs.forEach(pif =>  {
                 OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
+                if (OfflineHelper.pifChangeData && OfflineHelper.pifChangeData[pif.id]) {
+                   delete OfflineHelper.pifChangeData[pif.id];
+                }
             })
             // Trong trường hợp reset thực hiện xóa trong bảng lưu đánh dấu thay đổi flatChangeData
-            if(OfflineHelper.flatChangeData && OfflineHelper.flatChangeData[flat.id]){
-                console.log('Reset on flat change');
+            if(OfflineHelper.flatChangeData[flat.id]){
                 delete OfflineHelper.flatChangeData[flat.id];
+                console.log('test');
                 AsyncStorage.setItem('flatChangeData', JSON.stringify(OfflineHelper.flatChangeData));
             } else {
-                console.log('FlatChange Data : '+ JSON.stringify(OfflineHelper.flatChangeData));
+                console.log('Không tồn tại trong bảng flatChangeData ' + JSON.stringify(OfflineHelper.flatChangeData));
             }
+
             OfflineHelper.offlineFlatDataArr[index] = OfflineHelper.offlineFlatData[flat.id];
             AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
             AsyncStorage.setItem('offlineRequestTree', JSON.stringify(OfflineHelper.offlineRequestTree));
+            AsyncStorage.setItem('pifChangeData', JSON.stringify(OfflineHelper.pifChangeData));
         }
     }
 
@@ -459,11 +514,66 @@ export class OfflineHelper {
         return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData.length > 0;
     }
 
+    static syncSuccessCallback = (data) => {
+        console.log('SyncSuccessCallback : ' + JSON.stringify(data));
+        if(Def.setLoading){
+            Def.setLoading(false);
+        }
+        if(data['result'] == 1){
+            Alert.alert(
+                "Thông báo",
+                'Đồng bộ dữ liệu thành công!',
+                [
+                    {   // Chuyển sang trạng thái online
+                        text: "OK",
+                        onPress: async () => {
+                            await OfflineHelper.resetOldData(); // Thực hiện xóa dữ liệu để hệ thống load lại dữ liệu online.
+                            RNRestart.Restart();
+                        },
+                        style: 'cancel',
+                    },
+                ],
+                {cancelable: false},
+            );
+        } else {
+            Alert.alert(
+                "Thông báo",
+                'Đồng bộ dữ liệu thất bại! Ứng dụng sẽ cập nhật dữ liệu Online!',
+                [
+                    {   // Chuyển sang trạng thái online
+                        text: "OK",
+                        onPress: async () => {
+                            RNRestart.Restart();
+                        },
+                        style: 'cancel',
+                    },
+                    {
+                        text: "Offline",
+                        onPress: async () => {
+                            Def.NetWorkMode = false;
+                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
+                        },
+                        style: 'cancel',
+                    },
+                ],
+                {cancelable: false},
+            );
+        }
+
+    }
+
+    static syncFalseCallback = (data) => {
+        if(Def.setLoading){
+            Def.setLoading(false);
+        }
+        console.log('SyncFalseCallback : ' + JSON.stringify(data));
+    }
+
     static changeAppMode = async () => {
         let msg;
         // Từ chế độ Offline chuyển sang chế độ Online
         if(Def.NetWorkConnect && !Def.NetWorkMode) {
-            msg = 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!'
+            msg =  OfflineHelper.checkChangeData() ? 'Chuyển sang chế Online, Dữ liệu Offline sẽ được đồng bộ!' : 'Chuyển sang chế độ Online!'
             Alert.alert(
                 "Thông báo",
                 msg,
@@ -471,19 +581,19 @@ export class OfflineHelper {
                     {   // Chuyển sang trạng thái online
                         text: "OK",
                         onPress: async () => {
-                            console.log('Change Mode');
+                            console.log('Change  Mode Dữ liệu thay đổi');
                             Def.NetWorkMode = true;
-                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0')
-                            if (Def.NetWorkMode == true) {
-                                // Thực hiện đồng bộ dữ liệu khi có mạng và chuyển sang phiên bản online
-                                // Thực hiện đồng bộ trước
-                                // await OfflineHelper.initOfflineMode();
-                                RNRestart.Restart();
+                            await AsyncStorage.setItem('network_mode', Def.NetWorkMode ? '1' : '0');
+                            // Trong trường hợp thay đổi dữ liệu thì mới thực hiện đồng bộ lên dữ liệu online.
+                            if(OfflineHelper.checkChangeData()) {
+                                if (Def.setLoading) {
+                                    Def.setLoading(true);
+                                }
+                                FlatController.syncOfflineDataToServer(OfflineHelper.syncSuccessCallback, OfflineHelper.syncFalseCallback);
                             } else {
-
+                                await OfflineHelper.resetOldData();
+                                RNRestart.Restart();
                             }
-
-
                         },
                         style: 'cancel',
                     },
@@ -529,7 +639,21 @@ export class OfflineHelper {
         }
 
     }
+    // Thực hiện xóa dữ liệu FlatData để ứng dụng thực hiện reload
+    static resetOldData = async () => {
+        console.log('resetOldData');
+        await  OfflineHelper.resetLocalData();
+        await  OfflineHelper.resetInteractOfflineData();
+        Def.flat_data = [];
+        Def.requestRepairsTree = {};
+        await AsyncStorage.setItem('flat_data', JSON.stringify(Def.flat_data));
+        await AsyncStorage.setItem('requestRepairsTree',JSON.stringify(Def.requestRepairsTree));
+        console.log('resetOldData End');
+    }
 
+    static checkChangeData = () => {
+       return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData != '' && JSON.stringify(OfflineHelper.flatChangeData) != JSON.stringify({})
+    }
 
 
 

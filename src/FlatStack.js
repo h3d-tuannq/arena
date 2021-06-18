@@ -129,7 +129,7 @@ class FlatStack extends React.Component {
                     headerRight: Def.user_info ?  () => {
                         return (Def.NetWorkMode == 1 || Def.NetWorkMode == '1' ?
 
-                            !OfflineHelper.checkOffline(route.params.item, Def.FlatType)
+                                (Def.NetWorkMode == 1 || Def.NetWorkMode == '1') || !OfflineHelper.checkOffline(route.params.item, Def.FlatType)
                                 ?
                                 <TouchableOpacity
                                     style=  {
@@ -144,6 +144,7 @@ class FlatStack extends React.Component {
                                     onPress={() => this.downloadFlat(route.params.item.id)}>
                                     <Icon name="download" size={20} color={OfflineHelper.checkOffline(route.params.item, Def.FlatType) ? "#03fc66" : "#fff" } />
                                 </TouchableOpacity>
+
                                 :
                                 OfflineHelper.checkChangeOfflineFlat(route.params.item) ?
                                     <TouchableOpacity

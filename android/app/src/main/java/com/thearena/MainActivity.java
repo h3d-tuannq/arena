@@ -1,4 +1,4 @@
-package com.arena;
+package com.thearena;
 
 import com.facebook.react.ReactActivity;
 

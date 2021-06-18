@@ -81,6 +81,8 @@ export default class Def {
     static design_cate = null;
     static product_data = [];
     static cart_data = [];
+    static setLoading = null;
+
 
     static requestRepairtFlat ={} ;
 
@@ -478,7 +480,6 @@ export default class Def {
     static remoteVersion(path){
         console.log('path input ' + path);
         let rs = path.split("?v=");
-        console.log('RS: '+ JSON.stringify(rs));
         // rs.pop();
         // rs.join("=?");
         return rs[0];
@@ -487,18 +488,15 @@ export default class Def {
 
     static getFlatFromFlatData(flatId){
         let index = -1;
-        if(Def.flat_data){
-            index = Def.flat_data.findIndex((element) => element.id == flatId );
+        let flatData = Def.flat_data;
+        if(!Def.NetWorkMode && OfflineHelper.offlineFlatDataArr){
+           flatData = OfflineHelper.offlineFlatDataArr;
         }
-
-        console.log('Index : ' + index);
-        if (index > -1){
+        if(flatData){
+            index = flatData.findIndex((element) => element.id == flatId );
         }
-
-
-        return index > -1 ? Def.flat_data[index] : null;
-
-
+        console.log('Flat Data : ' + index);
+        return index > -1 ? flatData[index] : null;
     }
 
     static onlyUnique(value, index, self){
@@ -520,7 +518,7 @@ export default class Def {
     static customerData = [];
 
     static checkTakePhotoImg = (uri) => {
-        var n = uri.search("com.arena");
+        var n = uri.search("com.thearena");
         return n != -1;
     }
 

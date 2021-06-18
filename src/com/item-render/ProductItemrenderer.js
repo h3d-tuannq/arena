@@ -58,8 +58,20 @@ class ProductItemrenderer extends PureComponent{
                             </TouchableOpacity>
 
                         </View>
-                     : null
+                     : this.props.type == 'product-template' ?
+                            OfflineHelper.checkOffline(this.props.item, Def.ProductType) ?
+                                <View style={[styles.favoriteIcon, {width:40, height:20 , alignItems: 'center', justifyContent: 'flex-end', flexDirection:'row'} ]}>
+                                    {
 
+                                            <Icon name="download" size={20}
+                                                  color="#03fc66"
+                                                  style={{}}/>
+
+                                    }
+
+                                </View>
+                                : null
+                     : null
                 }
                 {
                     product && product.image_path ?

@@ -73,10 +73,12 @@ class ProductDetailScreen extends React.Component {
     }
 
     appendRepairItem = (data) => {
+        console.log('appendRepairItem data : ' + JSON.stringify(data));
         let currentList = this.state.requestRepairs;
-        if(data['requestRepair'] && !data['pif']){ // Trong trường hợp offline thì thêm ở mình trường hợp data[pif]
+        if(data['requestRepair'] && !data['offlineMode']){ // Trong trường hợp offline thì thêm ở mình trường hợp data[pif]
             currentList.push(data['requestRepair']);
         }
+
         if( data['pif']){
             this.setState({requestRepairs : currentList, displayRequestForm : false, item:data['pif']});
         } else {
@@ -143,6 +145,16 @@ class ProductDetailScreen extends React.Component {
                 ],
                 {cancelable: false},
             );
+
+
+            if(OfflineHelper.offlineFlatData){
+                console.log('Offline Flat Data : --------------------------------------');
+                for(const key in OfflineHelper.offlineFlatData ){
+                    console.log('Key : '+ OfflineHelper.offlineFlatData[key]['update']  );
+                }
+            }
+
+
 
         }
 
@@ -326,7 +338,7 @@ class ProductDetailScreen extends React.Component {
                     />
                 </View >
 
-                {this.state.item && flat && (flat.status != FlatHelper.DONE_STATUS) ? <View style={{flexDirection: 'row', paddingBottom: 5}}>
+                {this.state.item && ( flat && (flat.status != FlatHelper.DONE_STATUS)) ? <View style={{flexDirection: 'row', paddingBottom: 5}}>
                     {FlatHelper.canRequestRepair(this.state.item, Def.user_info) ?
                         <TouchableOpacity style={Style.button_styles.bookingBtn}
                                           onPress={() => this.openRequestForm(FlatHelper.REQUEST_TYPE)}>

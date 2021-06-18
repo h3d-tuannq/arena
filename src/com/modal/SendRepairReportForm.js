@@ -82,7 +82,6 @@ class SendRepairReportForm extends React.Component {
 
 
     sendMailSuccess = (data) => {
-        console.log('Change Status Sucsess ' + JSON.stringify(data));
         if(data['result'] == 1){
             this.setState({repairList: FlatHelper.getRepairItemList(data['flat']), refresh: Math.random()});
             this.props.updateFlatStatus(data['flat']);
