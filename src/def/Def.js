@@ -495,7 +495,6 @@ export default class Def {
         if(flatData){
             index = flatData.findIndex((element) => element.id == flatId );
         }
-        console.log('Flat Data : ' + index);
         return index > -1 ? flatData[index] : null;
     }
 

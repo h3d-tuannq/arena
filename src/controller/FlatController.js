@@ -118,6 +118,9 @@ export default class FlatController {
                    console.log('Khởi tạo request repair cho Pif : ' + pif.id);
                    OfflineHelper.offlineRequestTree[pif.id] = [repairItem];
                }
+
+               console.log('Repair Item for PIF '  + pif.id + ' : ' + OfflineHelper.offlineRequestTree[pif.id].length);
+
                // OfflineHelper.pifChangeData[pif.id] = pif;
                // AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
                AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));

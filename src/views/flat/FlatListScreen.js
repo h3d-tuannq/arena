@@ -479,9 +479,13 @@ class FlatListScreen extends React.Component {
             }
         }
         let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
-        OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+        OfflineHelper.offlineFlatData = offlineFlatDataStr && offlineFlatDataStr!== undefined  ?JSON.parse(offlineFlatDataStr) : {};
         let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
-        OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr ? JSON.parse( offlineFlatDataArrStr): [];
+        OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr && offlineFlatDataArrStr !== undefined ? JSON.parse( offlineFlatDataArrStr): [];
+
+        let flatChangeStr = await  AsyncStorage.getItem('flatChangeData');
+        OfflineHelper.flatChangeData = flatChangeStr && flatChangeStr !== undefined ? JSON.parse( flatChangeStr) : {};
+
         console.log('OfflineHelper.offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
         // if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
         //     OfflineHelper.offlineFlatDataArr.forEach(item => {
@@ -504,7 +508,16 @@ class FlatListScreen extends React.Component {
                 console.log('rewrite offlineFlatDataArr');
                 OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
             }
+
+
+
             this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh:false});
+
+            let offlineRequestTreeStr = await  AsyncStorage.getItem('offlineRequestTree');
+            OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse( offlineRequestTreeStr) : {};
+
+            console.log('Read Offline Request Tree : '+ JSON.stringify(OfflineHelper.offlineRequestTree));
+
             // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
             //
             // console.log('App Mode2' + JSON.stringify(OfflineHelper.offlineFlatData));
