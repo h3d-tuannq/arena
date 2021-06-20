@@ -53,7 +53,7 @@ export default class FlatController {
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-repair-item-by-flat" ,Def.POST_METHOD, param);
     }
 
-    static changeStatusProduct(callback, errCallback, pif, role, token , type, note, image, status ){
+    static async changeStatusProduct(callback, errCallback, pif, role, token , type, note, image, status ){
        if(Def.NetWorkMode) { // Xử lí trong trường hợp Online
            let param = {
                'product_instance_id': pif.id,
@@ -113,21 +113,23 @@ export default class FlatController {
 
                if(OfflineHelper.offlineRequestTree[pif.id]){
                    console.log('Add thêm request_repair cho Pif : ' + pif.id);
-                   OfflineHelper.offlineRequestTree[pif.id].push(repairItem);
+                    OfflineHelper.offlineRequestTree[pif.id].push(repairItem);
                }else {
                    console.log('Khởi tạo request repair cho Pif : ' + pif.id);
-                   OfflineHelper.offlineRequestTree[pif.id] = [repairItem];
+                    OfflineHelper.offlineRequestTree[pif.id] = [repairItem];
                }
 
-               console.log('Repair Item for PIF '  + pif.id + ' : ' + OfflineHelper.offlineRequestTree[pif.id].length);
+
 
                // OfflineHelper.pifChangeData[pif.id] = pif;
                // AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
-               AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
+               await  AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
            }
            pif['time'] = Math.ceil((new Date()).getTime() / 1000);
            OfflineHelper.pifChangeData[pif.id] = pif;
-           AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+           await AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+
+           console.log('Repair Item for PIF '  + pif.id + ' : ' + OfflineHelper.offlineRequestTree[pif.id].length);
 
 
            let data = {

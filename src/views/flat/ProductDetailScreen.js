@@ -48,6 +48,8 @@ class ProductDetailScreen extends React.Component {
         let repairData = Def.NetWorkMode ? ( Def.requestRepairsTree.hasOwnProperty(item.id) ? Def.requestRepairsTree[item.id] : [] )
             : (OfflineHelper.offlineRequestTree.hasOwnProperty(item.id) ? OfflineHelper.offlineRequestTree[item.id] : [] );
 
+        repairData = OfflineHelper.convertObjectTreeToArray({...repairData});
+
         this.state = {
             stateCount: 0.0,
             item:this.props.route.params.item,
@@ -75,35 +77,39 @@ class ProductDetailScreen extends React.Component {
 
     appendRepairItem = (data) => {
         // console.log('appendRepairItem data : ' + JSON.stringify(data['requestRepair']));
-        let currentList = this.state.requestRepairs;
-        console.log('Leng RequestData : ' + currentList.length);
-        if(data['requestRepair'] ){ // Trong trường hợp offline thì thêm ở mình trường hợp data[pif]
+        let currentList = this.state.requestRepairs ? this.state.requestRepairs : [];
+        // console.log('Leng RequestData : ' + currentList.length);
+        // console.log('Leng before RequestData In Tree : ' + OfflineHelper.offlineRequestTree[this.state.item.id].length);
+        if(data['requestRepair'] ){
             currentList.push(data['requestRepair']);
         }
-        console.log('Leng affter RequestData : ' + currentList.length);
-        console.log('Leng affter RequestData : ' + this.state.requestRepairs.length);
+        // console.log('Leng affter RequestData : ' + currentList.length);
+        // console.log('Leng affter RequestData : ' + this.state.requestRepairs.length);
+
+
 
         if( data['pif']){
             this.setState({requestRepairs : currentList, displayRequestForm : false, item:data['pif']});
         } else {
             this.setState({requestRepairs : currentList, displayRequestForm : false});
         }
-        console.log('Length affter RequestData2 : ' + this.state.requestRepairs.length);
+        // console.log('Length after RequestData2 : ' + this.state.requestRepairs.length);
+        // console.log('Leng after RequestData In Tree : ' + OfflineHelper.offlineRequestTree[this.state.item.id].length);
 
     };
 
     openRequestForm = (type = FlatHelper.REQUEST_TYPE) => {
-        console.log("Open Form --------------------------------------------------------------------");
+        console.log("Open Form --------------------------------------------------------------------" + this.state.requestRepairs.length);
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
 
     openFixedForm = (type = FlatHelper.REPAIRED_TYPE) => {
-        console.log("Open Form --------------------------------------------------------------------");
+        console.log("Open Form --------------------------------------------------------------------" + this.state.requestRepairs.length);
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
 
     openCommentForm = (type = FlatHelper.COMMENT_TYPE) => {
-        console.log("Open Form --------------------------------------------------------------------");
+        console.log("Open Form --------------------------------------------------------------------" + this.state.requestRepairs.length);
         this.setState({displayRequestForm:true , displayRequestModal: false, requestType: type});
     };
 
@@ -216,7 +222,10 @@ class ProductDetailScreen extends React.Component {
            } else {
                if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[keyId]) {
                    console.log('Isset on  request Tree');
-                   this.setState({requestRepairs:OfflineHelper.offlineRequestTree[keyId]});
+                   let repairData = OfflineHelper.offlineRequestTree[keyId];
+                   repairData = OfflineHelper.convertObjectTreeToArray({...repairData});
+
+                   this.setState({requestRepairs:repairData});
                }
            }
         }
