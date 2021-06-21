@@ -206,12 +206,25 @@ class ProductDetailScreen extends React.Component {
         this.setState({ stateCount: Math.random() });
     }
     shouldComponentUpdate(){
+        console.log('Should Update ProductDetailList');
         return true;
     }
     componentDidMount(){
-        console.log('Update repairList from comment list : ' + JSON.stringify(OfflineHelper.offlineRequestTree));
+        console.log('Component did mount');
+
+        const index = OfflineHelper.refreshPIF.indexOf(this.state.item.id);
+        let refresh = false;
+
+        if (index > -1) {
+            if(index > -1){
+                OfflineHelper.refreshPIF.splice(index, 1);
+            }
+            refresh = true;
+            console.log('Refresh true : ');
+        }
+        // console.log('Update repairList from comment list : ' + JSON.stringify(OfflineHelper.offlineRequestTree));
         let keyId = this.state.item.id + '';
-        if(this.state.requestRepairs.length == 0) {
+        if(this.state.requestRepairs.length == 0 || refresh) {
            if(Def.NetWorkMode) {
                if(Def.requestRepairsTree && Def.requestRepairsTree[keyId]) {
                    console.log('Isset on  request Tree');
@@ -222,6 +235,9 @@ class ProductDetailScreen extends React.Component {
            } else {
                if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[keyId]) {
                    console.log('Isset on  request Tree');
+                   if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[keyId]){
+                       console.log('Offline Request Tree In PIF : ' +  keyId +':' + OfflineHelper.offlineRequestTree[keyId].length);
+                   }
                    let repairData = OfflineHelper.offlineRequestTree[keyId];
                    repairData = OfflineHelper.convertObjectTreeToArray({...repairData});
 

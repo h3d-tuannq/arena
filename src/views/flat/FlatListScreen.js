@@ -400,6 +400,7 @@ class FlatListScreen extends React.Component {
                     text: "Đồng ý",
                     onPress: () => {
                         OfflineHelper.resetChangeFlat(item);
+                        console.log('OfflineHelper.refreshPIF : ' + JSON.stringify(OfflineHelper.refreshPIF));
                         this.refresh();
                     },
                     style: 'Cancel',
@@ -513,10 +514,17 @@ class FlatListScreen extends React.Component {
 
             this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh:false});
 
+            let requestRepairsTreeRaw = await AsyncStorage.getItem('requestRepairsTree');
+            Def.requestRepairsTree = requestRepairsTreeRaw ? JSON.parse(requestRepairsTreeRaw) : [];
+
+
             let offlineRequestTreeStr = await  AsyncStorage.getItem('offlineRequestTree');
             OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse( offlineRequestTreeStr) : {};
 
-            console.log('Read Offline Request Tree : '+ JSON.stringify(OfflineHelper.offlineRequestTree));
+            // console.log('Read Offline Request Tree : '+ JSON.stringify(OfflineHelper.offlineRequestTree));
+            // if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[7930]){
+            //     console.log('Offline Request Tree' + OfflineHelper.offlineRequestTree[7930].length);
+            // }
 
             // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
             //

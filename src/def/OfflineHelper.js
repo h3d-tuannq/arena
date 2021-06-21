@@ -35,11 +35,9 @@ export class OfflineHelper {
         for (const key in cloneObj){
 
             let flat = cloneObj[key];
-            console.log('Affter clone ' + flat.update);
             let cloneFlat = JSON.parse(JSON.stringify(flat));
             // Object.assign(cloneFlat, flat);
             rs.push(cloneFlat);
-            console.log('Affter clone ' + cloneFlat.update);
         }
         return rs;
     }
@@ -49,6 +47,9 @@ export class OfflineHelper {
         OfflineHelper.offlineRequestTree = {... Def.requestRepairsTree};
 
         console.log('OfflineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree));
+        // if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[7930]){
+        //     console.log('Offline Request Tree' + OfflineHelper.offlineRequestTree[7930].length);
+        // }
 
         OfflineHelper.pifChangeData = {};
         await AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
@@ -473,10 +474,29 @@ export class OfflineHelper {
     static resetChangeFlat = (flat) => {
         console.log('Start reset Data : ' + flat.id);
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+        console.log('Start reset Data Index : ' + index);
+
         if(index > -1){
             let pifs = flat.productInstanceFlat;
             pifs.forEach(pif =>  {
-                OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
+                if(pif.id == 7982 || pif.id == '7982') {
+                    console.log( 'Def.requestRepairsTree : ' + JSON.stringify(Def.requestRepairsTree[pif.id].length));
+                    console.log( 'OfflineHelper.offlineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree[pif.id].length));
+                }
+
+                let repairData = Def.requestRepairsTree[pif.id];
+                repairData =  repairData ? OfflineHelper.convertObjectTreeToArray({...repairData}) : [];
+                OfflineHelper.offlineRequestTree[pif.id] = repairData;
+
+                if(pif.id == 7982 || pif.id == '7982') {
+                    console.log( 'Affter Def.requestRepairsTree : ' + JSON.stringify(Def.requestRepairsTree[pif.id].length));
+                    console.log( 'Affter OfflineHelper.offlineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree[pif.id].length));
+                }
+
+                if(OfflineHelper.refreshPIF && !OfflineHelper.refreshPIF.includes(pif.id)) {
+                    OfflineHelper.refreshPIF.push(pif.id);
+                }
+
                 if (OfflineHelper.pifChangeData && OfflineHelper.pifChangeData[pif.id]) {
                    delete OfflineHelper.pifChangeData[pif.id];
                 }
@@ -657,6 +677,8 @@ export class OfflineHelper {
     static checkChangeData = () => {
        return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData != '' && JSON.stringify(OfflineHelper.flatChangeData) != JSON.stringify({})
     }
+
+    static refreshPIF = [];
 
 
 
