@@ -357,18 +357,9 @@ export class OfflineHelper {
                 break;
 
         }
-
-        // console.log('DesignData : '+ JSON.stringify(OfflineHelper.offlineDesignData));
-
         if(offlineData && offlineData[obj.id] && (offlineData[obj.id].downloaded || offlineData[obj.id].offline_img )) {
             rs = true;
         }
-
-        if(type == Def.DesignType){
-            console.log('Isset Offline Data : ' + rs);
-        }
-
-
         return rs;
     }
     static changeOfflineRepair = ( item = null, pif = null ) => {
