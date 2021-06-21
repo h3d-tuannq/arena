@@ -401,36 +401,26 @@ class ProductListScreen extends React.Component {
     }
 
 
-    componentDidMount() {
+    async componentDidMount() {
         console.log('Offline Data : ' + JSON.stringify(OfflineHelper.offlineProductData));
         if(!Def.product_data || Def.product_data.length == 0){
             if (Def.product_data.length > 0 && Def.product_data) {
                 this.setState({data:Def.product_data});
             } else {
-                AsyncStorage.getItem('user_info').then((value) => {
-                    if(value){
-                        Def.user_info = JSON.parse(value);
-                        Def.username = Def.user_info['user_name'];
-                        Def.email = Def.user_info['email'];
-                        console.log('Iset User Data');
-
-                        AsyncStorage.getItem('product_data').then((value) => {
-                            if(value){
-                                Def.product_data = JSON.parse(value);
-                                this.setState({data:Def.product_data});
-                            } else {
-                                FlatController.getProduct(this.onGetProductSuccess, this.onGetProductFalse);
-                            }
-
-                        });
-
+                let userData  = await AsyncStorage.getItem('user_info');
+                if(userData){
+                    Def.user_info = JSON.parse(userData);
+                    Def.username = Def.user_info['user_name'];
+                    Def.email = Def.user_info['email'];
+                    let productData  = await AsyncStorage.getItem('product_data');
+                    productData = productData ? JSON.parse(productData) : [];
+                    if(productData && productData.length > 0){
+                        Def.product_data = productData;
+                        this.setState({data:Def.product_data});
                     } else {
-                        AsyncStorage.removeItem('product_data');
+                        await AsyncStorage.setItem('product_data', "");
+                        FlatController.getProduct(this.onGetProductSuccess, this.onGetProductFalse);
                     }
-                });
-
-                if(Def.user_info){
-
                 }
             }
             Def.refresh_flat_data = false;

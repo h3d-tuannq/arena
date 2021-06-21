@@ -415,38 +415,25 @@ class DesignListScreen extends React.Component {
     }
 
 
-    componentDidMount() {
-
-        console.log('Offline Design Data : ' + JSON.stringify(OfflineHelper.offlineDesignData));
-
+    async componentDidMount() {
         if(!Def.design_data || Def.design_data.length == 0){
-            if (Def.design_data.length > 0 && Def.design_data) {
+            if (Def.design_data && Def.design_data.length > 0) {
                 this.setState({data:Def.design_data});
             } else {
-                AsyncStorage.getItem('user_info').then((value) => {
-                    if(value){
-                        Def.user_info = JSON.parse(value);
-                        Def.username = Def.user_info['user_name'];
-                        Def.email = Def.user_info['email'];
-                        console.log('Iset User Data');
-
-                        AsyncStorage.getItem('design_data').then((value) => {
-                            if(value){
-                                Def.design_data = JSON.parse(value);
-                                this.setState({data:Def.design_data});
-                            } else {
-                                FlatController.getDesign(this.onGetDesignSuccess, this.onGetDesignFalse);
-                            }
-
-                        });
-
+                let userData  = await AsyncStorage.getItem('user_info');
+                if(userData){
+                    Def.user_info = JSON.parse(userData);
+                    Def.username = Def.user_info['user_name'];
+                    Def.email = Def.user_info['email'];
+                    let designData  = await AsyncStorage.getItem('design_data');
+                    designData = designData ? JSON.parse(designData) : [];
+                    if(designData && designData.length > 0){
+                        Def.design_data = designData;
+                        this.setState({data:Def.design_data});
                     } else {
-                        AsyncStorage.set('design_data', null);
+                        await AsyncStorage.setItem('design_data', "");
+                        FlatController.getDesign(this.onGetDesignSuccess, this.onGetDesignFalse);
                     }
-                });
-
-                if(Def.user_info){
-
                 }
             }
             Def.refresh_flat_data = false;

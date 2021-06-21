@@ -414,7 +414,38 @@ export default class Def {
     }
 
     static getFlatStatusName( statusFilter = 0 ){
+        let statusName = Def.FlatSTatusList[statusFilter];
         return Def.FlatSTatusList[statusFilter];
+    }
+
+    static getFlatExt(model) {
+        let ext = '';
+        if(model.absentee_hanover) {
+            ext = ' (Bàn giao vắng mặt';
+        }
+        if(model.is_decline) {
+            if(ext.length > 0){
+                ext +=  ', Từ chối bàn giao';
+            } else {
+                ext =  ' (Từ chối bàn giao';
+            }
+
+
+        }
+        if(model.online_handover) {
+            if(ext.length > 0){
+                ext +=  ', Bàn giao Online';
+            } else {
+                ext =  ' ( Bàn giao Online';
+            }
+        }
+
+        if(ext.length > 0){
+            ext += ')';
+        }
+
+        return ext;
+
     }
 
     static getFlatStatusColor( statusFilter = 0 ){

@@ -233,7 +233,7 @@ export class OfflineHelper {
         let rs = {};
         if(arr){
             arr.forEach(item => {
-                rs[item['id']] = item;
+                rs[item['id']] = {... item};
             });
         }
         return rs;
@@ -313,6 +313,7 @@ export class OfflineHelper {
     }
 
     static resetTemplateData = async  () => {
+        console.log('Start REset Data');
         OfflineHelper.offlineProductData = {};
         OfflineHelper.offlineDesignData = {};
         Def.product_data = [];
@@ -321,6 +322,8 @@ export class OfflineHelper {
         await  AsyncStorage.setItem('offlineDesignData',JSON.stringify(OfflineHelper.offlineDesignData));
         await  AsyncStorage.setItem('product_data',JSON.stringify(Def.product_data));
         await  AsyncStorage.setItem('design_data',JSON.stringify(Def.design_data));
+
+        console.log('DesignData0 : '+ JSON.stringify(OfflineHelper.offlineDesignData));
     }
 
     static resetInteractOfflineData = async ()=> {
@@ -352,14 +355,19 @@ export class OfflineHelper {
             case Def.FlatType:
                 offlineData = OfflineHelper.offlineFlatData;
                 break;
-            case Def.REQUESTREPAIRTYPE:
-                offlineData = OfflineHelper.offlineRepairData;
-                break;
 
         }
+
+        // console.log('DesignData : '+ JSON.stringify(OfflineHelper.offlineDesignData));
+
         if(offlineData && offlineData[obj.id] && (offlineData[obj.id].downloaded || offlineData[obj.id].offline_img )) {
             rs = true;
         }
+
+        if(type == Def.DesignType){
+            console.log('Isset Offline Data : ' + rs);
+        }
+
 
         return rs;
     }

@@ -238,6 +238,11 @@ class FlatListScreen extends React.Component {
                     console.log('Case -3');
                     rs = item.absentee_hanover == 1;
                     break;
+                case -4 : // Filter cho trường hợp bàn giao Online
+                    console.log('Case -4');
+                    rs = item.online_handover == 1;
+                    break;
+
                 default :
                     rs = item.status == this.criteria.status['id'];
                     break;
@@ -300,8 +305,11 @@ class FlatListScreen extends React.Component {
 
     choseStatusClick = () => {
         console.log('Chose status click');
-
-        this.showModal(FlatHelper.FlatStatusData, 'Chọn Trạng thái', CHOSE_STATUS);
+        let filterData = FlatHelper.FlatStatusData;
+        if(FlatHelper.checkCanPermission(Def.user_info, FlatHelper.ROLE_HANDOVER)) {
+            filterData = filterData.concat([{'id': -4 , 'name': "Bàn giao Online"}]);
+        }
+        this.showModal(filterData, 'Chọn Trạng thái', CHOSE_STATUS);
     };
 
 
@@ -400,7 +408,6 @@ class FlatListScreen extends React.Component {
                     text: "Đồng ý",
                     onPress: () => {
                         OfflineHelper.resetChangeFlat(item);
-                        console.log('OfflineHelper.refreshPIF : ' + JSON.stringify(OfflineHelper.refreshPIF));
                         this.refresh();
                     },
                     style: 'Cancel',

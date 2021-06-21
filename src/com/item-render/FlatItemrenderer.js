@@ -120,7 +120,7 @@ class FlatItemrenderer extends PureComponent{
                                 {"Trạng thái:" + ' '}
                             </Text>
                             <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {Def.getFlatStatusName(model.status)+""}
+                                {Def.getFlatStatusName(model.status)}
                             </Text>
                         </View>
 

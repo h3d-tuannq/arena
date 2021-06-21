@@ -85,7 +85,7 @@ class SettingScreen extends React.Component {
                     onPress: async () => {
                         // resetTemplateData
                         await OfflineHelper.resetTemplateData();
-                        RNRestart.Restart();
+                        await RNRestart.Restart();
 
                     },
                     style: 'Cancel',
@@ -200,7 +200,7 @@ class SettingScreen extends React.Component {
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 10, backgroundColor : '#fff', marginTop:20}}
-                                      onPress={this.resetData}
+                                      onPress={this.resetTemplateData}
                     >
                         <View style={{flexDirection : 'row', alignItems : 'center'}}>
                             <View style={{width :30}}>

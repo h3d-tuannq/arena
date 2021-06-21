@@ -648,7 +648,7 @@ class FlatDetailScreen extends React.Component {
                             {"Tình trạng:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
+                            {Def.getFlatStatusName(item.status)+"" + Def.getFlatExt(item)}
                         </Text>
                     </View>
 
@@ -732,13 +732,12 @@ class FlatDetailScreen extends React.Component {
                                 </Text>
 
                                 <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                    { item.signature && item.signature.date_create ? Def.getDateString(new Date(item.signature.date_create *1000), "dd-MM-yyyy hh:mm") : ""}
+
+                                    {   item.offlineSignature ? Def.getDateString(new Date(item.offlineSignature.create_at *1000), "dd-MM-yyyy hh:mm"):
+                                        (item.signature && item.signature.date_create ? Def.getDateString(new Date(item.signature.date_create *1000), "dd-MM-yyyy hh:mm") : "")}
                                 </Text>
                             </View> : null
                     }
-
-
-
 
                     <View style={{flexDirection:'row'}}>
                         <Text>
