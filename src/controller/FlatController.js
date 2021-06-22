@@ -25,7 +25,7 @@ export default class FlatController {
 
     static getbuilding(callback,errCallback , params = null) {
 
-        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-bulding" ,Def.POST_METHOD, params);
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-building" ,Def.POST_METHOD, params);
     }
 
     static getCustomer(callback,errCallback ) {

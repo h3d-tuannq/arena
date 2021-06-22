@@ -86,8 +86,8 @@ class FlatItemrenderer extends PureComponent{
                 {/*/>*/}
 
                 <View style={styles.imageContainer}>
-                    {model.design && model.design.image_path ?
-                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage(model.design, 0, Def.DesignType)}}  />
+                    {(Def.getDesignForFlat(model)) && Def.getDesignForFlat(model).image_path ?
+                        <Image  style={[styles.itemImage ]}  source={{uri: Def.getObjImage( Def.getDesignForFlat(model), 0, Def.DesignType)}}  />
                         :
                         <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                     }
@@ -106,11 +106,11 @@ class FlatItemrenderer extends PureComponent{
                                 </Text>
                             </View>
 
-                            <View style={{flexDirection:'row', backgroundColor:Style.DEFAUT_RED_COLOR, borderRadius:2, borderColor:'#fff'}}>
-                                    <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5, color:'#fff'}}>
-                                        {FlatHelper.calPassPifStr(model)}
-                                    </Text>
-                            </View>
+                            {/*<View style={{flexDirection:'row', backgroundColor:Style.DEFAUT_RED_COLOR, borderRadius:2, borderColor:'#fff'}}>*/}
+                            {/*        <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5, color:'#fff'}}>*/}
+                            {/*            {FlatHelper.calPassPifStr(model)}*/}
+                            {/*        </Text>*/}
+                            {/*</View>*/}
 
                         </View>
 
@@ -130,7 +130,7 @@ class FlatItemrenderer extends PureComponent{
                             </Text>
 
                             <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                                {model.building ? model.building.name+"" : ""}
+                                {Def.getBuildingForFlat(model) ? Def.getBuildingForFlat(model).name+"" : ""}
                             </Text>
                         </View>
                         <View style={{flexDirection:'row'}}>
@@ -138,7 +138,8 @@ class FlatItemrenderer extends PureComponent{
                                 {"Chủ sở hữu:" + ' '}
                             </Text>
                             <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                { model.customer? model.customer.name+"" : ""}
+                                {Def.getCustomerForFlat(model) ? Def.getCustomerForFlat(model).name+"" : ""}
+                                {/*{ model.customer? model.customer.name+"" : ""}*/}
                             </Text>
                         </View>
 

@@ -564,8 +564,11 @@ class FlatDetailScreen extends React.Component {
 
         if(Def.user_info){
             if(Def.NetWorkMode){
-                this.setState({isLoading:true})
-                FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+                if(!this.state.item.productInstanceFlat || this.state.item.productInstanceFlat.length < 1) {
+                    this.setState({isLoading:true})
+                    FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+                }
+
             } else {
                 // thực hiện lấy dữ liệu từ hệ thống offline
                 let offlineFlat = OfflineHelper.getOfflineFlatById(this.state.item.id);

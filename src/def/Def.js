@@ -557,4 +557,37 @@ export default class Def {
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
         Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
     }
+
+    static getBuildingForFlat(flat){
+        if(!flat.building){
+            let index = Def.buildingData.findIndex(element => element.id == flat.building_id);
+            if(index > -1){
+                flat.building = Def.buildingData[index];
+            }
+        }
+        return flat.building;
+
+    }
+
+    static getDesignForFlat(flat){
+        if(!flat.design){
+            let index = Def.design_data.findIndex(element => element.id == flat.design_id);
+            if(index > -1){
+                flat.design = Def.design_data[index];
+            }
+        }
+        return flat.design;
+    }
+
+    static getCustomerForFlat(flat){
+        if(!flat.customer){
+            let index = Def.customerData.findIndex(element => element.code == flat.customer_code);
+            if(index > -1){
+                flat.customer = Def.customerData[index];
+            }
+        }
+        return flat.customer;
+    }
+
+
 }
