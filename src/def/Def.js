@@ -2,7 +2,6 @@ import {OfflineHelper} from "./OfflineHelper";
 import {Platform, Dimensions} from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 export default class Def {
     static URL_BASE = "https://eurotiledev.house3d.net";
     static URL_CONTENT_BASE = "https://eurotiledev.house3d.net/data/eurotileData/";
@@ -418,6 +417,36 @@ export default class Def {
         return Def.FlatSTatusList[statusFilter];
     }
 
+    static getFlatExt(model) {
+        let ext = '';
+        if(model.absentee_hanover) {
+            ext = ' (Bàn giao vắng mặt';
+        }
+        if(model.is_decline) {
+            if(ext.length > 0){
+                ext +=  ', Từ chối bàn giao';
+            } else {
+                ext =  ' (Từ chối bàn giao';
+            }
+
+
+        }
+        if(model.online_handover) {
+            if(ext.length > 0){
+                ext +=  ', Bàn giao Online';
+            } else {
+                ext =  ' ( Bàn giao Online';
+            }
+        }
+
+        if(ext.length > 0){
+            ext += ')';
+        }
+
+        return ext;
+
+    }
+
     static getFlatStatusColor( statusFilter = 0 ){
         return Def.FlatSTatusColorList[statusFilter];
     }
@@ -496,7 +525,6 @@ export default class Def {
         if(flatData){
             index = flatData.findIndex((element) => element.id == flatId );
         }
-        console.log('Flat Data : ' + index);
         return index > -1 ? flatData[index] : null;
     }
 
@@ -528,6 +556,39 @@ export default class Def {
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
         Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
     }
+
+    static getBuildingForFlat(flat){
+        if(!flat.building){
+            let index = Def.buildingData.findIndex(element => element.id == flat.building_id);
+            if(index > -1){
+                flat.building = Def.buildingData[index];
+            }
+        }
+        return flat.building;
+
+    }
+
+    static getDesignForFlat(flat){
+        if(!flat.design){
+            let index = Def.design_data.findIndex(element => element.id == flat.design_id);
+            if(index > -1){
+                flat.design = Def.design_data[index];
+            }
+        }
+        return flat.design;
+    }
+
+    static getCustomerForFlat(flat){
+        if(!flat.customer){
+            let index = Def.customerData.findIndex(element => element.code == flat.customer_code);
+            if(index > -1){
+                flat.customer = Def.customerData[index];
+            }
+        }
+        return flat.customer;
+    }
+
+
 
     static isIphoneXorAbove() {
         const dimen = Dimensions.get('window');

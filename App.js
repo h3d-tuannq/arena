@@ -517,6 +517,8 @@ class App extends React.Component {
             let offlineRequestTreeStr = await  AsyncStorage.getItem('offlineRequestTree');
             OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse( offlineRequestTreeStr) : {};
 
+            // console.log('Read Offline Request Tree : '+ OfflineHelper.offlineRequestTree);
+
             let flat_current_pageStr = await  AsyncStorage.getItem('flat_current_page');
             Def.flatCurrentPage = flat_current_pageStr && flat_current_pageStr != undefined ? JSON.parse( flat_current_pageStr) : {};
 

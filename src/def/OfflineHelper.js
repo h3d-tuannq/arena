@@ -35,11 +35,9 @@ export class OfflineHelper {
         for (const key in cloneObj){
 
             let flat = cloneObj[key];
-            console.log('Affter clone ' + flat.update);
             let cloneFlat = JSON.parse(JSON.stringify(flat));
             // Object.assign(cloneFlat, flat);
             rs.push(cloneFlat);
-            console.log('Affter clone ' + cloneFlat.update);
         }
         return rs;
     }
@@ -47,9 +45,15 @@ export class OfflineHelper {
     static initOfflineMode = async () => {
         console.log('Init offline data');
         OfflineHelper.offlineRequestTree = {... Def.requestRepairsTree};
+
+        console.log('OfflineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree));
+        // if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[7930]){
+        //     console.log('Offline Request Tree' + OfflineHelper.offlineRequestTree[7930].length);
+        // }
+
         OfflineHelper.pifChangeData = {};
-        AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
-        AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
+        await AsyncStorage.setItem('pifChangeData',JSON.stringify(OfflineHelper.pifChangeData));
+        await AsyncStorage.setItem('offlineRequestTree',JSON.stringify(OfflineHelper.offlineRequestTree));
         if (!OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({})) {
             if(!Def.user_info)
                 Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
@@ -58,7 +62,7 @@ export class OfflineHelper {
         }
 
         for (const key in OfflineHelper.offlineFlatData){
-            console.log('OfflineHelper.offlineFlatData : Update : ' + OfflineHelper.offlineFlatData[key].update);
+            // console.log('OfflineHelper.offlineFlatData : Update : ' + OfflineHelper.offlineFlatData[key].update);
         }
         if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
             OfflineHelper.offlineFlatDataArr.forEach(item => {
@@ -75,7 +79,7 @@ export class OfflineHelper {
                 console.log('Update from offline data : --' + item['update']);
             });
         }
-        AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
+        await  AsyncStorage.setItem('offlineFlatDataArr',JSON.stringify(OfflineHelper.offlineFlatDataArr));
     }
 
 
@@ -229,7 +233,7 @@ export class OfflineHelper {
         let rs = {};
         if(arr){
             arr.forEach(item => {
-                rs[item['id']] = item;
+                rs[item['id']] = {... item};
             });
         }
         return rs;
@@ -309,6 +313,7 @@ export class OfflineHelper {
     }
 
     static resetTemplateData = async  () => {
+        console.log('Start REset Data');
         OfflineHelper.offlineProductData = {};
         OfflineHelper.offlineDesignData = {};
         Def.product_data = [];
@@ -317,6 +322,8 @@ export class OfflineHelper {
         await  AsyncStorage.setItem('offlineDesignData',JSON.stringify(OfflineHelper.offlineDesignData));
         await  AsyncStorage.setItem('product_data',JSON.stringify(Def.product_data));
         await  AsyncStorage.setItem('design_data',JSON.stringify(Def.design_data));
+
+        console.log('DesignData0 : '+ JSON.stringify(OfflineHelper.offlineDesignData));
     }
 
     static resetInteractOfflineData = async ()=> {
@@ -348,22 +355,18 @@ export class OfflineHelper {
             case Def.FlatType:
                 offlineData = OfflineHelper.offlineFlatData;
                 break;
-            case Def.REQUESTREPAIRTYPE:
-                offlineData = OfflineHelper.offlineRepairData;
-                break;
 
         }
         if(offlineData && offlineData[obj.id] && (offlineData[obj.id].downloaded || offlineData[obj.id].offline_img )) {
             rs = true;
         }
-
         return rs;
     }
     static changeOfflineRepair = ( item = null, pif = null ) => {
         OfflineHelper.requestChangeData.push(item);
         AsyncStorage.setItem('requestChangeData', JSON.stringify(OfflineHelper.requestChangeData));
         // Trong trường hợp ko có trong danh sách thay đổi thì thực hiện bổ sung
-        console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
+        // console.log('OfflineHelper.offlineFlatData : ' + JSON.stringify(OfflineHelper.offlineFlatData));
         // thực hiện lấy dữ liệu trong bản offline nếu khong có sẽ thwucj hiện lấy trong dữ liệu originnal.
         let refFlat = OfflineHelper.getOfflineFlatById(item.flat_id) ? OfflineHelper.getOfflineFlatById(item.flat_id)  : OfflineHelper.offlineFlatData[item.flat_id] ;
         if(refFlat){
@@ -449,7 +452,7 @@ export class OfflineHelper {
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
         if(index > -1){
             OfflineHelper.offlineFlatDataArr.splice(index,1);
-            console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
+            // console.log('offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
             AsyncStorage.setItem('offlineFlatDataArr', JSON.stringify(OfflineHelper.offlineFlatDataArr));
         }
         // Khi thực hiện xóa căn hộ khỏi danh sách thì thực hiện xóa
@@ -470,10 +473,29 @@ export class OfflineHelper {
     static resetChangeFlat = (flat) => {
         console.log('Start reset Data : ' + flat.id);
         let index = OfflineHelper.offlineFlatDataArr.findIndex((element) => element.id == flat.id );
+        console.log('Start reset Data Index : ' + index);
+
         if(index > -1){
             let pifs = flat.productInstanceFlat;
             pifs.forEach(pif =>  {
-                OfflineHelper.offlineRequestTree[pif.id] = Def.requestRepairsTree[pif.id] ? Def.requestRepairsTree[pif.id] : [];
+                if(pif.id == 7982 || pif.id == '7982') {
+                    console.log( 'Def.requestRepairsTree : ' + JSON.stringify(Def.requestRepairsTree[pif.id].length));
+                    console.log( 'OfflineHelper.offlineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree[pif.id].length));
+                }
+
+                let repairData = Def.requestRepairsTree[pif.id];
+                repairData =  repairData ? OfflineHelper.convertObjectTreeToArray({...repairData}) : [];
+                OfflineHelper.offlineRequestTree[pif.id] = repairData;
+
+                if(pif.id == 7982 || pif.id == '7982') {
+                    console.log( 'Affter Def.requestRepairsTree : ' + JSON.stringify(Def.requestRepairsTree[pif.id].length));
+                    console.log( 'Affter OfflineHelper.offlineRequestTree : ' + JSON.stringify(OfflineHelper.offlineRequestTree[pif.id].length));
+                }
+
+                if(OfflineHelper.refreshPIF && !OfflineHelper.refreshPIF.includes(pif.id)) {
+                    OfflineHelper.refreshPIF.push(pif.id);
+                }
+
                 if (OfflineHelper.pifChangeData && OfflineHelper.pifChangeData[pif.id]) {
                    delete OfflineHelper.pifChangeData[pif.id];
                 }
@@ -654,6 +676,8 @@ export class OfflineHelper {
     static checkChangeData = () => {
        return  OfflineHelper.flatChangeData && OfflineHelper.flatChangeData != '' && JSON.stringify(OfflineHelper.flatChangeData) != JSON.stringify({})
     }
+
+    static refreshPIF = [];
 
 
 

@@ -194,6 +194,9 @@ class FlatDetailScreen extends React.Component {
                await AsyncStorage.setItem('requestRepairsTree', JSON.stringify(Def.requestRepairsTree));
             }
 
+            console.log( 'Def.requestRepairsTree ' + JSON.stringify(Def.requestRepairsTree) );
+
+
             if(Def.requestRepairtFlat){
                await AsyncStorage.setItem('requestRepairtFlat', JSON.stringify(Def.requestRepairtFlat));
             }
@@ -561,8 +564,11 @@ class FlatDetailScreen extends React.Component {
 
         if(Def.user_info){
             if(Def.NetWorkMode){
-                this.setState({isLoading:true})
-                FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+                if(!this.state.item.productInstanceFlat || this.state.item.productInstanceFlat.length < 1) {
+                    this.setState({isLoading:true})
+                    FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+                }
+
             } else {
                 // thực hiện lấy dữ liệu từ hệ thống offline
                 let offlineFlat = OfflineHelper.getOfflineFlatById(this.state.item.id);
@@ -645,7 +651,7 @@ class FlatDetailScreen extends React.Component {
                             {"Tình trạng:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {Def.getFlatStatusName(item.status)+"" + (item.is_decline ? "/Đã từ chối bàn giao" :"")}
+                            {Def.getFlatStatusName(item.status)+"" + Def.getFlatExt(item)}
                         </Text>
                     </View>
 
@@ -729,13 +735,12 @@ class FlatDetailScreen extends React.Component {
                                 </Text>
 
                                 <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5}}>
-                                    { item.signature && item.signature.date_create ? Def.getDateString(new Date(item.signature.date_create *1000), "dd-MM-yyyy hh:mm") : ""}
+
+                                    {   item.offlineSignature ? Def.getDateString(new Date(item.offlineSignature.create_at *1000), "dd-MM-yyyy hh:mm"):
+                                        (item.signature && item.signature.date_create ? Def.getDateString(new Date(item.signature.date_create *1000), "dd-MM-yyyy hh:mm") : "")}
                                 </Text>
                             </View> : null
                     }
-
-
-
 
                     <View style={{flexDirection:'row'}}>
                         <Text>

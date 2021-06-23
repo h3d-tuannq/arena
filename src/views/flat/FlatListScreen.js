@@ -54,6 +54,7 @@ class FlatListScreen extends React.Component {
 
     constructor(props){
         super(props);
+        console.log('Start FlatList Screen! ');
         this.onGetFlatSuccess     = this.onGetFlatSuccess.bind(this);
         this.onGetFlatFalse     = this.onGetFlatFalse.bind(this);
         this.formatText    = this.formatText.bind(this);
@@ -79,6 +80,11 @@ class FlatListScreen extends React.Component {
         this.removeOfflineItem = this.removeOfflineItem.bind(this);
         this.resetOfflineFlat = this.resetOfflineFlat.bind(this);
         this.forcusFunction = this.forcusFunction.bind(this);
+        this.onGetDesignSuccess = this.onGetDesignSuccess.bind(this);
+        this.getPreBuildingSuccess = this.getPreBuildingSuccess.bind(this);
+        this.getPreCustomerSuccess = this.getPreCustomerSuccess.bind(this);
+        this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
+        this.readExtData = this.readExtData.bind(this);
 
         let title = "Căn hộ bàn giao";
         this.state = {
@@ -238,6 +244,11 @@ class FlatListScreen extends React.Component {
                     console.log('Case -3');
                     rs = item.absentee_hanover == 1;
                     break;
+                case -4 : // Filter cho trường hợp bàn giao Online
+                    console.log('Case -4');
+                    rs = item.online_handover == 1;
+                    break;
+
                 default :
                     rs = item.status == this.criteria.status['id'];
                     break;
@@ -285,13 +296,14 @@ class FlatListScreen extends React.Component {
     }
 
 
-    shouldComponentUpdate(){
+    async shouldComponentUpdate(){
         const index = Def.REFESH_SCREEN.indexOf('flat-screen');
-
+        console.log('shouldComponentUpdate Start FlatList Screen! ');
         if (index > -1 || (this.props.route && this.props.route.param && this.props.route.param.refresh)) {
             if(index > -1){
                 Def.REFESH_SCREEN.splice(index, 1);
             }
+            let apendData = await this.readExtData();
             this.onRefresh();
         }
 
@@ -300,8 +312,11 @@ class FlatListScreen extends React.Component {
 
     choseStatusClick = () => {
         console.log('Chose status click');
-
-        this.showModal(FlatHelper.FlatStatusData, 'Chọn Trạng thái', CHOSE_STATUS);
+        let filterData = FlatHelper.FlatStatusData;
+        if(FlatHelper.checkCanPermission(Def.user_info, FlatHelper.ROLE_HANDOVER)) {
+            filterData = filterData.concat([{'id': -4 , 'name': "Bàn giao Online"}]);
+        }
+        this.showModal(filterData, 'Chọn Trạng thái', CHOSE_STATUS);
     };
 
 
@@ -320,6 +335,7 @@ class FlatListScreen extends React.Component {
     }
 
     getBuildingSuccess = (data) => {
+        console.log('Building Success !');
         if(data['result'] == 1){
             Def.buildingData = data['building'];
             AsyncStorage.setItem('buildingData', JSON.stringify(Def.buildingData));
@@ -340,6 +356,24 @@ class FlatListScreen extends React.Component {
         }
 
     }
+
+    getPreBuildingSuccess = (data) => {
+        console.log('Lấy dữ liệu Tòa nhà và Refresh Data Success !');
+        if(data['result'] == 1){
+            Def.buildingData = data['building'];
+            AsyncStorage.setItem('buildingData', JSON.stringify(Def.buildingData));
+            this.refresh();
+        }
+    }
+    getPreCustomerSuccess = (data) => {
+        console.log('Lấy dữ liệu khách hàng và Refresh Data Success !');
+        if (data['result'] == 1) {
+            Def.customerData = data['customer'];
+            AsyncStorage.setItem('customerData', JSON.stringify(Def.customerData));
+            this.refresh();
+        }
+    }
+
 
     getFilterDataFalse = (data)=> {
         console.log('Get Bulding False' + JSON.stringify(data));
@@ -458,6 +492,66 @@ class FlatListScreen extends React.Component {
         this.setState(state)
     }
 
+    onGetDesignSuccess(data){
+        console.log('Lấy dữ liệu căn mẫu và Refresh Data Success !');
+        Def.design_data = data["data"];
+        AsyncStorage.setItem('design_data', JSON.stringify(Def.design_data));
+        console.log('Get Design Success !');
+        this.refresh();
+    }
+
+
+    onGetDesignFalse(data){
+        console.log("false data : " + data);
+        this.setState({isRefresh:false});
+    }
+
+    async readExtData() {
+        let apendData = false;
+        if (!Def.buildingData || Def.buildingData.length == 0) {
+            console.log(' Get Building  ! : ' + JSON.stringify(Def.buildingData));
+            let buildingData = await AsyncStorage.getItem('buildingData');
+            buildingData = buildingData ? JSON.parse(buildingData) : [];
+            if (buildingData && buildingData.length > 0) {
+                apendData = true;
+                Def.buildingData = buildingData;
+            } else {
+                await AsyncStorage.setItem('buildingData', "");
+                FlatController.getbuilding(this.getPreBuildingSuccess, this.onGetDesignFalse);
+            }
+        } else {
+            console.log('Building Data : ' + JSON.stringify(Def.buildingData));
+        }
+
+        if (!Def.design_data || Def.design_data.length == 0) {
+            let designData = await AsyncStorage.getItem('design_data');
+            designData = designData ? JSON.parse(designData) : [];
+            if (designData && designData.length > 0) {
+                Def.design_data = designData;
+                apendData = true;
+            } else {
+                await AsyncStorage.setItem('design_data', "");
+                FlatController.getDesign(this.onGetDesignSuccess, this.onGetDesignFalse);
+            }
+        }
+
+        if (!Def.customerData || Def.customerData.length == 0) {
+            console.log('Lấy dữ liệu Customer Data');
+            let customerData = await AsyncStorage.getItem('customerData');
+            customerData = customerData ? JSON.parse(customerData) : [];
+            if (customerData && customerData.length > 0) {
+                Def.customerData = customerData;
+                apendData = true;
+            } else {
+                await AsyncStorage.setItem('customerData', "");
+                FlatController.getCustomer(this.getPreCustomerSuccess, this.getFilterDataFalse);
+            }
+
+        }
+        return apendData;
+    }
+
+
     async componentDidMount() {
         console.log('Flat list component did mount');
         let network_mode_data = await AsyncStorage.getItem('network_mode');
@@ -479,9 +573,13 @@ class FlatListScreen extends React.Component {
             }
         }
         let offlineFlatDataStr = await  AsyncStorage.getItem('offlineFlatData');
-        OfflineHelper.offlineFlatData = offlineFlatDataStr ?JSON.parse(offlineFlatDataStr) : {};
+        OfflineHelper.offlineFlatData = offlineFlatDataStr && offlineFlatDataStr!== undefined  ?JSON.parse(offlineFlatDataStr) : {};
         let offlineFlatDataArrStr = await  AsyncStorage.getItem('offlineFlatDataArr');
-        OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr ? JSON.parse( offlineFlatDataArrStr): [];
+        OfflineHelper.offlineFlatDataArr = offlineFlatDataArrStr && offlineFlatDataArrStr !== undefined ? JSON.parse( offlineFlatDataArrStr): [];
+
+        let flatChangeStr = await  AsyncStorage.getItem('flatChangeData');
+        OfflineHelper.flatChangeData = flatChangeStr && flatChangeStr !== undefined ? JSON.parse( flatChangeStr) : {};
+
         console.log('OfflineHelper.offlineFlatDataArr : ' + OfflineHelper.offlineFlatDataArr.length);
         // if(Array.isArray(OfflineHelper.offlineFlatDataArr)){
         //     OfflineHelper.offlineFlatDataArr.forEach(item => {
@@ -489,67 +587,92 @@ class FlatListScreen extends React.Component {
         //     });
         // }
 
+
+
         if(!Def.user_info)
             Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
-
-        if(!Def.NetWorkMode) {
-            if(!OfflineHelper.offlineFlatDataArr || OfflineHelper.offlineFlatDataArr.length == 0){
-
-                if (!OfflineHelper.offlineFlatData && ( !OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({}))) {
-                    console.log('get data from storage');
-                    if(!Def.user_info)
-                        Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
-                    OfflineHelper.offlineFlatData = JSON.parse(await AsyncStorage.getItem('offlineFlatData'));
-                }
-                console.log('rewrite offlineFlatDataArr');
-                OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+        if(Def.user_info) {
+            let apendData = await this.readExtData();
+            if(apendData){
+                this.refresh();
             }
-            this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh:false});
-            // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
-            //
-            // console.log('App Mode2' + JSON.stringify(OfflineHelper.offlineFlatData));
-            // OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
-            // console.log('offlineFlatDataArr' + OfflineHelper.offlineFlatDataArr.length);
-            // this.setState({data: OfflineHelper.offlineFlatDataArr});
-        } else
-        if(Def.refresh_flat_data || Def.flat_data.length == 0){
-            if (Def.flat_data.length > 0 && Def.flat_data) {
-                this.setState({data:Def.flat_data});
-            } else {
-                AsyncStorage.getItem('user_info').then((value) => {
-                    if(value){
-                        Def.user_info = JSON.parse(value);
-                        Def.username = Def.user_info['user_name'];
-                        Def.email = Def.user_info['email'];
+            if (!Def.NetWorkMode) {
+                if (!OfflineHelper.offlineFlatDataArr || OfflineHelper.offlineFlatDataArr.length == 0) {
 
-                        AsyncStorage.getItem('flat_data').then((value) => {
-                            JSON.parse(value);
-                            if(value && JSON.parse(value).length > 0 ){
-                                Def.flat_data = JSON.parse(value);
-                                console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0 ));
-                                this.setState({data:Def.flat_data, pageIndex : Math.ceil(Def.flat_data.length/Def.pageSize) -1});
-                            } else {
-                                this.setState({isLoading:true});
-                                FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
-                            }
-
-                        });
-
-                    } else {
-                        AsyncStorage.removeItem('flat_data');
+                    if (!OfflineHelper.offlineFlatData && (!OfflineHelper.offlineFlatData || JSON.stringify(OfflineHelper.offlineFlatData) === JSON.stringify({}))) {
+                        console.log('get data from storage');
+                        if (!Def.user_info)
+                            Def.user_info = JSON.parse(await AsyncStorage.getItem('user_info'));
+                        OfflineHelper.offlineFlatData = JSON.parse(await AsyncStorage.getItem('offlineFlatData'));
                     }
-                });
-
-                if(Def.user_info){
-
+                    console.log('rewrite offlineFlatDataArr');
+                    OfflineHelper.offlineFlatDataArr = OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
                 }
-            }
-            Def.refresh_flat_data = false;
-        }
-        let navigation =  this.props.navigation ? this.props.navigation : Def.mainNavigate ;
 
-        if(navigation){
-            this.focusListener = navigation.addListener("focus", this.forcusFunction);
+
+                this.setState({data: OfflineHelper.offlineFlatDataArr, isRefresh: false});
+
+                let requestRepairsTreeRaw = await AsyncStorage.getItem('requestRepairsTree');
+                Def.requestRepairsTree = requestRepairsTreeRaw ? JSON.parse(requestRepairsTreeRaw) : [];
+
+
+                let offlineRequestTreeStr = await AsyncStorage.getItem('offlineRequestTree');
+                OfflineHelper.offlineRequestTree = offlineRequestTreeStr && offlineRequestTreeStr != undefined ? JSON.parse(offlineRequestTreeStr) : {};
+
+                // console.log('Read Offline Request Tree : '+ JSON.stringify(OfflineHelper.offlineRequestTree));
+                // if(OfflineHelper.offlineRequestTree && OfflineHelper.offlineRequestTree[7930]){
+                //     console.log('Offline Request Tree' + OfflineHelper.offlineRequestTree[7930].length);
+                // }
+
+                // console.log('App Mode1' + JSON.stringify(OfflineHelper.offlineFlatData));
+                //
+                // console.log('App Mode2' + JSON.stringify(OfflineHelper.offlineFlatData));
+                // OfflineHelper.offlineFlatDataArr =OfflineHelper.convertObjectTreeToArray(OfflineHelper.offlineFlatData);
+                // console.log('offlineFlatDataArr' + OfflineHelper.offlineFlatDataArr.length);
+                // this.setState({data: OfflineHelper.offlineFlatDataArr});
+            } else if (Def.refresh_flat_data || Def.flat_data.length == 0) {
+                if (Def.flat_data.length > 0 && Def.flat_data) {
+                    this.setState({data: Def.flat_data});
+                } else {
+                    AsyncStorage.getItem('user_info').then((value) => {
+                        if (value) {
+                            Def.user_info = JSON.parse(value);
+                            Def.username = Def.user_info['user_name'];
+                            Def.email = Def.user_info['email'];
+
+                            AsyncStorage.getItem('flat_data').then((value) => {
+                                JSON.parse(value);
+                                if (value && JSON.parse(value).length > 0) {
+                                    Def.flat_data = JSON.parse(value);
+                                    console.log("FlatData Length : " + (Def.flat_data ? Def.flat_data.length : 0));
+                                    this.setState({
+                                        data: Def.flat_data,
+                                        pageIndex: Math.ceil(Def.flat_data.length / Def.pageSize) - 1
+                                    });
+                                } else {
+                                    this.setState({isLoading: true});
+                                    FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
+                                }
+
+                            });
+
+                        } else {
+                            AsyncStorage.removeItem('flat_data');
+                        }
+                    });
+
+                    if (Def.user_info) {
+
+                    }
+                }
+                Def.refresh_flat_data = false;
+            }
+            let navigation = this.props.navigation ? this.props.navigation : Def.mainNavigate;
+
+            if (navigation) {
+                this.focusListener = navigation.addListener("focus", this.forcusFunction);
+            }
+            console.log('Component Did Moud done')
         }
     }
 
