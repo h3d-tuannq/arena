@@ -58,7 +58,6 @@ import NetInfo from "@react-native-community/netinfo";
 
 
 
-
 NetInfo.addEventListener(async networkState => {
     let msg;
     let network_mode_data = await AsyncStorage.getItem('network_mode');
@@ -166,25 +165,26 @@ function CustomDrawerContent(props) {
 
     return (
         <View style={{flex: 1}}>
-            <View
-                style={{
-                    height: Style.HEADER_HEIGHT,
-                    backgroundColor: Style.DEFAUT_BLUE_COLOR,
-                    flexDirection: 'row',
-                    // justifyContent: 'space-between',
-                    alignItems: 'center',
-                }}>
-                <TouchableOpacity
-                    style={{padding: 5}}
-                    onPress={() => {
-                        props.navigation.closeDrawer();
+            <View style={{height: Style.HEADER_HEIGHT,justifyContent:'flex-end', backgroundColor: Style.DEFAUT_BLUE_COLOR}}>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingBottom : Style.HEADER_HEIGHT  / 8,
                     }}>
-                    <BackIcon width={25} height={25} />
-                </TouchableOpacity>
-                <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
-                    {Def.email == null || Def.email == '' ? 'WSH' : 'WSH'}
-                </Text>
-                <View />
+
+                    <TouchableOpacity
+                        style={{padding: 5}}
+                        onPress={() => {
+                            props.navigation.closeDrawer();
+                        }}>
+                        <BackIcon width={25} height={25} />
+                    </TouchableOpacity>
+                    <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
+                        {Def.email == null || Def.email == '' ? 'WSH' : 'WSH'}
+                    </Text>
+                    <View />
+                </View>
             </View>
             <DrawerContentScrollView {...props}>
                 <View style={{flex: 1}}>
@@ -349,11 +349,11 @@ function AppDrawer() {
             drawerStyle={{
                 width: width * 0.8,
             }}
-
             drawerContentOptions={{
                 // activeTintColor: '#e91e63',
-                itemStyle: { marginVertical: 0, height : true < 2 ? 35 :40, paddingVertical:0, justifyContent:'center'},
+                itemStyle: { marginVertical: 0, height : PixelRatio.get() < 2 ? 37 :42, paddingVertical:0, justifyContent:'center'},
             }}
+
             drawerContent={(props) => <CustomDrawerContent {...props} />}
         >
             <Drawer.Screen
@@ -399,7 +399,7 @@ const Tab = createBottomTabNavigator();
 function OfflineTab() {
     return (
         <Tab.Navigator
-            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
+            // style={{height: Style.BOTTOM_HEIGHT, paddingVertical: 20 , backgroundColor : 'red'}}
 
             // tabBar={(props) => <MyTabBar {...props} item={null} />}
             initialRouteName={'Design'}
@@ -409,7 +409,7 @@ function OfflineTab() {
                 labelStyle: {
                     fontSize: Style.NORMAL_SIZE,
                 },
-                style: {height: 50},
+                style: {height: Style.BOTTOM_HEIGHT},
                 tabStyle: {
                     paddingVertical: 5,
                     paddingTop :8,

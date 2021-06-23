@@ -1,9 +1,11 @@
 import React from 'react'
 import {Text, View, StyleSheet, Dimensions, TouchableOpacity, TextInput} from 'react-native'
-import Autocomplete from 'react-native-autocomplete-input'
+import Autocomplete from 'react-native-autocomplete-input';
+import MyAutocompleteInput from './MyAutocompleteInput';
 import Style from "../../def/Style";
 const {width,  height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import DownBackButton from  '../../../assets/icon/icon-down-black.svg';
 
 import LocationIcon from '../../../assets/icons/Location.svg';
 
@@ -54,43 +56,65 @@ class AutocompleteModal extends React.Component {
     render() {
         const filterData = this.filterData(this.state.query);
         return (
-            <View style={{height: height, paddingBottom :50}}>
-                <View style={{justifyContent: 'center', alignItems : 'center', paddingVertical: 10}}>
-                    <Text style={Style.text_styles.titleTextNotBold}>
-                        {this.props.title}
-                    </Text>
+            <View style={{height: height, paddingBottom :50, marginTop: 50}}>
+
+                <View
+                    style={{
+                        position: 'absolute',zIndex:50 ,right: 5,
+                        top: 10,
+                        backgroundColor: '#fff',}}>
+                    <TouchableOpacity style={{
+                        paddingLeft:0, paddingRight:10, flexDirection:'row', justifyContent : 'center', paddingVertical:10,
+
+                    }}
+                                      onPress={()=> {
+                                          console.log('Close Autocomple click');
+                                          this.props.closeFunction();
+                                      }}
+                    >
+                        <DownBackButton width={Style.BACK_ICON_SIZE -2} height={Style.BACK_ICON_SIZE -5}/>
+                        {/*<Text>*/}
+                        {/*    Back*/}
+                        {/*</Text>*/}
+                    </TouchableOpacity>
+
                 </View>
-                <Autocomplete
+                <MyAutocompleteInput
                     data={filterData}
-                    defaultValue={this.state.query}
-                    onChangeText={text => this.setState({ query : text })}
                     keyExtractor={(item,index) => "hoz" + index}
                     renderItem={({ item, i }) => (
                         <TouchableOpacity style={styles.itemStyle} onPress={() => {
                             this.item_click(item)
                         }}>
-                            {
-                                this.props.type == 1 ?
-                                    <Icon name="user" size={25} color={Style.GREY_TEXT_COLOR} />:
-                                    <LocationIcon width={25} height={25} style={{padding:5}}/>
-
-                            }
-
-                            <Text style={{paddingHorizontal:10}} >{item[this.props.filterAttr] + "" +  (this.props.type == 1  && item['phone'] ?  " - " + item['phone'] : "")}</Text>
+                            <LocationIcon width={25} height={25} style={{padding:5}}/>
+                            <Text style={{paddingHorizontal:10}} >{item[this.props.filterAttr] + ""}</Text>
                         </TouchableOpacity>
                     )}
                     renderTextInput={()=> (
-                        <View style={{borderWidth : 0,borderBottomWidth:1 ,borderColor:Style.GREY_TEXT_COLOR, flexDirection : 'row',alignItems : 'center', marginHorizontal : 10, marginBottom : 10}}>
-                            <Icon style={styles.searchIcon} name="search" size={24} color={Style.GREY_TEXT_COLOR}/>
-                            <TextInput onChangeText={text => this.setState({ query : text })} placeholder={"Nhập " + this.props.title} style={[styles.textInput, {marginTop:10}]}>
+                        <View style={{
+                            borderWidth : 0,borderBottomWidth:1 ,borderColor:Style.GREY_TEXT_COLOR,
+
+                            flexDirection : 'row',alignItems : 'center', marginHorizontal : 10, marginBottom : 10,
+                            marginLeft : 15,
+                        }}>
+                            <Icon style={styles.searchIcon} name="search" size={20} color={Style.GREY_TEXT_COLOR}/>
+
+                            <TextInput onChangeText={text => this.setState({ query : text })}
+                                       placeholder={" " + this.props.title}
+                                       style={[styles.textInput, {marginTop:10}]}>
+
                             </TextInput>
+
                         </View>
                     )
                     }
-                    keyboardShouldPersistTaps='always'
-                    inputContainerStyle={{borderWidth:0}}
-                    listStyle={{borderWidth:0}}
+
+                    style={{alignItems: 'center'}}
+
+                    listStyle={{borderWidth:0, paddingLeft: 15}}
+
                 />
+
             </View>
         );
     }

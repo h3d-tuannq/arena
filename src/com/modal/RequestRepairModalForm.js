@@ -1,8 +1,8 @@
 import React from 'react'
 import {
     Text, View, Button, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, TextInput, FlatList,
-    Alert, Platform
-} from 'react-native'
+    Alert, Platform, PixelRatio,
+} from 'react-native';
 import Def from '../../def/Def'
 const {width, height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -187,7 +187,7 @@ class RequestRepairModalForm extends React.Component {
                             this.setState({note:text});
                         }}
 
-                        style={{borderBottomWidth : 1}}
+                        style={{borderBottomWidth : 1, height: PixelRatio.get() == 2 && !Def.isIphoneXorAbove() ? 32 : 35}}
                     />
 
                         <TouchableOpacity onPress={() => this.handleChoosePhoto('image')}
