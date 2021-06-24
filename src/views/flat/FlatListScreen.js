@@ -202,10 +202,11 @@ class FlatListScreen extends React.Component {
 
     refresh()
     {
-        if(OfflineHelper.offlineFlatDataArr) {
-            console.log('OfflineHelper.offlineFlatDataArr Forcus - Refresh ' +  OfflineHelper.offlineFlatDataArr.length);
+        if(this.criteria){
+           this.filterDataByCondition();
+        } else{
+            this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
         }
-        this.setState({ stateCount: Math.random() , data : Def.NetWorkMode ?  Def.flat_data : OfflineHelper.offlineFlatDataArr });
     }
 
     searchButtonClick = () => {
@@ -213,13 +214,18 @@ class FlatListScreen extends React.Component {
         this.filterDataByCondition();
     }
 
-    filterDataByCondition = () => {
+    filterDataByCondition = (refresh = false) => {
         this.criteria['name'] = this.state.name;
        console.log('Run Filter Criteria : ' + JSON.stringify(this.criteria));
        let allData = Def.NetWorkMode ? Def.flat_data : OfflineHelper.offlineFlatDataArr;
        let dataFilter =  allData.filter(this.filterFunc);
        console.log('Filter-Data : ' + dataFilter.length);
-       this.setState({data:dataFilter});
+       if(refresh){
+           this.setState({data:dataFilter,  stateCount: Math.random() });
+       } else {
+           this.setState({data:dataFilter});
+       }
+
     }
 
     filterFunc = (item) => {

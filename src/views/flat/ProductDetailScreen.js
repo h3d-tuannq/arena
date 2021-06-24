@@ -48,7 +48,7 @@ class ProductDetailScreen extends React.Component {
         let repairData = Def.NetWorkMode ? ( Def.requestRepairsTree.hasOwnProperty(item.id) ? Def.requestRepairsTree[item.id] : [] )
             : (OfflineHelper.offlineRequestTree.hasOwnProperty(item.id) ? OfflineHelper.offlineRequestTree[item.id] : [] );
 
-        repairData = OfflineHelper.convertObjectTreeToArray({...repairData});
+        repairData = Def.NetWorkMode ? repairData :OfflineHelper.convertObjectTreeToArray({...repairData});
 
         this.state = {
             stateCount: 0.0,
