@@ -774,7 +774,7 @@ class FlatListScreen extends React.Component {
                 :
             <View style={{flex:1, paddingTop:5}}>
                 <LoadingModal visible={this.state.isLoading}/>
-                <View style={{paddingHorizontal:10, backgroundColor : '#fff', paddingBottom:2}}>
+                <View style={{paddingHorizontal:0, backgroundColor : '#fff', paddingBottom:2}}>
                     <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', height:ITEM_HEIGHT,justifyContent:'space-between',paddingHorizontal:10 , paddingVertical: 5, backgroundColor : '#fff', marginTop:2}}
                                       onPress={this.choseStatusClick}
                     >
@@ -853,10 +853,13 @@ class FlatListScreen extends React.Component {
                             <Icon name="angle-right" size={25} color={Style.GREY_TEXT_COLOR}/>
                         </View>
                     </TouchableOpacity>
-                    <View style={{ width : width -20, borderWidth : 0, height:ITEM_HEIGHT + 10 ,borderBottomWidth:1 ,borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginTop : 0, marginBottom : 5,}}>
-                        <TextInput value={this.state.name} onChangeText={text => this.setState({ name : text })} placeholder={"Tìm kiếm"} style={[styles.textInput, {backgroundColor:'#fff',marginTop:5, width: width -70, paddingHorizontal:10}]}>
+                    <View style={{ width : width -20, borderWidth : 0, height:ITEM_HEIGHT + 10 ,borderBottomWidth:1 , marginLeft :10 ,
+                        borderColor:Style.GREY_BACKGROUND_COLOR, flexDirection : 'row',alignItems : 'center', marginTop : 0, marginBottom : 5,}}>
+                        <TextInput value={this.state.name} onChangeText={text => this.setState({ name : text })} placeholder={"Tìm kiếm"}
+                                   placeholderTextColor="#000"
+                                   style={[styles.textInput, {marginTop:5, paddingLeft : 2,width: width -50, paddingHorizontal:10}]}>
                         </TextInput>
-                        <TouchableOpacity onPress={this.searchButtonClick} style={{paddingLeft:5,paddingRight:10, paddingVertical:5 ,  }} >
+                        <TouchableOpacity onPress={this.searchButtonClick} style={{paddingLeft:5,paddingRight:5, paddingVertical:5 ,  }} >
                             <Icon style={styles.searchIcon} name="search" size={27} color={Style.GREY_TEXT_COLOR}/>
                         </TouchableOpacity>
                     </View>

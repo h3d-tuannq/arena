@@ -139,7 +139,7 @@ export class OfflineHelper {
         }
 
 
-        let dir = fs.dirs.DownloadDir + '/arena/';
+        let dir = fs.dirs.DocumentDir + '/arena/';
         let path = Def.remoteVersion(dir +  (obj ?  typeName +   obj.id : date.getTime()) + ext);
         fs.isDir(dir).then((isDir) => {
             if(!isDir){

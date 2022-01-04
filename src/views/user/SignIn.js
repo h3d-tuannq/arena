@@ -102,7 +102,7 @@ export default class SignIn extends Component {
                 {
                     Def.NetWorkMode && Def.NetWorkConnect ?
 
-                    <View style={[loginform, {marginTop: -10}]}>
+                    <View style={[loginform, {marginTop: -100}]}>
                         <TextInput
                             onFocus={() => this.setState({focus: 1})}
                             onBlur={() => this.setState({focus: 0})}

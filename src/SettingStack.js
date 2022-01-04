@@ -19,7 +19,11 @@ class SettingStack extends React.Component {
     }
     render() {
         return (
-            <RootStack.Navigator>
+            <RootStack.Navigator
+                screenOptions={{
+                    headerBackTitleVisible: false
+                }}
+            >
                 <RootStack.Screen name="setting-screen" component={SettingScreen} options={{
                     title: "Cài đặt",
                     headerLeft: () => (

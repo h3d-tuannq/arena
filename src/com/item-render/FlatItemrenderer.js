@@ -237,7 +237,7 @@ const  styles = StyleSheet.create({
 
     info: {
         marginLeft:5,
-        flex: 2.5,
+        flex: 2.6,
         // justifyContent: 'space-around',
         // paddingVertical: 5,
         // backgroundColor : 'red'

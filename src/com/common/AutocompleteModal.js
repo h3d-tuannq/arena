@@ -56,7 +56,12 @@ class AutocompleteModal extends React.Component {
     render() {
         const filterData = this.filterData(this.state.query);
         return (
-            <View style={{height: height, paddingBottom :50, marginTop: 50}}>
+            <View style={{height: height, paddingBottom :50, marginTop: 10}}>
+                <View style={{justifyContent: 'center', alignItems : 'center', paddingVertical: 10}}>
+                    <Text style={Style.text_styles.titleTextNotBold}>
+                        {this.props.title}
+                    </Text>
+                </View>
 
                 <View
                     style={{
@@ -65,6 +70,7 @@ class AutocompleteModal extends React.Component {
                         backgroundColor: '#fff',}}>
                     <TouchableOpacity style={{
                         paddingLeft:0, paddingRight:10, flexDirection:'row', justifyContent : 'center', paddingVertical:10,
+                        marginTop: 40,
 
                     }}
                                       onPress={()=> {
@@ -101,6 +107,7 @@ class AutocompleteModal extends React.Component {
 
                             <TextInput onChangeText={text => this.setState({ query : text })}
                                        placeholder={" " + this.props.title}
+                                       placeholderTextColor="#000"
                                        style={[styles.textInput, {marginTop:10}]}>
 
                             </TextInput>

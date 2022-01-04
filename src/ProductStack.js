@@ -44,7 +44,11 @@ class ProductStack extends React.Component {
 
     render() {
         return (
-            <RootStack.Navigator>
+            <RootStack.Navigator
+                screenOptions={{
+                    headerBackTitleVisible: false
+                }}
+            >
                 <RootStack.Screen name="product-list-screen" component={ProductListScreen} options={{
                     title: "Sản phẩm mẫu",
                     headerLeft: () => (

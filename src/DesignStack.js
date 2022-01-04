@@ -32,7 +32,11 @@ class DesignStack extends React.Component {
 
     render() {
         return (
-            <RootStack.Navigator>
+            <RootStack.Navigator
+                screenOptions={{
+                    headerBackTitleVisible: false
+                }}
+            >
                 <RootStack.Screen name="design-screen" component={DesignListScreen} options={{
                     title: "Danh sách căn mẫu",
                     headerLeft: () => (

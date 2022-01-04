@@ -172,7 +172,7 @@ class RequestRepairModalForm extends React.Component {
 
         return (
             <View style={styles.container}>
-                <View style={{height:50, backgroundColor:Style.DEFAUT_BLUE_COLOR , justifyContent:'center' , borderTopRightRadius:10, borderTopLeftRadius:10, paddingHorizontal : 10}}>
+                <View style={{height:45, backgroundColor:Style.DEFAUT_BLUE_COLOR , justifyContent:'center' , borderTopRightRadius:10, borderTopLeftRadius:10, paddingHorizontal : 10}}>
                     <Text style={[Style.text_styles.titleText, {color:'#fff'}]}>
                         {this.state.title}
                     </Text>
@@ -183,11 +183,12 @@ class RequestRepairModalForm extends React.Component {
                         value={this.state.note}
                         multiline={true}
                         numberOfLines={2}
+                        placeholderTextColor="#000"
                         onChangeText={(text) => {
                             this.setState({note:text});
                         }}
 
-                        style={{borderBottomWidth : 1, height: PixelRatio.get() == 2 && !Def.isIphoneXorAbove() ? 32 : 35}}
+                        style={{borderBottomWidth : 1, height: PixelRatio.get() == 2 && !Def.isIphoneXorAbove() ? 35 : 35, marginTop: 3}}
                     />
 
                         <TouchableOpacity onPress={() => this.handleChoosePhoto('image')}
@@ -197,7 +198,7 @@ class RequestRepairModalForm extends React.Component {
 
                                 <Image
                                     source={{ uri: this.state.image.uri }}
-                                    style={{ width: width * 0.8 -20, height:150, maxHeight: 200 , marginTop: 5 }}
+                                    style={{ width: width * 0.8 -20, height:140, maxHeight: 200 , marginTop: 5 }}
                                 />
 
                                 :
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
     requestBtn : {
         marginTop : 10,
         backgroundColor: Style.DEFAUT_RED_COLOR,
-        height: 45,
+        height: 40,
         justifyContent : 'center',
         alignItems: 'center',
         paddingHorizontal : 10,

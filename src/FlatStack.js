@@ -61,7 +61,11 @@ class FlatStack extends React.Component {
 
     render() {
         return (
-            <RootStack.Navigator>
+            <RootStack.Navigator
+                screenOptions={{
+                    headerBackTitleVisible: false
+                }}
+            >
                 <RootStack.Screen name="flat-screen" component={FlatListScreen} options={{
                     title: "Danh sách căn hộ",
                     headerLeft: () => (
