@@ -229,7 +229,6 @@ export default class FlatHelper {
 
     static canChangeDeadlineCompleted(flat, user){
             let isDefect =  FlatHelper.checkCanPermission(user, FlatHelper.ROLE_DEFECT);
-
             return isDefect && (flat.status) != FlatHelper.DONE_STATUS;
     }
 

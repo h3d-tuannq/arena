@@ -678,6 +678,15 @@ class FlatDetailScreen extends React.Component {
 
                     <View style={{flexDirection:'row'}}>
                         <Text>
+                            {"Tình trạng tài chính:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            { (typeof item.finance_progress == 'number'  ? typeof item.finance_progress : 0) + '%' }
+                        </Text>
+                    </View>
+
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
                             {"CSKH:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
