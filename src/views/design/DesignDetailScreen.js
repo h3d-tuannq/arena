@@ -33,6 +33,7 @@ import UpdateDeadlineModal from '../../com/modal/UpdateDeadlineModal';
 
 
 import FullImageModal from  '../../../src/com/modal/FullImageModal'
+import ProductItemrenderer from "../../com/item-render/ProductItemrenderer";
 
 
 const PROGRAM_IMAGE_WIDTH = (width - 38) /2;
@@ -66,9 +67,6 @@ class DesignDetailScreen extends React.Component {
         let design_list = [];
         let title = "Chi tiết thiết kế";
 
-        this.closeFunction = this.closeFunction.bind(this);
-
-
         this.state = {
             item: this.props.route.params.item,
             title: title,
@@ -81,33 +79,30 @@ class DesignDetailScreen extends React.Component {
             displayFullFlatImg : false,
 
         };
-        this.updateFlatStatus = this.updateFlatStatus.bind(this);
-        this.changeStatusSuccess = this.changeStatusSuccess.bind(this);
-        this.changeStatusFalse = this.changeStatusFalse.bind(this);
-        this.clickSignature = this.clickSignature.bind(this);
-        this.updateDeadlineCompleted = this.updateDeadlineCompleted.bind(this);
+        this.updateDesignStatus = this.updateDesignStatus.bind(this);
         this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
         this.handleDatePicked = this.handleDatePicked.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
-        this.saveDeadline = this.saveDeadline.bind(this);
-        this.readyToDeliver = this.readyToDeliver.bind(this);
         this.displayFullImg = this.displayFullImg.bind(this);
-    }
+        this.onGetDesignDetailSuccess = this.onGetDesignDetailSuccess.bind(this);
+        this.onGetDesignFalse = this.onGetDesignFalse.bind(this);
+        this.itemClick = this.itemClick.bind(this);
+     }
 
     onRefresh = () => {
         console.log('Refresh News');
         this.setState({isRefresh:true});
-        FlatController.getFlatById(this.onGetFlatDetailSuccess, this.onGetDesignFalse, this.state.item.id);
+        FlatController.getDesignById(this.onGetDesignDetailSuccess, this.onGetDesignFalse, this.state.item.id);
     };
 
     displayFullImg =  ()=> {
         this.setState({'displayFullFlatImg' : true});
     }
 
-    onGetFlatDetailSuccess(data){
+    onGetDesignDetailSuccess(data){
         this.setState({isRefresh:false});
         if(data['result'] == 1){
-            this.updateFlatStatus(data['flat']);
+            this.updateDesignStatus(data['design']);
         } else {
             Alert.alert(
                 "Thông báo",
@@ -127,118 +122,19 @@ class DesignDetailScreen extends React.Component {
         console.log("false data : " + data);
     }
 
-    changeFlatStatus = (type, status = null) => {
-        if(type == decline_deliver_form) {
-            this.setState({displayDeclineForm : true, type:type});
-        }
-        if(type == signature_form) {
-            this.setState({displaySignatureForm : true, type:type});
-        }
-        if (type == update_status_form) {
-            if(Def.user_info){
-                FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, status, 0 , null, "",  FlatHelper.UPDATE_STATUS_TYPE);
-            }
-        }
-    }
-
-    saveDeadline = () => {
-        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_DEADLINE, this.state.deadlineCompleted.getTime()/1000);
-    }
-    readyToDeliver = () => {
-        console.log('Ready To Send');
-        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.READY_TO_DELIVER, null, 1);
-    }
-
-    clickSignature = () => {
-        this.setState({displaySignatureForm : true, type:signature_form});
-    }
-
-    updateDeadlineCompleted = () => {
-        this.setState({displayUpdateDeadline : true, type:update_deadline_form});
-    }
-
-    openSendMailModal = () => {
-            this.setState({displaySendMailForm : true, type:sendmail_form});
-    }
-
-
-    changeStatusSuccess = (data) => {
-        console.log('REady : '+ JSON.stringify(data['flat']['highlight_re_schedule']));
-        if(data['msg'] == "Ok"){
-            // this.setState({canSaveDeadline:false});
-            Alert.alert(
-                "Thông báo",
-                'Cập nhật thành công',
-                [
-                    {
-                        text: "Ok",
-                    }
-                ],
-                {cancelable: false},
-            );
-        } else {
-            Alert.alert(
-                "Thông báo",
-                data['msg'],
-                [
-                    {
-                        text: "Ok",
-                        style: 'cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
-    };
-
-    changeStatusFalse = (data) => {
-        console.log('Change Status False ' + JSON.stringify(data));
-    };
-
-
-
     refresh()
     {
         this.setState({ stateCount: Math.random(),  });
     }
 
-    updateFlatStatus =(flat) => {
-        if(flat) {
-            this.setState({item:flat, deadlineCompleted: null, canSaveDeadline : false});
-            if(Def.flat_data) { // Update dữ liệu
-                let updated = Def.updateFlatToFlatList(flat);
-                if(updated){
-                    Def.refresh_flat_data = true;
-                    if (Def.refeshFlatList){
-                        Def.refeshFlatList();
-                    }
-                }
-            }
-        }
+    updateDesignStatus =(design) => {
+        if(design) {
+            this.setState({item:design, deadlineCompleted: null, canSaveDeadline : false});
 
-        this.closeFunction();
-    };
-
-    closeFunction = () => {
-        if(this.state.type == decline_deliver_form) {
-            this.setState({displayDeclineForm : false});
-        }
-
-        if(this.state.type == signature_form) {
-            this.setState({displaySignatureForm : false});
-        }
-
-        if(this.state.type == sendmail_form) {
-            this.setState({displaySendMailForm : false});
-        }
-        if(this.state.type == update_deadline_form) {
-            this.setState({displayUpdateDeadline : false});
         }
     };
 
-    closeFullImgFunc = () => {
-        this.setState({displayFullFlatImg:false});
-    };
+
 
     onGetDesignSuccess(data){
         Object.entries(data["data"]).map((prop, key) => {
@@ -258,16 +154,11 @@ class DesignDetailScreen extends React.Component {
     createConfigData(data){
         if(data){
             let configData =  Object.entries(data).map((prop, key) => {
-                // console.log("Props : " + JSON.stringify(prop));
                 return {key: prop[0],name_vi:prop[1]["name_vi"], hidden:0, data:prop[1]["data"]};
             });
             return configData;
         }
     }
-
-
-
-
     formatText(text){
         let rs = text;
         if(text && text.length > 10){
@@ -278,8 +169,6 @@ class DesignDetailScreen extends React.Component {
 
 
     shouldComponentUpdate(){
-        // this.setState({ configMenu: Def.config_news_menu});
-        // console.log('SortData ddd:' + JSON.stringify(this.props.route));
         console.log('shouldComponentUpdate - flat');
         return true;
     }
@@ -300,11 +189,27 @@ class DesignDetailScreen extends React.Component {
         this.setState({ displayUpdateDeadline : false });
     };
 
+    itemClick(item){
+        this.props.navigation.navigate('Design', {screen:'product-detail', params: { item: item }});
+    }
+
 
 
     render() {
         const {navigation} = this.props;
         const {item} = this.state;
+        console.log('Product : ' + JSON.stringify(this.state.item));
+        const renderItem = ({item}) => {
+
+            return (
+                <View style={{}}>
+                    <ProductItemrenderer
+                        item ={item} click={this.itemClick}  type={'product-template'}
+                        styleImage={{width: (width - 30) / 2, height: (width - 30) / 2}}
+                    />
+                </View>
+            )
+        }
         Def.order_number = 20;
         const ListHeader = () => (
             <View>
@@ -351,21 +256,29 @@ class DesignDetailScreen extends React.Component {
         return (
             <View style={{flex:1}}>
                 <View style={{flex:1, paddingTop:5 , paddingBottom : 5 }}>
-
-                    <ListHeader />
-                    {/*<ProgramVerList*/}
-                    {/*    refreshControl={*/}
-                    {/*        <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>*/}
-                    {/*    }*/}
-                    {/*    data={this.state.item.product}*/}
-                    {/*    navigation={this.props.navigation}*/}
-                    {/*    header={ListHeader}*/}
-                    {/*    type={'product'}*/}
-                    {/*    numColumns={2}*/}
-                    {/*    stack={'Flat'}*/}
-                    {/*    screen={'product-detail'}*/}
-                    {/*    addToCart={this.addToCart}*/}
-                    {/*/>*/}
+                    <ProgramVerList
+                        data={this.state.item.relationProduct}
+                        navigation={this.props.navigation}
+                        header={ListHeader}
+                        styleList={{paddingHorizontal : 10}}
+                        refreshControl={
+                            <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
+                        }
+                        renderFunction={renderItem}
+                        type={'product-template'}
+                        numColumns={2}
+                        screen={'product-detail'}
+                        itemSeparatorComponent={
+                            (({ highlighted }) => (
+                                <View
+                                    style={[
+                                        {backgroundColor:Style.GREY_TEXT_COLOR, height:1, width:width -25, marginHorizontal: 10},
+                                        highlighted && { marginHorizontal:10 }
+                                    ]}
+                                />
+                            ))
+                        }
+                    />
                 </View>
 
                 <View style={styles.controlBtn}>

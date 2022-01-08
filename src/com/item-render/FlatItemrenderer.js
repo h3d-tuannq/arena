@@ -114,7 +114,7 @@ class FlatItemrenderer extends PureComponent{
 
                             <View style={{flexDirection:'row', backgroundColor:Style.DEFAUT_RED_COLOR, borderRadius:2, borderColor:'#fff', minWidth : 30 , alignItems: 'center' , justifyContent: 'center'}}>
                                     <Text style={{fontSize:Style.MIDLE_SIZE, paddingRight:5, color:'#fff'}}>
-                                        { (typeof model.finance_progress == 'number'  ? typeof model.finance_progress : 0) + '%' }
+                                        { (typeof model.finance_progress == 'number'  ?  model.finance_progress : 0) + '%' }
                                     </Text>
                             </View>
 

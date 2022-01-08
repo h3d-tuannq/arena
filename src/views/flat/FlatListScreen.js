@@ -161,7 +161,6 @@ class FlatListScreen extends React.Component {
     }
 
     onGetFlatSuccess(data){
-        console.log("OnGetFlatSuccess Length : "  +  data['data'].length);
         Def.flat_data = data["data"];
         Def.flatCriteria = this.criteria;
         let title = "Danh sách thiết kế";
@@ -528,6 +527,8 @@ class FlatListScreen extends React.Component {
         } else {
             console.log('Building Data : ' + JSON.stringify(Def.buildingData));
         }
+
+
 
         if (!Def.design_data || Def.design_data.length == 0) {
             let designData = await AsyncStorage.getItem('design_data');

@@ -416,7 +416,7 @@ class DesignListScreen extends React.Component {
 
 
     async componentDidMount() {
-        if(!Def.design_data || Def.design_data.length == 0){
+        if(Def.refresh_design_data || !Def.design_data || Def.design_data.length == 0){
             if (Def.design_data && Def.design_data.length > 0) {
                 this.setState({data:Def.design_data});
             } else {
@@ -436,7 +436,7 @@ class DesignListScreen extends React.Component {
                     }
                 }
             }
-            Def.refresh_flat_data = false;
+            Def.refresh_design_data = false;
         }
     }
     render() {

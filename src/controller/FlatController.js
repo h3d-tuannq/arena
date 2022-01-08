@@ -43,6 +43,11 @@ export default class FlatController {
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat-by-id" ,Def.POST_METHOD, param);
     }
 
+    static getDesignById(callback,errCallback, designId ) {
+        let param = {'design_id' : designId, 'token' : Def.user_info['access_token']};
+        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/design/get-design-by-id" ,Def.POST_METHOD, param);
+    }
+
     static getRequestRepair(callback, errCallback , product_flat_id){
        let param = {'product_flat_id' : product_flat_id};
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-request-repair-by-pif" ,Def.POST_METHOD, param);
