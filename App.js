@@ -142,11 +142,13 @@ NetInfo.addEventListener(async networkState => {
             }
 
         }
-    } else {
+    } else if (Def.user_info) { // Trong trường hợp tài khoản đã login mới thực hiện lưu trạng thái
         Def.NetWorkConnect = networkState.isConnected;
-        Def.NetWorkMode = networkState.isConnected;
         await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
-        await AsyncStorage.setItem('network_mode' , networkState.isConnected ? '1' : '0');
+        if (Def.user_info) {
+            Def.NetWorkMode = networkState.isConnected;
+            await AsyncStorage.setItem('network_mode' , networkState.isConnected ? '1' : '0');
+        }
     }
 });
 

@@ -100,7 +100,7 @@ export default class SignIn extends Component {
         return (
             <View style={wraper}>
                 {
-                    Def.NetWorkMode && Def.NetWorkConnect ?
+                    Def.NetWorkConnect ?
 
                     <View style={[loginform, {marginTop: -100}]}>
                         <TextInput

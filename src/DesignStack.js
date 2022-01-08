@@ -10,6 +10,7 @@ import Style from './def/Style'
 import Def from './def/Def'
 import FlatHelper from "./def/FlatHelper";
 import {OfflineHelper} from "./def/OfflineHelper";
+import ProductDetailScreen from "./views/product/ProductDetailScreen";
 const RootStack = createStackNavigator();
 class DesignStack extends React.Component {
     downloaded = 0;
@@ -123,6 +124,42 @@ class DesignStack extends React.Component {
                     }
                 })}
                 } />
+                <RootStack.Screen name="product-detail" component={ProductDetailScreen} options={({route}) => {
+                    return ({
+                        title: 'Chi tiết sản phẩm',
+                        headerStyle: {
+                            backgroundColor: Style.DEFAUT_BLUE_COLOR,
+                            height: Style.HEADER_HEIGHT,
+                        },
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+
+                        },
+                        headerRight: false?  () => (
+
+                            <TouchableOpacity
+                                style=  {
+                                    {
+                                        width: Style.DRAWER_MENU_SIZE,
+                                        height: Style.DRAWER_MENU_SIZE,
+                                        justifyContent: 'center',
+                                        paddingRight:5 ,
+                                        alignItems : 'center'
+                                    }
+                                }
+                                onPress={() => this.goProductList}>
+                                <Icon name="download" size={25} color="#fff" />
+                            </TouchableOpacity>
+
+
+                        ) : null,
+
+                        headerBackImage: ()=> {
+                            return <BackIconSvg width={Style.BACK_ICON_SIZE} height={Style.BACK_ICON_SIZE} />
+                        }
+                    })}
+                } />
+
             </RootStack.Navigator>
         )
     }

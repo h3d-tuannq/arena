@@ -102,6 +102,8 @@ export default class UserController{
                 Def.username = data['username'];
                 Def.user_info = data;
                 AsyncStorage.setItem('user_info', JSON.stringify(data));
+                Def.NetWorkMode = 1;
+                await AsyncStorage.setItem('network_mode' , '1');
                 Def.setLoader(false);
                 // UserController.loginSuccessFunc();
 

@@ -12,6 +12,7 @@ export default class FlatHelper {
     static SIGNATURE_PAD_TYPE = 2;
     static UPDATE_DEADLINE = 3;
     static READY_TO_DELIVER = 4;
+    static MARK_BUILT = 5;
 
 
     static INACTIVE_STATUS = 0; // Trạng thái mặc định khi đưa lên hệ thống
@@ -42,6 +43,11 @@ export default class FlatHelper {
     static ROLE_ADMINISTRATOR = 'administrator';
     static ROLE_MANAGER = 'manager';
 
+    static DECLINE_FILTER_STATUS = -1;
+    static ABSENTEE_HANOVER_FILTER_STATUS = -2;
+    static ONLINE_HANOVER_FILTER_STATUS = -3;
+    static BUILT_FILTER_STATUS = -4;
+
     static COMMENT_TYPE = 3;
     static APPROVE_REPAIR_TYPE = 2;
     static REPAIRED_TYPE = 1;
@@ -64,6 +70,7 @@ export default class FlatHelper {
 
     static FlatSTatusList = {0: "Chưa kích hoạt", 1: "Hoạt động", 2: "Hoàn thành nghĩa vụ tài chính", 3: "Đủ điều kiện bàn giao", 4: "Đang bàn giao", 5:"Đã ký nhận bàn giao" , 6:"Sữa chữa sau bàn giao", 8:"Đã hoàn thiện hồ sơ", 7:"Đã hoàn thành"};
     static FlatStatusData = [
+            {'id': -4 , 'name' :"Hoàn thành xây dựng"},
             {'id': -2 , 'name': "Từ chối bàn giao"},
             {'id': -3 , 'name' :"Bàn giao vắng mặt"},
             {'id': 2 , 'name': "Hoàn thành nghĩa vụ tài chính"},
@@ -151,6 +158,7 @@ export default class FlatHelper {
     }
 
     static canChangeDeliverStatus(flat, user){
+        return false;
         let isQa = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
         let financeDone = flat.status == FlatHelper.FINANCE_DONE_STATUS;
         return isQa && financeDone;
@@ -229,7 +237,8 @@ export default class FlatHelper {
 
     static canChangeDeadlineCompleted(flat, user){
             let isDefect =  FlatHelper.checkCanPermission(user, FlatHelper.ROLE_DEFECT);
-            return isDefect && (flat.status) != FlatHelper.DONE_STATUS;
+            let isArn = flat.building &&  (flat.building.code == 'THE ARENA CAM RANH') ;
+            return isDefect &&  (flat.status) != FlatHelper.DONE_STATUS && isArn;
     }
 
 
@@ -238,6 +247,15 @@ export default class FlatHelper {
         let isHandover = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_HANDOVER) && (flat.handover_id = user.id);
         return isSignedStatus && isHandover;
     }
+
+    static canMarkBuilt(flat, user)
+    {
+        let is_wsh = FlatHelper.checkCanPermission(user, FlatHelper.ROLE_WSH);
+        let is_built = flat.is_built;
+        let status = flat.status == FlatHelper.ACTIVE_STATUS || flat.status == FlatHelper.FINANCE_DONE_STATUS;
+        return !is_built && is_wsh && status;
+    }
+
 
     static getRepairItemList(flat){
         let repairList = [];

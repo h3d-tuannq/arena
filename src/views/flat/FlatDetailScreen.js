@@ -135,6 +135,7 @@ class FlatDetailScreen extends React.Component {
         this.showDownloadedMsg = this.showDownloadedMsg.bind(this);
         this.updateOnlineStatus = this.updateOnlineStatus.bind(this);
         this.storeOfflineData = this.storeOfflineData.bind(this);
+        this.markBuilt = this.markBuilt.bind(this);
     }
     downloadFlat = async () => {
         console.log('item data 1 : ' + this.state.item.update);
@@ -368,6 +369,11 @@ class FlatDetailScreen extends React.Component {
     saveDeadline = () => {
         FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.UPDATE_DEADLINE, this.state.deadlineCompleted.getTime()/1000);
     }
+
+    markBuilt = () => {
+        FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.MARK_BUILT);
+    }
+
     readyToDeliver = () => {
         console.log('Ready To Send');
         FlatController.changeStatusFlat(this.changeStatusSuccess, this.changeStatusFalse, Def.user_info['access_token'] ,this.state.item.id, null, 0 , null, "",  FlatHelper.READY_TO_DELIVER, null, 1);
@@ -424,8 +430,6 @@ class FlatDetailScreen extends React.Component {
     changeStatusFalse = (data) => {
         console.log('Change Status False ' + JSON.stringify(data));
     };
-
-
 
     refresh()
     {
@@ -681,7 +685,7 @@ class FlatDetailScreen extends React.Component {
                             {"Tình trạng tài chính:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            { (typeof item.finance_progress == 'number'  ? typeof item.finance_progress : 0) + '%' }
+                            { (typeof item.finance_progress == 'number'  ? item.finance_progress : 0) + '%' }
                         </Text>
                     </View>
 
@@ -852,6 +856,16 @@ class FlatDetailScreen extends React.Component {
                                                           onPress={() => this.changeFlatStatus(update_status_form, FlatHelper.CAN_DELIVER_STATUS)}>
                                             <Text style={Style.text_styles.whiteTitleText}>
                                                 Đủ điều kiện
+                                            </Text>
+                                        </TouchableOpacity> : null
+                                }
+
+                                {
+                                    FlatHelper.canMarkBuilt(this.state.item,Def.user_info) ?
+                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
+                                                          onPress={() => this.markBuilt()}>
+                                            <Text style={Style.text_styles.whiteTitleText}>
+                                                Hoàn thành xây dựng
                                             </Text>
                                         </TouchableOpacity> : null
                                 }

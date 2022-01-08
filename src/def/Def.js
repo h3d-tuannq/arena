@@ -88,6 +88,7 @@ export default class Def {
 
     static flat_data = [];
     static refresh_flat_data = false;
+    static refresh_design_data = false;
     static refeshFlatList = [];
 
     static customer = [];
@@ -486,6 +487,15 @@ export default class Def {
                 Def.flat_data[index] = flat;
                 Def.refresh_flat_data = true;
             }
+        }
+        return index> -1;
+    }
+
+    static updateDesignToDesignList(design){
+        let index = Def.design_data.findIndex((element) => element.id == design.id );
+        if(index > -1){
+                Def.design_data[index] = flat;
+                Def.refresh_design_data = true;
         }
         return index> -1;
     }
