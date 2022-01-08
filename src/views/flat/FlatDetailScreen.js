@@ -446,7 +446,6 @@ class FlatDetailScreen extends React.Component {
             if(Def.flat_data) { // Update dữ liệu
                 let updated = Def.updateFlatToFlatList(flat);
                 if(updated){
-
                     Def.refresh_flat_data = true;
                     if (Def.refeshFlatList){
                         Def.refeshFlatList();
