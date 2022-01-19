@@ -31,7 +31,11 @@ class BuildingStack extends React.Component {
 
     render() {
         return (
-            <RootStack.Navigator>
+            <RootStack.Navigator
+                screenOptions={{
+                    headerBackTitleVisible: false
+                }}
+            >
                 <RootStack.Screen name="design-screen" component={BuildingListScreen} options={{
                     title: "Danh sách dự án",
                     headerLeft: () => (
