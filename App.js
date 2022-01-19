@@ -185,7 +185,7 @@ function CustomDrawerContent(props) {
                     <BackIcon width={25} height={25} />
                 </TouchableOpacity>
                 <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
-                    {Def.email == null || Def.email == '' ? FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info)) : 'The Arena'}
+                    {Def.email == null || Def.email == '' ? 'The Arena' : FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info))}
                 </Text>
                 <View />
             </View>
@@ -392,16 +392,19 @@ function AppDrawer() {
                 }}
             />
 
-            <Drawer.Screen
-                name="Offline-Lib"
-                component={OfflineLibStack}
-                options={{
-                    title: 'Thư viện Offline',
-                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
-                        return <Icon name="folder-open" size={iconSize} />;
-                    },
-                }}
-            />
+            {
+                Def.user_info ?
+                <Drawer.Screen
+                    name="Offline-Lib"
+                    component={OfflineLibStack}
+                    options={{
+                        title: 'Thư viện Offline',
+                        drawerIcon: ({focused: boolean, color: string, size: number}) => {
+                            return <Icon name="folder-open" size={iconSize} />;
+                        },
+                    }}
+                /> : null
+            }
 
 
             <Drawer.Screen
