@@ -168,25 +168,26 @@ function CustomDrawerContent(props) {
 
     return (
         <View style={{flex: 1}}>
-            <View
-                style={{
-                    height: Style.HEADER_HEIGHT,
-                    backgroundColor: Style.DEFAUT_BLUE_COLOR,
-                    flexDirection: 'row',
-                    // justifyContent: 'space-between',
-                    alignItems: 'center',
-                }}>
-                <TouchableOpacity
-                    style={{padding: 5}}
-                    onPress={() => {
-                        props.navigation.closeDrawer();
-                    }}>
-                    <BackIcon width={25} height={25} />
-                </TouchableOpacity>
-                <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
-                    {Def.email == null || Def.email == '' ? FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info)) : 'The Arena'}
-                </Text>
-                <View />
+            <View style={{height: Style.HEADER_HEIGHT,justifyContent:'flex-end', backgroundColor: Style.DEFAUT_BLUE_COLOR}}>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingBottom : Style.HEADER_HEIGHT  / 8,
+                    }}
+                >
+                    <TouchableOpacity
+                        style={{padding: 5}}
+                        onPress={() => {
+                            props.navigation.closeDrawer();
+                        }}>
+                        <BackIcon width={25} height={25} />
+                    </TouchableOpacity>
+                    <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
+                        {Def.email == null || Def.email == '' ?  'The Arena' : FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info))}
+                    </Text>
+                    <View />
+                </View>
             </View>
             <DrawerContentScrollView {...props}>
                 <View style={{flex: 1}}>
@@ -486,7 +487,6 @@ function OfflineTab() {
 function IntroTab() {
     return (
         <Tab.Navigator
-            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
             initialRouteName={'Building'}
             tabBarOptions={{
                 activeTintColor: Style.DEFAUT_RED_COLOR,
@@ -494,7 +494,7 @@ function IntroTab() {
                 labelStyle: {
                     fontSize: Style.NORMAL_SIZE,
                 },
-                style: {height: 50},
+                style: {height: Style.BOTTOM_HEIGHT},
                 tabStyle: {
                     paddingVertical: 5,
                     paddingTop :8,

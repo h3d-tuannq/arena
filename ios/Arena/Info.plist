@@ -38,11 +38,11 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>The Arena requires access to your phone’s photo library.</string>
+	<string>The Arena requires access to your phone’s camera to take photo update status furniture in apartment, report issue about flat. </string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The Arena requires access to your phone’s camera.</string>
+	<string>The Arena requires access to your phone’s photo library to select photo update status furniture in apartment, report issue about flat. </string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
