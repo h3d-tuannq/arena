@@ -392,16 +392,19 @@ function AppDrawer() {
                 }}
             />
 
-            <Drawer.Screen
-                name="Offline-Lib"
-                component={OfflineLibStack}
-                options={{
-                    title: 'Thư viện Offline',
-                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
-                        return <Icon name="folder-open" size={iconSize} />;
-                    },
-                }}
-            />
+            {
+                Def.user_info ?
+                <Drawer.Screen
+                    name="Offline-Lib"
+                    component={OfflineLibStack}
+                    options={{
+                        title: 'Thư viện Offline',
+                        drawerIcon: ({focused: boolean, color: string, size: number}) => {
+                            return <Icon name="folder-open" size={iconSize} />;
+                        },
+                    }}
+                /> : null
+            }
 
 
             <Drawer.Screen
