@@ -52,6 +52,7 @@ import BackIcon from './assets/icon/icon-back.svg';
 import FlatStack from './src/FlatStack';
 import ProductStack from './src/ProductStack';
 import DesignStack from './src/DesignStack';
+import BuildingStack from "./src/BuildingStack";
 import SettingStack from './src/SettingStack';
 import NetInfo from "@react-native-community/netinfo";
 
@@ -184,7 +185,7 @@ function CustomDrawerContent(props) {
                     <BackIcon width={25} height={25} />
                 </TouchableOpacity>
                 <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
-                    {Def.email == null || Def.email == '' ? 'WSH' : 'WSH'}
+                    {Def.email == null || Def.email == '' ? FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info)) : 'The Arena'}
                 </Text>
                 <View />
             </View>
@@ -342,6 +343,16 @@ function OfflineLibStack() {
 
 }
 
+function IntroStack() {
+    return (
+        <Stack.Navigator headerMode="none">
+            <Stack.Screen name="Intro" component={IntroTab} />
+            <RootStack.Screen name="Login" component={LoginStack} />
+        </Stack.Navigator>
+    );
+
+}
+
 
 
 function AppDrawer() {
@@ -358,6 +369,18 @@ function AppDrawer() {
             }}
             drawerContent={(props) => <CustomDrawerContent {...props} />}
         >
+
+            <Drawer.Screen
+                name="Home"
+                component={IntroStack}
+                options={{
+                    title: 'Giới thiệu',
+                    drawerIcon: ({focused: boolean, color: string, size: number}) => {
+                        return <Icon name="home" size={iconSize} />;
+                    },
+                }}
+            />
+
             <Drawer.Screen
                 name="Flat"
                 component={AppStack}
@@ -460,6 +483,66 @@ function OfflineTab() {
         </Tab.Navigator>
     );
 }
+
+function IntroTab() {
+    return (
+        <Tab.Navigator
+            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
+            initialRouteName={'Building'}
+            tabBarOptions={{
+                activeTintColor: Style.DEFAUT_RED_COLOR,
+                inactiveTintColor: '#b3b3b3',
+                labelStyle: {
+                    fontSize: Style.NORMAL_SIZE,
+                },
+                style: {height: 50},
+                tabStyle: {
+                    paddingVertical: 5,
+                    paddingTop :8,
+                },
+                // item:program
+            }}>
+
+            <Tab.Screen
+                name="Building"
+                component={BuildingStack}
+                options={(route) => {
+                    return false
+                        ? {tabBarVisible: false}
+                        : {
+                            tabBarLabel: 'Dự án',
+                            tabBarIcon: ({focused, color, size}) => {
+                                if (focused) {
+                                    return <GallerySelectedIcon style={styles.tabBarIconStyle} />;
+                                    // return <MyProfileIconSelect style={styles.tabBarIconStyle} />;
+                                }
+                                return <GalleryIcon style={styles.tabBarIconStyle} />;
+                            },
+                        };
+                }}
+            />
+            <Tab.Screen
+                name="Design"
+                component={DesignStack}
+                options={(route) => {
+                    return false
+                        ? {tabBarVisible: false}
+                        : {
+                            tabBarLabel: 'Căn mẫu',
+                            tabBarIcon: ({focused, color, size}) => {
+                                if (focused) {
+                                    return <GallerySelectedIcon style={styles.tabBarIconStyle} />;
+                                    // return <MyProfileIconSelect style={styles.tabBarIconStyle} />;
+                                }
+                                return <GalleryIcon style={styles.tabBarIconStyle} />;
+                            },
+                        };
+                }}
+            />
+        </Tab.Navigator>
+    );
+}
+
 
 const LoadingModal = (props) => (
         <Modal onRequestClose={() => {console.log('test')}} visible={props.visible} transparent={true} styles={{backgroundColor : '#green'}} >
