@@ -56,7 +56,7 @@ const sendmail_form = 3;
 const update_deadline_form = 4;
 
 
-class DesignDetailScreen extends React.Component {
+class BuildingDetailScreen extends React.Component {
 
     constructor(props){
         super(props);
@@ -65,7 +65,7 @@ class DesignDetailScreen extends React.Component {
         Def.mainNavigate = this.props.navigation;
 
         let design_list = [];
-        let title = "Chi tiết thiết kế";
+        let title = "Chi tiết dự án";
 
         this.state = {
             item: this.props.route.params.item,
@@ -129,7 +129,6 @@ class DesignDetailScreen extends React.Component {
 
     updateDesignStatus =(design) => {
         if(design) {
-
             this.setState({item:design, deadlineCompleted: null, canSaveDeadline : false});
 
         }
@@ -142,7 +141,7 @@ class DesignDetailScreen extends React.Component {
         });
         Def.design_data = data["data"];
         let design_list = [];
-        let title = "Danh sách căn mẫu";
+        let title = "Danh sách thiết kế";
         if(this.state.cate){
             design_list = Def.design_cate[this.state.cate['id']]['data'];
             title = Def.design_cate[this.state.cate['id']]['name_vi']
@@ -225,7 +224,7 @@ class DesignDetailScreen extends React.Component {
                         <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
 
                             <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                                {Def.formatText(item.model, 15)}
+                                {Def.formatText(item.name, 15)}
                             </Text>
                         </View>
                     </TouchableOpacity>
@@ -234,18 +233,10 @@ class DesignDetailScreen extends React.Component {
                 <View style={styles.info}>
                     <View style={{flexDirection:'row'}}>
                         <Text>
-                            {"Tình trạng :" + ' '}
+                            {"Tình trạng:" + ' '}
                         </Text>
                         <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
                             {Def.getDesignStatusName(item.status)}
-                        </Text>
-                    </View>
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"Tên :" + ' '}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {item.name}
                         </Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
@@ -256,25 +247,6 @@ class DesignDetailScreen extends React.Component {
                             {item.building ? item.building.name+"" : ""}
                         </Text>
                     </View>
-
-                    <View style={{flexDirection:'row'}}>
-                        <Text>
-                            {"Mô tả:" + ' '}
-                        </Text>
-                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
-                            {item.description ? item.description + "" : "Chưa có mô tả"}
-                        </Text>
-                    </View>
-
-                    {
-                        item.panorama_url ?
-                            <View>
-
-                            </View>
-                            : null
-                    }
-
-
                 </View>
                 <View style={{paddingHorizontal:10, marginTop:20 ,  paddingBottom:8 , flexDirection:'row', justifyContent:'space-between'}}>
                     <Text style={styles.titleStyle}>{"Thiết bị nội thất"}</Text>
@@ -282,55 +254,70 @@ class DesignDetailScreen extends React.Component {
             </View>
         );
         return (
-            <View style={{flex:1}}>
-                <View style={{flex:1, paddingTop:5 , paddingBottom : 5 }}>
-                    <ProgramVerList
-                        data={this.state.item.relationProduct}
-                        navigation={this.props.navigation}
-                        header={ListHeader}
-                        styleList={{paddingHorizontal : 10}}
-                        refreshControl={
-                            <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
+            <View>
+                <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
+                    <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
+                        { item.image_path ?
+                            <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
+                            :
+                            <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                         }
-                        renderFunction={renderItem}
-                        type={'product-template'}
-                        numColumns={2}
-                        screen={'product-detail'}
-                        itemSeparatorComponent={
-                            (({ highlighted }) => (
-                                <View
-                                    style={[
-                                        {backgroundColor:Style.GREY_TEXT_COLOR, height:1, width:width -25, marginHorizontal: 10},
-                                        highlighted && { marginHorizontal:10 }
-                                    ]}
-                                />
-                            ))
-                        }
-                    />
+
+                        <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
+
+                            <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
+                                {Def.formatText(item.name, 15)}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
 
-                <View style={styles.controlBtn}>
-                    {       false ?
-                            <View style={{flexDirection: 'row', paddingBottom: 2}}>
-                                {
-                                   true ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          >
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Download
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-                                {
-                                    true ?
-                                        <TouchableOpacity style={Style.button_styles.buttonFlatStyle}
-                                                          >
-                                            <Text style={Style.text_styles.whiteTitleText}>
-                                                Xóa
-                                            </Text>
-                                        </TouchableOpacity> : null
-                                }
-                            </View> : null}
+                <View style={styles.info}>
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Mã:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE , paddingRight:5}}>
+                            {item.code+""}
+                        </Text>
+                    </View>
+
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Tên:" + ' '}
+                        </Text>
+
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            { item.name+""}
+                        </Text>
+                    </View>
+
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Trạng thái:" + ' '}
+                        </Text>
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            {Def.getDesignStatusName(item.status)}
+                        </Text>
+                    </View>
+                    <View>
+                        <Text>
+                            {"Miêu tả:" + ' '}
+                        </Text>
+
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            {item.description}
+                        </Text>
+                    </View>
+                    <View style={{flexDirection:'row'}}>
+                        <Text>
+                            {"Địa chỉ:" + ' '}
+                        </Text>
+
+                        <Text style={{fontSize:Style.MIDLE_SIZE ,  paddingRight:5}}>
+                            {Def.getAddressStr(item.straddress)}
+                        </Text>
+                    </View>
 
                 </View>
             </View>
@@ -427,4 +414,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default DesignDetailScreen;
+export default BuildingDetailScreen;

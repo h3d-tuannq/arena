@@ -29,6 +29,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MailProductItemrenderer from '../../com/item-render/MailProductItemrenderer';
 import DesignItemrenderer from '../../com/item-render/DesignItemrenderer';
 import {OfflineHelper} from "../../def/OfflineHelper";
+import BuildingItemrenderer from "../../com/item-render/BuildingItemrenderer";
 
 const CHOSE_BUILDING = 0;
 const CHOSE_CUSTOMER = 1;
@@ -48,22 +49,20 @@ const LoadingModal = (props) => (
 
 
 
-class DesignListScreen extends React.Component {
+class BuildingListScreen extends React.Component {
 
     criteria = {};
     imageView = null;
 
     constructor(props){
         super(props);
-        this.onGetDesignSuccess     = this.onGetDesignSuccess.bind(this);
-        this.onGetDesignFalse     = this.onGetDesignFalse.bind(this);
+        this.getBuildingSuccess     = this.getBuildingSuccess.bind(this);
+        this.onGetBuildingFalse     = this.onGetBuildingFalse.bind(this);
         this.refresh     = this.refresh.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
         this.choseBuildingClick = this.choseBuildingClick.bind(this);
-        this.choseCustomerClick = this.choseCustomerClick.bind(this);
         this.showModal = this.showModal.bind(this);
         this.getBuildingSuccess = this.getBuildingSuccess.bind(this);
-        this.getCustomerSuccess = this.getCustomerSuccess.bind(this);
         this.getFilterDataFalse = this.getFilterDataFalse.bind(this);
         this.closeFunction = this.closeFunction.bind(this);
         this.filterDataByCondition = this.filterDataByCondition.bind(this);
@@ -72,18 +71,12 @@ class DesignListScreen extends React.Component {
         this.resetCriteria = this.resetCriteria.bind(this);
         this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
-
-
         this.checkPermission = this.checkPermission.bind(this);
-        this.downloadDesignList = this.downloadDesignList.bind(this);
-        this.downloadDesignFalse = this.downloadDesignFalse.bind(this);
-
-        OfflineHelper.downloadDesignList = this.checkPermission;
-
-
-        let title = "Căn mẫu";
+        this.downloadBuildingList = this.downloadBuildingList.bind(this);
+        this.downloadBuildingFalse = this.downloadBuildingFalse.bind(this);
+        let title = "Danh sách dự án";
         this.state = {
-            data: Def.design_data,
+            data: Def.buildingData,
             title: title,
             stateCount: 0.0,
             isRefresh : false,
@@ -106,12 +99,7 @@ class DesignListScreen extends React.Component {
             isLoading:false
 
         };
-
-        this.handleDatePicked = this.handleDatePicked.bind(this);
-        this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
-        this.displayFilterDate = this.displayFilterDate.bind(this);
-        this.cancelDateFilter = this.cancelDateFilter.bind(this);
-        this.finishDownloadDesign = this.finishDownloadDesign.bind(this);
+        this.finishDownloadBuilding = this.finishDownloadBuilding.bind(this);
         this.itemClick = this.itemClick.bind(this);
 
     }
@@ -150,7 +138,7 @@ class DesignListScreen extends React.Component {
         }
     };
 
-    downloadDesignList = () => {
+    downloadBuildingList = () => {
         this.setState({startDownload:true});
         let i = 0;
         this.downloaded = 0; this.downloadFalse = 0;
@@ -162,7 +150,7 @@ class DesignListScreen extends React.Component {
         }
     }
 
-    downloadDesignSuccess = (obj,res) => {
+    downloadBuildingSuccess = (obj,res) => {
         obj.offline_img = res.path();
         this.downloaded = this.downloaded + 1;
         this.setState({downloaded: this.downloaded , isLoading:true});
@@ -171,15 +159,11 @@ class DesignListScreen extends React.Component {
         }
     }
 
-    finishDownloadDesign = ()=> {
-        if(OfflineHelper.offlineDesignData){
-            console.log('Offline Data : ' + JSON.stringify(OfflineHelper.offlineDesignData));
-            AsyncStorage.setItem('offlineDesignData', JSON.stringify(OfflineHelper.offlineDesignData));
-            this.setState({startDownload:false, isLoading:false});
-        }
+    finishDownloadBuilding = ()=> {
+
     }
 
-    downloadDesignFalse = (obj,res) => {
+    downloadBuildingFalse = (obj,res) => {
         this.downloadFalse = this.downloadFalse + 1;
         this.setState({downloadFalse: this.downloadFalse,isLoading:true});
     }
@@ -191,34 +175,13 @@ class DesignListScreen extends React.Component {
         this.filterDataByCondition();
     };
 
-    cancelDateFilter = () => {
-        this.setState({filterDate : null});
-        if(this.criteria['deliverDate']){
-            this.criteria['deliverDate'] = null;
-            this.filterDataByCondition();
-        }
-    }
-
     loadNextPage = (pageIndex) => {
         FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
     }
 
     itemClick(item){
-       this.props.navigation.navigate('Design', {screen:'design-detail', params: { item: item }});
+       this.props.navigation.navigate('Building', {screen:'building-detail', params: { item: item }});
     }
-
-
-
-
-
-    hideDateTimePicker = () => {
-        this.setState({ displaySelectDate : false });
-    };
-
-    displayFilterDate = () => {
-        this.setState({ displaySelectDate : true });
-    };
-
 
     refresh()
     {
@@ -240,38 +203,17 @@ class DesignListScreen extends React.Component {
 
     filterFunc = (item) => {
         let rs = true;
-        if(this.criteria.building){
-            rs = item.building_id == this.criteria.building.id;
-        }
-        if(rs && this.criteria.customer){
-            rs = item.customer_code == this.criteria.customer.code;
-        }
 
-        if(rs && this.criteria.status){
-            rs = item.status == this.criteria.status['id'];
-        }
-        if(rs && this.criteria.deliverDate){
-            // console.log('Item : ' + JSON.stringify(item.deliverDate));
-            rs = item.deliver_date && Def.compairDate(item.deliver_date * 1000, this.criteria.deliverDate, Def.COMPARE_DATE);
-        }
-        if(rs && this.criteria.name && this.criteria.name.length > 0){
-            const regex = new RegExp(`${this.criteria.name.trim()}`, 'i');
-            rs = item.code.search(regex) >= 0;
-        }
         return rs;
     }
 
     onRefresh = () => {
         if(!this.state.startDownload){
-
             this.setState({isRefresh:true, pageIndex:0,downloaded : 0, downloadFalse:0});
-
         }
 
         this.resetCriteria();
-        if(Def.user_info){
-            FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
-        }
+            FlatController.getbuilding(this.onGetBuildingSuccess, this.onGetBuildingFalse);
     };
 
     resetCriteria = () => {
@@ -280,15 +222,15 @@ class DesignListScreen extends React.Component {
     }
 
 
-    onGetDesignSuccess(data){
+    onGetBuildingSuccess(data){
         Def.design_data = data["data"];
-        let title = "Danh sách thiết kế";
-        AsyncStorage.setItem('design_data', JSON.stringify(Def.design_data));
-        this.setState({data:Def.design_data, isRefresh:false});
+        let title = "Danh sách dự án";
+        AsyncStorage.setItem('buildingData', JSON.stringify(Def.buildingData));
+        this.setState({data:Def.buildingData, isRefresh:false});
     }
 
 
-    onGetDesignFalse(data){
+    onGetBuildingFalse(data){
         console.log("false data : " + data);
         this.setState({isRefresh:false});
     }
@@ -296,7 +238,7 @@ class DesignListScreen extends React.Component {
 
 
     shouldComponentUpdate(){
-        const index = Def.REFESH_SCREEN.indexOf('design-screen');
+        const index = Def.REFESH_SCREEN.indexOf('building-screen');
 
         if (index > -1 || (this.props.route && this.props.route.param && this.props.route.param.refresh)) {
             if(index > -1){
@@ -309,9 +251,7 @@ class DesignListScreen extends React.Component {
     }
 
     choseStatusClick = () => {
-        console.log('Chose status click');
 
-        this.showModal(FlatHelper.FlatStatusData, 'Chọn Trạng thái', CHOSE_STATUS);
     };
 
 
@@ -350,42 +290,6 @@ class DesignListScreen extends React.Component {
     getFilterDataFalse = (data)=> {
         console.log('Get Bulding False' + JSON.stringify(data));
     }
-
-    getCustomerSuccess = (data) => {
-        if(data['result'] == 1){
-            Def.customerData = data['customer'];
-            console.log('Customer Length : ' + Def.customerData.length);
-            AsyncStorage.setItem('customerData', JSON.stringify(Def.customerData));
-            this.showModal(Def.customerData, 'Chọn Chủ sở hữu', CHOSE_CUSTOMER );
-
-        }else {
-            Alert.alert(
-                "Thông báo",
-                data['msg'],
-                [
-                    {
-                        text: "Ok",
-                        style: 'Cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
-
-    }
-
-
-
-    choseCustomerClick = ()=> {
-        console.log('Chose Customer Click');
-        if(!Def.customerData || Def.customerData.length < 1){
-            FlatController.getCustomer(this.getCustomerSuccess, this.getFilterDataFalse);
-        } else {
-            this.showModal(Def.customerData, 'Chọn Chủ sở hữu', CHOSE_CUSTOMER);
-        }
-
-    }
-
     signInBtnClick(){
         this.props.navigation.navigate('Login', {'screen': 'signIn'});
     }
@@ -416,28 +320,21 @@ class DesignListScreen extends React.Component {
 
 
     async componentDidMount() {
-        if(Def.refresh_design_data || !Def.design_data || Def.design_data.length == 0){
-            if (Def.design_data && Def.design_data.length > 0) {
-                this.setState({data:Def.design_data});
+        if(Def.refresh_building_data || !Def.buildingData || Def.buildingData.length == 0){
+            if (Def.buildingData && Def.buildingData.length > 0) {
+                this.setState({data:Def.buildingData});
             } else {
-                let userData  = await AsyncStorage.getItem('user_info');
-                 if(userData) {
-                     Def.user_info = JSON.parse(userData);
-                     Def.username = Def.user_info['user_name'];
-                     Def.email = Def.user_info['email'];
-                 }
-                let designData  = await AsyncStorage.getItem('design_data');
+                let designData  = await AsyncStorage.getItem('buildingData');
                 designData = designData ? JSON.parse(designData) : [];
                 if(designData && designData.length > 0){
-                    Def.design_data = designData;
-                    this.setState({data:Def.design_data});
+                    Def.buildingData = designData;
+                    this.setState({data:Def.buildingData});
                 } else {
-                    await AsyncStorage.setItem('design_data', "");
-                    FlatController.getDesign(this.onGetDesignSuccess, this.onGetDesignFalse);
+                    await AsyncStorage.setItem('buildingData', "");
+                    FlatController.getFlat(this.onGetDesignSuccess, this.onGetDesignFalse);
                 }
-
             }
-            Def.refresh_design_data = false;
+            Def.refresh_building_data = false;
         }
     }
     render() {
@@ -448,7 +345,7 @@ class DesignListScreen extends React.Component {
             <View>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between' , alignItems: 'flex-start'}}>
                     <View style={{marginLeft:15, paddingBottom:5}}>
-                        <Text style={styles.titleStyle}>{ (this.state.data ? this.state.data.length : 0 )+ " Căn mẫu"}</Text>
+                        <Text style={styles.titleStyle}>{ (this.state.data ? this.state.data.length : 0 )+ " Dự án"}</Text>
                     </View>
                 </View>
             </View>
@@ -458,9 +355,9 @@ class DesignListScreen extends React.Component {
 
             return (
                 <View style={{}}>
-                    <DesignItemrenderer
+                    <BuildingItemrenderer
                         item ={item} click={this.itemClick}
-                        styleImage={{width: (width - 30) / 2, height: (width - 30) / 2}}
+                        styleImage={{width: (width - 30), height: (width - 30)}}
                     />
                 </View>
             )
@@ -468,28 +365,6 @@ class DesignListScreen extends React.Component {
 
 
         return (
-
-            // !Def.user_info ?
-            //
-            //     <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
-            //         <View style={{flexDirection: 'row'}}>
-            //             <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
-            //                 Vui lòng
-            //             </Text>
-            //             <TouchableOpacity onPress={this.signInBtnClick}>
-            //                 <Text style={{fontSize:Style.TITLE_SIZE, marginLeft:5 , color:Style.DEFAUT_RED_COLOR}}>
-            //                     đăng nhập
-            //                 </Text>
-            //             </TouchableOpacity>
-            //         </View>
-            //         <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
-            //             để sử dụng đầy đủ tính năng cá nhân
-            //         </Text>
-            //
-            //     </View>
-            //     :
-
-
             <View style={{flex:1, paddingTop:5, paddingHorizontal:10}}>
                 <LoadingModal visible={this.state.isLoading}/>
                 {
@@ -528,9 +403,9 @@ class DesignListScreen extends React.Component {
                         <RefreshControl refreshing={this.state.isRefresh} onRefresh={this.onRefresh}/>
                     }
                     renderFunction={renderItem}
-                    type={'design'}
+                    type={'building'}
                     numColumns={1}
-                    screen={'design-detail'}
+                    screen={'building-detail'}
                     itemSeparatorComponent={
                         (({ highlighted }) => (
                             <View
@@ -588,4 +463,4 @@ const styles = StyleSheet.create({
     textInput : {height: 40,  borderColor: "#9e9e9e", borderWidth : 0, borderBottomWidth:0 ,color:'black', fontSize : Style.MIDLE_SIZE, borderRadius: 5, paddingHorizontal: 5  },
 });
 
-export default DesignListScreen;
+export default BuildingListScreen;
