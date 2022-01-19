@@ -7,19 +7,19 @@ import {Platform} from "react-native";
 
 export default class FlatController {
     static getFlat(callback,errCallback , get_all = false, pageSize = Def.pageSize, pageIndex) {
-       let param = {'token' : Def.user_info['access_token'] , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
+       let param = {'token' : Def.user_info ? Def.user_info['access_token'] : '', 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
        Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat" ,Def.POST_METHOD, param);
     }
 
     static getDesign(callback,errCallback , get_all = false, pageSize = Def.pageSize, pageIndex) {
         console.log('Get Design');
-        let param = {'token' : Def.user_info['access_token'] , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
+        let param = {'token' : Def.user_info ? Def.user_info['access_token'] : '' , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/design/design" ,Def.POST_METHOD, param);
     }
 
     static getProduct(callback,errCallback , get_all = true, pageSize = Def.pageSize, pageIndex) {
         console.log('Get Product');
-        let param = {'token' : Def.user_info['access_token'] , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
+        let param = {'token' : Def.user_info ? Def.user_info['access_token'] : '' , 'get_all' : true, 'pageSize' :pageSize, 'pageIndex' : pageIndex };
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/product/product" ,Def.POST_METHOD, param);
     }
 
@@ -29,7 +29,7 @@ export default class FlatController {
     }
 
     static getCustomer(callback,errCallback ) {
-        let param = {'token' : Def.user_info['access_token']};
+        let param = {'token' : Def.user_info ? Def.user_info['access_token'] : ''};
 
        console.log(JSON.stringify(param));
 
@@ -38,13 +38,13 @@ export default class FlatController {
 
 
     static getFlatById(callback,errCallback, flatId ) {
-        let param = {'flat_id' : flatId, 'token' : Def.user_info['access_token']};
+        let param = {'flat_id' : flatId, 'token' : Def.user_info ? Def.user_info['access_token'] : ''};
         console.log(JSON.stringify(param));
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-flat-by-id" ,Def.POST_METHOD, param);
     }
 
     static getDesignById(callback,errCallback, designId ) {
-        let param = {'design_id' : designId, 'token' : Def.user_info['access_token']};
+        let param = {'design_id' : designId, 'token' : Def.user_info ? Def.user_info['access_token'] : ''};
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/design/get-design-by-id" ,Def.POST_METHOD, param);
     }
 
@@ -54,7 +54,7 @@ export default class FlatController {
     }
 
     static getRequestRepairByFlat(callback, errCallback , flat_id){
-        let param = {'flat_id' : flat_id, 'token' : Def.user_info['access_token']};
+        let param = {'flat_id' : flat_id, 'token' : Def.user_info ? Def.user_info['access_token'] : ''};
         Net.sendRequest(callback,errCallback, Def.ARENA_BASE + "/api/flat/get-repair-item-by-flat" ,Def.POST_METHOD, param);
     }
 
