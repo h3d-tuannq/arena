@@ -15,6 +15,7 @@ import {
     RefreshControl
 } from 'react-native';
 import Def from '../../def/Def'
+import { WebView } from 'react-native-webview';
 const {width, height} = Dimensions.get('window');
 import Style from '../../def/Style';
 import FlatHelper from  '../../def/FlatHelper'
@@ -268,8 +269,13 @@ class DesignDetailScreen extends React.Component {
 
                     {
                         item.panorama_url ?
-                            <View>
-
+                            <View style={styles.webView}>
+                                <WebView
+                                    source={{
+                                        uri: item.panorama_url
+                                    }}
+                                    style={{ marginTop: 1 }}
+                                />
                             </View>
                             : null
                     }
@@ -423,6 +429,11 @@ const styles = StyleSheet.create({
         alignItems : 'center',
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    webView : {
+        height : width / 2,
+        backgroundColor: '#e6e6e6',
+        marginTop : 5,
     },
 
 });

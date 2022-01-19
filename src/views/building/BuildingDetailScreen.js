@@ -257,16 +257,19 @@ class BuildingDetailScreen extends React.Component {
             <View>
                 <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
-                        { item.image_path ?
+                        {item && item.image_path ?
                             <Image  style={[styles.itemImage ]}  source={{uri: Def.getThumnailImg(item.image_path)}}  />
                             :
-                            <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
+                            item.code == 'THE ARENA CAM RANH'  ?
+                                <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/duan_arena.jpg')} />
+                                :
+                                <Image  style={[styles.itemImage ]} source={require('../../../assets/icon/default_arena.jpg')} />
                         }
 
                         <View style = {{marginTop : 10, width:PROGRAM_IMAGE_WIDTH, justifyContent:'flex-start'  }}>
 
                             <Text style={[{   paddingVertical:1 , borderRadius : 3 ,bottom:5, backgroundColor:  Style.DEFAUT_BLUE_COLOR, textAlign: 'center'}, Style.text_styles.whiteTitleText]}>
-                                {Def.formatText(item.name, 15)}
+                                {Def.formatText(item.code, 15)}
                             </Text>
                         </View>
                     </TouchableOpacity>

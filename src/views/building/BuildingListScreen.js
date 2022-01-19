@@ -56,52 +56,33 @@ class BuildingListScreen extends React.Component {
 
     constructor(props){
         super(props);
-        this.getBuildingSuccess     = this.getBuildingSuccess.bind(this);
+        this.onGetBuildingSuccess     = this.onGetBuildingSuccess.bind(this);
         this.onGetBuildingFalse     = this.onGetBuildingFalse.bind(this);
         this.refresh     = this.refresh.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
-        this.choseBuildingClick = this.choseBuildingClick.bind(this);
         this.showModal = this.showModal.bind(this);
-        this.getBuildingSuccess = this.getBuildingSuccess.bind(this);
-        this.getFilterDataFalse = this.getFilterDataFalse.bind(this);
-        this.closeFunction = this.closeFunction.bind(this);
         this.filterDataByCondition = this.filterDataByCondition.bind(this);
         this.searchButtonClick = this.searchButtonClick.bind(this);
         this.filterFunc = this.filterFunc.bind(this);
         this.resetCriteria = this.resetCriteria.bind(this);
-        this.choseStatusClick = this.choseStatusClick.bind(this);
         this.signInBtnClick = this.signInBtnClick.bind(this);
         this.checkPermission = this.checkPermission.bind(this);
-        this.downloadBuildingList = this.downloadBuildingList.bind(this);
-        this.downloadBuildingFalse = this.downloadBuildingFalse.bind(this);
         let title = "Danh sách dự án";
         this.state = {
             data: Def.buildingData,
             title: title,
             stateCount: 0.0,
             isRefresh : false,
-            building: null,
-            customer: null,
             name:'',
             displayModal: false,
-            filterAttr:"name",
-            filterData: [],
-            choseMode:0, // 0 chọn dự án, 1 chọn khách hàng
-            displayLoadedImage: false,
             status:null,
-            selectedDate: new Date(),
-            filterDate: null,
-            displaySelectDate: false,
             pageIndex:0,
             downloaded: 0,
             startDownload : false,
             downloadFalse : 0,
             isLoading:false
-
         };
-        this.finishDownloadBuilding = this.finishDownloadBuilding.bind(this);
         this.itemClick = this.itemClick.bind(this);
-
     }
 
     checkPermission = async () => {
@@ -138,47 +119,6 @@ class BuildingListScreen extends React.Component {
         }
     };
 
-    downloadBuildingList = () => {
-        this.setState({startDownload:true});
-        let i = 0;
-        this.downloaded = 0; this.downloadFalse = 0;
-        OfflineHelper.offlineDesignData = OfflineHelper.makeObjectDataWithIdKey(Def.design_data);
-        for (const key in  OfflineHelper.offlineDesignData){
-            if(OfflineHelper.offlineDesignData[key]){
-                OfflineHelper.downloadDesignImage(OfflineHelper.offlineDesignData[key], this.downloadDesignSuccess, this.downloadDesignFalse);
-            }
-        }
-    }
-
-    downloadBuildingSuccess = (obj,res) => {
-        obj.offline_img = res.path();
-        this.downloaded = this.downloaded + 1;
-        this.setState({downloaded: this.downloaded , isLoading:true});
-        if(this.downloaded + this.downloadFalse >= Def.design_data.length ){
-            this.finishDownloadDesign();
-        }
-    }
-
-    finishDownloadBuilding = ()=> {
-
-    }
-
-    downloadBuildingFalse = (obj,res) => {
-        this.downloadFalse = this.downloadFalse + 1;
-        this.setState({downloadFalse: this.downloadFalse,isLoading:true});
-    }
-
-    handleDatePicked = date => {
-        this.hideDateTimePicker();
-        this.setState({ selectedDate : date, filterDate:date, type:CHOSE_DELIVER_DATE });
-        this.criteria['deliverDate'] = date;
-        this.filterDataByCondition();
-    };
-
-    loadNextPage = (pageIndex) => {
-        FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse, false, Def.pageSize, this.state.pageIndex + 1);
-    }
-
     itemClick(item){
        this.props.navigation.navigate('Building', {screen:'building-detail', params: { item: item }});
     }
@@ -196,7 +136,7 @@ class BuildingListScreen extends React.Component {
     filterDataByCondition = () => {
         this.criteria['name'] = this.state.name;
        console.log('Run Filter Criteria : ' + JSON.stringify(this.criteria));
-       let dataFilter =  Def.flat_data.filter(this.filterFunc);
+       let dataFilter =  Def.buildingData.filter(this.filterFunc);
        console.log('Filter-Data : ' + dataFilter.length);
        this.setState({data:dataFilter});
     }
@@ -208,31 +148,28 @@ class BuildingListScreen extends React.Component {
     }
 
     onRefresh = () => {
-        if(!this.state.startDownload){
-            this.setState({isRefresh:true, pageIndex:0,downloaded : 0, downloadFalse:0});
-        }
-
         this.resetCriteria();
-            FlatController.getbuilding(this.onGetBuildingSuccess, this.onGetBuildingFalse);
+        console.log('Start Refresh');
+        FlatController.getbuilding(this.onGetBuildingSuccess, this.onGetBuildingFalse);
     };
 
     resetCriteria = () => {
-        this.setState({building: null, customer:null, name: "", deliverDate: null});
         this.criteria = {};
     }
 
 
     onGetBuildingSuccess(data){
-        Def.design_data = data["data"];
+        Def.buildingData = data["building"];
         let title = "Danh sách dự án";
         AsyncStorage.setItem('buildingData', JSON.stringify(Def.buildingData));
         this.setState({data:Def.buildingData, isRefresh:false});
+        console.log('End Refresh');
     }
 
 
     onGetBuildingFalse(data){
-        console.log("false data : " + data);
-        this.setState({isRefresh:false});
+        console.log("Test false data : " + JSON.stringify(data));
+        // this.setState({isRefresh:false});
     }
 
 
@@ -250,46 +187,7 @@ class BuildingListScreen extends React.Component {
         return true;
     }
 
-    choseStatusClick = () => {
 
-    };
-
-
-    choseBuildingClick = ()=> {
-        console.log('Chose Building Click');
-        if(!Def.buildingData && Def.buildingData.length < 1 ){
-            FlatController.getbuilding(this.getBuildingSuccess, this.getFilterDataFalse);
-        } else {
-            this.showModal(Def.buildingData, 'Chọn Dự án', CHOSE_BUILDING);
-        }
-
-    }
-
-    getBuildingSuccess = (data) => {
-        if(data['result'] == 1){
-            Def.buildingData = data['building'];
-            AsyncStorage.setItem('buildingData', JSON.stringify(Def.buildingData));
-            this.showModal(Def.buildingData, 'Chọn Dự án', CHOSE_BUILDING);
-
-        }else {
-            Alert.alert(
-                "Thông báo",
-                data['msg'],
-                [
-                    {
-                        text: "Ok",
-                        style: 'Cancel',
-                    }
-                ],
-                {cancelable: false},
-            );
-        }
-
-    }
-
-    getFilterDataFalse = (data)=> {
-        console.log('Get Bulding False' + JSON.stringify(data));
-    }
     signInBtnClick(){
         this.props.navigation.navigate('Login', {'screen': 'signIn'});
     }
@@ -298,26 +196,6 @@ class BuildingListScreen extends React.Component {
 
         this.setState({displayModal:true, title:title, type:type , filterData:data})
     }
-
-    closeFunction = (data) => {
-        let state = {displayModal:false};
-
-        if(data){
-            console.log("DAta :" + JSON.stringify(data))
-            if(data && data['id'] == -1){
-                data = null;
-            }
-
-
-          this.state.type == CHOSE_CUSTOMER?  state['customer'] = data : state['status'] = data;
-            this.state.type == CHOSE_CUSTOMER ?  this.criteria['customer'] = data : this.criteria['status'] = data;
-          this.filterDataByCondition();
-        }
-
-
-        this.setState(state)
-    }
-
 
     async componentDidMount() {
         if(Def.refresh_building_data || !Def.buildingData || Def.buildingData.length == 0){
@@ -331,7 +209,7 @@ class BuildingListScreen extends React.Component {
                     this.setState({data:Def.buildingData});
                 } else {
                     await AsyncStorage.setItem('buildingData', "");
-                    FlatController.getFlat(this.onGetDesignSuccess, this.onGetDesignFalse);
+                    FlatController.getbuilding(this.onGetBuildingSuccess, this.onGetBuildingFalse);
                 }
             }
             Def.refresh_building_data = false;
@@ -367,34 +245,7 @@ class BuildingListScreen extends React.Component {
         return (
             <View style={{flex:1, paddingTop:5, paddingHorizontal:10}}>
                 <LoadingModal visible={this.state.isLoading}/>
-                {
-                    this.state.startDownload ?
-                        <View>
-                            <Text>
-                                Tải xuống
-                            </Text>
-                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
-                                <Text>
-                                    Thành công
-                                </Text>
-                                <Text>
-                                    {this.state.downloaded + '/' + Def.design_data.length }
-                                </Text>
-                            </View>
-                            <View style={{flexDirection : 'row', justifyContent: 'space-between'}}>
-                                <Text>
-                                    Thất bại
-                                </Text>
-                                <Text>
-                                    {this.state.downloadFalse + '/' + Def.design_data.length }
-                                </Text>
-                            </View>
-                        </View>
-
-                        : null
-                }
                  <ProgramVerList
-
                     data={this.state.data}
                     navigation={this.props.navigation}
                     header={ListHeader}
