@@ -393,7 +393,7 @@ class FlatDetailScreen extends React.Component {
 
 
     changeStatusSuccess = (data) => {
-        if(data['msg'] == "Ok"){
+        if( data['result'] == 1  || data['result'] == '1'  || data['msg'] == "Ok"){
             // this.setState({canSaveDeadline:false});
             Alert.alert(
                 "Thông báo",
@@ -415,7 +415,7 @@ class FlatDetailScreen extends React.Component {
         } else {
             Alert.alert(
                 "Thông báo",
-                'Test Ko cập nhật',
+                data['msg'],
                 [
                     {
                         text: "Ok",
