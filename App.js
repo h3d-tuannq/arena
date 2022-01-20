@@ -144,7 +144,7 @@ NetInfo.addEventListener(async networkState => {
             }
 
         }
-    } else if (Def.user_info) { // Trong trường hợp tài khoản đã login mới thực hiện lưu trạng thái
+    } else  { // Trong trường hợp tài khoản đã login mới thực hiện lưu trạng thái
         Def.NetWorkConnect = networkState.isConnected;
         await AsyncStorage.setItem('network_connect' , networkState.isConnected ? '1' : '0');
         if (Def.user_info) {
@@ -185,13 +185,13 @@ function CustomDrawerContent(props) {
                     <BackIcon width={25} height={25} />
                 </TouchableOpacity>
                 <Text style={{marginLeft: 30, color: '#fff' , fontSize: Style.TITLE_SIZE}}>
-                    {Def.email == null || Def.email == '' ? 'The Arena' : FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info))}
+                    {Def.email == null || Def.email == '' || !Def.user_info ? 'The Arena' : FlatHelper.getRoleName(FlatHelper.getPriorityRole(Def.user_info))}
                 </Text>
                 <View />
             </View>
             <DrawerContentScrollView {...props}>
                 <View style={{flex: 1}}>
-                    {Def.NetWorkMode && (Def.email == null || Def.email == '')  ? (
+                    {Def.NetWorkConnect && (Def.email == null || Def.email == '' || !Def.user_info)  ? (
                         <View
                             style={{
                                 flexDirection: 'row',
@@ -393,7 +393,6 @@ function AppDrawer() {
             />
 
             {
-                Def.user_info ?
                 <Drawer.Screen
                     name="Offline-Lib"
                     component={OfflineLibStack}
@@ -403,7 +402,7 @@ function AppDrawer() {
                             return <Icon name="folder-open" size={iconSize} />;
                         },
                     }}
-                /> : null
+                />
             }
 
 
@@ -574,7 +573,6 @@ class App extends React.Component {
    async componentDidMount(){
         let network_mode = JSON.parse(await AsyncStorage.getItem('network_mode'));
         Def.NetWorkMode = network_mode == 1 || network_mode == '1' ;
-
         let userInfoRaw = await AsyncStorage.getItem('user_info');
         if(userInfoRaw){
             Def.user_info = JSON.parse(userInfoRaw);
