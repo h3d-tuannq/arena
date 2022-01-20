@@ -755,7 +755,7 @@ class FlatListScreen extends React.Component {
         return (
             !Def.user_info ?
 
-                ( Def.NetWorkMode && Def.NetWorkConnect ?
+                (Def.NetWorkConnect ?
                         <View style={{justifyContent: 'center', flex: 1, alignItems: 'center', width: width}}>
                             <View style={{flexDirection: 'row'}}>
                                 <Text style={{fontSize: Style.TITLE_SIZE, color: '#b3b3b3'}}>
