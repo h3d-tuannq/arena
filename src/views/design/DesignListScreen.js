@@ -269,9 +269,7 @@ class DesignListScreen extends React.Component {
         }
 
         this.resetCriteria();
-        if(Def.user_info){
-            FlatController.getFlat(this.onGetFlatSuccess, this.onGetDesignFalse);
-        }
+        FlatController.getDesign(this.onGetDesignSuccess, this.onGetDesignFalse);
     };
 
     resetCriteria = () => {

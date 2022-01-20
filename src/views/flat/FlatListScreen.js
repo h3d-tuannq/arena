@@ -753,29 +753,35 @@ class FlatListScreen extends React.Component {
 
 
         return (
-            Def.NetWorkMode && Def.NetWorkConnect ?
-                !Def.user_info ?
-                <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
-                    <View style={{flexDirection: 'row'}}>
-                        <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
-                            Vui lòng
-                        </Text>
-                        <TouchableOpacity onPress={this.signInBtnClick}>
-                            <Text style={{fontSize:Style.TITLE_SIZE, marginLeft:5 , color:Style.DEFAUT_RED_COLOR}}>
-                                đăng nhập
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={{fontSize:Style.TITLE_SIZE, color:'#b3b3b3'}}>
-                        để sử dụng đầy đủ tính năng cá nhân
-                    </Text>
+            !Def.user_info ?
 
-                </View > :
-                    <View style={{justifyContent :'center',flex: 1, alignItems : 'center', width: width}}>
-                        <Text>
-                            Vui lòng kết nối mạng Internet
-                        </Text>
-                    </View>
+                ( Def.NetWorkMode && Def.NetWorkConnect ?
+                        <View style={{justifyContent: 'center', flex: 1, alignItems: 'center', width: width}}>
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={{fontSize: Style.TITLE_SIZE, color: '#b3b3b3'}}>
+                                    Vui lòng
+                                </Text>
+                                <TouchableOpacity onPress={this.signInBtnClick}>
+                                    <Text style={{
+                                        fontSize: Style.TITLE_SIZE,
+                                        marginLeft: 5,
+                                        color: Style.DEFAUT_RED_COLOR
+                                    }}>
+                                        đăng nhập
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={{fontSize: Style.TITLE_SIZE, color: '#b3b3b3'}}>
+                                để sử dụng đầy đủ tính năng cá nhân
+                            </Text>
+
+                        </View> :
+                        <View style={{justifyContent: 'center', flex: 1, alignItems: 'center', width: width}}>
+                            <Text>
+                                Vui lòng kết nối mạng Internet
+                            </Text>
+                        </View>
+                )
                 :
             <View style={{flex:1, paddingTop:5}}>
                 <LoadingModal visible={this.state.isLoading}/>
