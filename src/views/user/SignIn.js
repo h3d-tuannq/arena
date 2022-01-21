@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import Style from "../../../src/def/Style";
 import Def from "../../../src/def/Def";
+import RNRestart from 'react-native-restart';
 
 import UserController from '../../../src/controller/UserController'
 

@@ -470,6 +470,8 @@ class FlatListScreen extends React.Component {
     }
 
     signInBtnClick(){
+        Def.redirect_stack = 'Flat';
+        Def.redirect_screen = 'flat-screen';
         this.props.navigation.navigate('Login', {'screen': 'signIn'});
     }
 
