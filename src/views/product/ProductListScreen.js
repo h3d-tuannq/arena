@@ -211,7 +211,7 @@ class ProductListScreen extends React.Component {
 
     refresh()
     {
-        this.setState({ stateCount: Math.random() , data : Def.flat_data });
+        this.setState({ stateCount: Math.random() , data : Def.product_data });
     }
 
     searchButtonClick = () => {
@@ -260,6 +260,7 @@ class ProductListScreen extends React.Component {
         }
     };
 
+
     resetCriteria = () => {
         this.setState({building: null, customer:null, name: "", deliverDate: null});
         this.criteria = {};
@@ -282,7 +283,7 @@ class ProductListScreen extends React.Component {
 
 
     shouldComponentUpdate(){
-        const index = Def.REFESH_SCREEN.indexOf('design-screen');
+        const index = Def.REFESH_SCREEN.indexOf('product-list-screen');
 
         if (index > -1 || (this.props.route && this.props.route.param && this.props.route.param.refresh)) {
             if(index > -1){
@@ -373,6 +374,8 @@ class ProductListScreen extends React.Component {
     }
 
     signInBtnClick(){
+        Def.redirect_stack = 'Product';
+        Def.redirect_screen = 'product-list-screen';
         this.props.navigation.navigate('Login', {'screen': 'signIn'});
     }
 

@@ -105,7 +105,7 @@ export default class UserController{
                 Def.NetWorkMode = 1;
                 await AsyncStorage.setItem('network_mode' , '1');
                 Def.setLoader(false);
-                // UserController.loginSuccessFunc();
+                UserController.loginSuccessFunc();
 
 
                 // let token = await messaging().getToken();
@@ -122,7 +122,8 @@ export default class UserController{
         console.log("Test");
 
         Def.REFESH_SCREEN.push('flat-screen');
-        Def.mainNavigate.navigate('Flat',{screen:'flat-screen', params: {'refresh' : true}});
+        Def.REFESH_SCREEN.push('product-list-screen');
+        Def.mainNavigate.navigate(Def.redirect_stack,{screen:Def.redirect_screen, params: {'refresh' : true}});
     }
 
     static async onLoginFalse (data){

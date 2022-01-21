@@ -83,6 +83,9 @@ export default class Def {
     static cart_data = [];
     static setLoading = null;
 
+    static redirect_stack = 'Flat';
+    static redirect_screen = 'flat-screen';
+
 
     static requestRepairtFlat ={} ;
 

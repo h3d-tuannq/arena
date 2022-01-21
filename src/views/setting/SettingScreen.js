@@ -50,6 +50,8 @@ class SettingScreen extends React.Component {
     }
 
     signInBtnClick(){
+        Def.redirect_stack = 'Setting';
+        Def.redirect_screen = 'setting-screen';
         this.props.navigation.navigate('Login', {'screen': 'signIn'});
     }
 
