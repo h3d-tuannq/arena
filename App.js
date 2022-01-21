@@ -362,11 +362,11 @@ function AppDrawer() {
             drawerStyle={{
                 width: width * 0.8,
             }}
+
             drawerContentOptions={{
                 // activeTintColor: '#e91e63',
                 itemStyle: { marginVertical: 0, height : PixelRatio.get() < 2 ? 37 :42, paddingVertical:0, justifyContent:'center'},
             }}
-
             drawerContent={(props) => <CustomDrawerContent {...props} />}
         >
 
@@ -426,7 +426,7 @@ const Tab = createBottomTabNavigator();
 function OfflineTab() {
     return (
         <Tab.Navigator
-            // style={{height: Style.BOTTOM_HEIGHT, paddingVertical: 20 , backgroundColor : 'red'}}
+            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
 
             // tabBar={(props) => <MyTabBar {...props} item={null} />}
             initialRouteName={'Design'}
@@ -436,7 +436,7 @@ function OfflineTab() {
                 labelStyle: {
                     fontSize: Style.NORMAL_SIZE,
                 },
-                style: {height: Style.BOTTOM_HEIGHT},
+                style: {height: 50},
                 tabStyle: {
                     paddingVertical: 5,
                     paddingTop :8,
@@ -489,6 +489,7 @@ function OfflineTab() {
 function IntroTab() {
     return (
         <Tab.Navigator
+            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
             initialRouteName={'Building'}
             tabBarOptions={{
                 activeTintColor: Style.DEFAUT_RED_COLOR,
@@ -496,7 +497,7 @@ function IntroTab() {
                 labelStyle: {
                     fontSize: Style.NORMAL_SIZE,
                 },
-                style: {height: Style.BOTTOM_HEIGHT},
+                style: {height: 50},
                 tabStyle: {
                     paddingVertical: 5,
                     paddingTop :8,
