@@ -35,13 +35,22 @@ class SettingScreen extends React.Component {
 
     }
     componentDicMount(){
+        console.log('setting component did mount');
 
     }
     refresh()
     {
-        this.setState({ stateCount: Math.random() });
+        this.setState({ stateCount: Math.random() , user: Def.user_info});
     }
-    shouldComponentUpdate(){
+    async shouldComponentUpdate(){
+        const index = Def.REFESH_SCREEN.indexOf('setting-screen');
+        console.log('shoud component update');
+        if (index > -1 || (this.props.route && this.props.route.param && this.props.route.param.refresh)) {
+            if(index > -1){
+                Def.REFESH_SCREEN.splice(index, 1);
+            }
+            this.refresh();
+        }
         return true;
     }
 
