@@ -254,7 +254,7 @@ class BuildingDetailScreen extends React.Component {
             </View>
         );
         return (
-            <View>
+            <ScrollView>
                 <View style={{width : width, backgroundColor: '#fff', flexDirection : 'row' , paddingBottom:5 }}>
                     <TouchableOpacity style={styles.imageContainer} onPress={this.displayFullImg}>
                         {item && item.image_path ?
@@ -323,7 +323,18 @@ class BuildingDetailScreen extends React.Component {
                     </View>
 
                 </View>
-            </View>
+                {
+                    item.code == 'THE ARENA CAM RANH'  ?
+                        <View style={styles.info}>
+                            <Image  style={[styles.contentImage ]} source={require('../../../assets/icon/arena_1.jpg')} />
+                            <Image  style={[styles.contentImage ]} source={require('../../../assets/icon/arena_2.jpg')} />
+                            <Image  style={[styles.contentImage ]} source={require('../../../assets/icon/arena_3.jpg')} />
+                            <Image  style={[styles.contentImage ]} source={require('../../../assets/icon/arena_4.jpg')} />
+                        </View> : null
+                }
+
+
+            </ScrollView>
         )
     }
 }
@@ -371,6 +382,13 @@ const styles = StyleSheet.create({
         height : PROGRAM_IMAGE_HEIGHT + 5,
         borderRadius: 5,
     },
+    contentImage : {
+        width: width -20,
+        height : (width -20) *2 /3,
+        borderRadius: 5,
+        marginTop :5,
+    },
+
     titleStyle : {
         fontSize : Style.BIG_SIZE,
         color: Style.GREY_TEXT_COLOR,

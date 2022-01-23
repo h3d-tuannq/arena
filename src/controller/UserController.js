@@ -118,12 +118,11 @@ export default class UserController{
         } catch (err){
             console.log('Error : ' + err);
         }
-
-        console.log("Test");
-
         Def.REFESH_SCREEN.push('flat-screen');
         Def.REFESH_SCREEN.push('product-list-screen');
+        Def.REFESH_SCREEN.push('setting-screen');
         Def.mainNavigate.navigate(Def.redirect_stack,{screen:Def.redirect_screen, params: {'refresh' : true}});
+        RNRestart.Restart();
     }
 
     static async onLoginFalse (data){
