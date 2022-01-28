@@ -426,7 +426,7 @@ const Tab = createBottomTabNavigator();
 function OfflineTab() {
     return (
         <Tab.Navigator
-            style={{height: 120, paddingVertical: 20 , backgroundColor : 'red'}}
+            style={{height: Style.HEADER_HEIGHT, paddingVertical: 20 , backgroundColor : 'red'}}
 
             // tabBar={(props) => <MyTabBar {...props} item={null} />}
             initialRouteName={'Design'}
@@ -436,7 +436,7 @@ function OfflineTab() {
                 labelStyle: {
                     fontSize: Style.NORMAL_SIZE,
                 },
-                style: {height: 50},
+                style: {height: Style.BOTTOM_HEIGHT},
                 tabStyle: {
                     paddingVertical: 5,
                     paddingTop :8,
@@ -497,7 +497,7 @@ function IntroTab() {
                 labelStyle: {
                     fontSize: Style.NORMAL_SIZE,
                 },
-                style: {height: 50},
+                style: {height: Style.BOTTOM_HEIGHT},
                 tabStyle: {
                     paddingVertical: 5,
                     paddingTop :8,

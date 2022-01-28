@@ -11,6 +11,10 @@ export default class Def {
     static LIFE_STYLE_BASE = "https://lifestylevietnamonline.com";
     static LIFE_STYLE_BASE_ASSET = "https://arenaadmin.house3d.com/data/acceptanceData/";
     static ARENA_BASE = "https://arena.house3d.com";
+
+    // static ARENA_BASE = "https://bangiao.thearena.vn";
+    // static LIFE_STYLE_BASE_ASSET = "https://admbangiao.thearena.vn/data/acceptanceData/";
+
     static PARTNER_ACTIVE_STATUS = 1;
 
     static DEFAULT_MAX_SIZE = 1024;
