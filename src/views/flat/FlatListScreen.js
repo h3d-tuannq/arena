@@ -253,6 +253,10 @@ class FlatListScreen extends React.Component {
                     console.log('Case -4');
                     rs = item.online_handover == 1;
                     break;
+                case -5 : // Filter các căn được đánh dấu là hoàn thành xây
+                    console.log('Case -4');
+                    rs = item.is_built == 1;
+                    break;
 
                 default :
                     rs = item.status == this.criteria.status['id'];

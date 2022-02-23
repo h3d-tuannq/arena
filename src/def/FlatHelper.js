@@ -70,7 +70,8 @@ export default class FlatHelper {
 
     static FlatSTatusList = {0: "Chưa kích hoạt", 1: "Hoạt động", 2: "Hoàn thành nghĩa vụ tài chính", 3: "Đủ điều kiện bàn giao", 4: "Đang bàn giao", 5:"Đã ký nhận bàn giao" , 6:"Sữa chữa sau bàn giao", 8:"Đã hoàn thiện hồ sơ", 7:"Đã hoàn thành"};
     static FlatStatusData = [
-            {'id': -4 , 'name' :"Hoàn thành xây dựng"},
+            {'id': -5 , 'name' :"Hoàn thành xây dựng"},
+            {'id': -4 , 'name' :"Bàn giao Online"},
             {'id': -2 , 'name': "Từ chối bàn giao"},
             {'id': -3 , 'name' :"Bàn giao vắng mặt"},
             {'id': 2 , 'name': "Hoàn thành nghĩa vụ tài chính"},
@@ -123,7 +124,7 @@ export default class FlatHelper {
 
     static getPriorityRole(user){
         let permission = false;
-        if(user){
+        if(user && user.listRoleName){
             let userPermission = user.listRoleName.split();
             FlatHelper.PriorityRoles.forEach(element => {
                 if(userPermission.indexOf(element) != -1){
